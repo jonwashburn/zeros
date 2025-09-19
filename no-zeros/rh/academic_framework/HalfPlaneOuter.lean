@@ -164,7 +164,7 @@ lemma poissonKernel_nonneg {z : ℂ} (hz : (1/2 : ℝ) < z.re) (t : ℝ) :
 
 -- Boundary nonnegativity predicate for `F` on `Re = 1/2`.
 def PPlus (F : ℂ → ℂ) : Prop :=
-  (∀ᵐ t : ℝ, 0 ≤ (F (Complex.mk (1/2) t)).re)
+  (∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re)
 
 lemma P_nonneg_of_ae_nonneg
     {u : ℝ → ℝ}
@@ -200,11 +200,7 @@ theorem HasHalfPlanePoissonTransport
     PPlus F → ∀ ⦃z : ℂ⦄, z ∈ Ω → 0 ≤ (F z).re := by
   intro hBoundary z hz
   -- Convert boundary a.e. nonnegativity to the `boundary` parametrization
-  have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := by
-    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F (Complex.mk (1/2) t)).re := hBoundary
-    exact h0.mono (by
-      intro t ht
-      simpa [boundary_mk_eq] using ht)
+  have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := hBoundary
   have hpos :=
     P_nonneg_of_ae_nonneg
       (u := fun t : ℝ => (F (boundary t)).re)
@@ -297,10 +293,7 @@ theorem HasHalfPlanePoissonTransport_on
     PPlus F → ∀ z ∈ S, 0 ≤ (F z).re := by
   intro hBoundary z hzS
   -- convert boundary a.e. nonnegativity to boundary parametrization
-  have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := by
-    -- equality of boundary parametrizations is definitional
-    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F (Complex.mk (1/2) t)).re := hBoundary
-    exact h0.mono (by intro t ht; simpa [boundary_mk_eq] using ht)
+  have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := hBoundary
   -- positivity of the Poisson operator applied to nonnegative boundary data
   have hzΩ : z ∈ Ω := hRep.subset_Ω hzS
   have hker : 0 ≤ᵐ[volume] fun t : ℝ => poissonKernel z t := by
@@ -435,32 +428,35 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
   set a : ℝ := z.re - (1/2 : ℝ)
   set b : ℝ := z.im
   have ha : 0 < a := sub_pos.mpr hz
-  have hrewrite :
-      (fun t : ℝ => poissonKernel z t)
-        = (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) := by
-    funext t
-    have : (z.re - (1/2 : ℝ)) = a := rfl
-    have : z.im = b := rfl
-    simp [poissonKernel, this, a, b, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc,
-          add_comm, add_left_comm, add_assoc, pow_two]
   -- `t ↦ 1/(1 + ((t - b)/a)^2)` is integrable (affine change of variables)
   have hBase : Integrable (fun u : ℝ => 1 / (1 + u^2)) := by
     -- current mathlib lemma name
     simpa [one_div] using integrable_inv_one_add_sq
   have hScaled : Integrable (fun t : ℝ => 1 / (1 + ((t - b) / a)^2)) := by
-    -- Integrability is preserved by translation; scaling by nonzero preserves integrability
-    have htrans := hBase.comp_sub_right b
+    -- Start from the integrable prototype u ↦ 1/(1+u^2)
     have ha_ne : a ≠ 0 := ne_of_gt ha
-    have hscale := hBase.comp_mul_right' (hR := (1 / a)) (by
-      -- 1/a ≠ 0
-      exact inv_ne_zero ha_ne)
-    -- Combine translation and scaling in any order (both preserve Integrable)
-    -- Use translation result then rewrite to the target form
-    simpa [sub_eq_add_neg, one_div, div_eq_mul_inv, pow_two] using htrans
-  -- Multiply by the constant `(1 / (π a))`
+    -- Scale by a ≠ 0 via t ↦ t / a, then translate by b
+    have hscale : Integrable (fun t : ℝ => 1 / (1 + (t / a)^2)) := by
+      -- use comp_div helper from mathlib
+      have := hBase.comp_div (by exact ha_ne)
+      simpa [div_eq_mul_inv, pow_two] using this
+    -- translate
+    simpa [sub_eq_add_neg, pow_two] using hscale.comp_sub_right b
+  -- Multiply by the constant `(1 / (π a))` and convert back to the kernel form
   have hConst : Integrable (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) :=
     hScaled.const_mul _
-  simpa [hrewrite] using hConst
+  -- Finally, rewrite to the original kernel definition (lightweight algebra)
+  have h_eq : (fun t : ℝ => poissonKernel z t)
+      = (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) := by
+    funext t
+    have ha_ne : (a : ℝ) ≠ 0 := ne_of_gt ha
+    -- algebraic identity: a/(a^2+(t-b)^2) = (1/a) * 1/(1+((t-b)/a)^2)
+    have : (1 / Real.pi) * (a / (a^2 + (t - b)^2))
+        = (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2)) := by
+      field_simp [mul_comm, mul_left_comm, mul_assoc, pow_two, div_eq_mul_inv] at *
+    simpa [poissonKernel, a, b]
+  simpa [h_eq]
+    using hConst
 
 /-- Simple sufficient condition: if the boundary real trace is globally bounded
 by `M`, then the boundary Poisson integrand is integrable for any interior
@@ -471,25 +467,16 @@ lemma integrable_boundary_kernel_of_bounded
   (hBnd : ∀ t : ℝ, |(F (boundary t)).re| ≤ M) :
   Integrable (fun t : ℝ => (F (boundary t)).re * poissonKernel z t) := by
   classical
-  -- Use kernel integrability and domination by the constant bound M
+  -- Use kernel integrability and bounded multiplier
   have hker : Integrable (fun t : ℝ => poissonKernel z t) := poissonKernel_integrable hz
-  -- Domination: |(F(boundary t)).re * P(z,t)| ≤ M * P(z,t)
-  have hDom : (fun t : ℝ => |(F (boundary t)).re * poissonKernel z t|)
-      ≤ᵐ[volume] (fun t : ℝ => M * poissonKernel z t) := by
-    refine (Filter.eventually_of_forall ?_)
-    intro t; have := hBnd t
-    have hnonneg : 0 ≤ poissonKernel z t := by
-      exact poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using hz) t
-    have : |(F (boundary t)).re * poissonKernel z t|
-        = |(F (boundary t)).re| * poissonKernel z t := by
-      simpa [abs_mul, abs_of_nonneg hnonneg]
-    simpa [this, mul_comm, mul_left_comm, mul_assoc] using
-      (mul_le_mul_of_nonneg_right (hBnd t) hnonneg)
-  -- Conclude by dominated convergence (bounded by an integrable majorant)
-  have hMaj : Integrable (fun t : ℝ => M * poissonKernel z t) :=
-    hker.const_mul _
-  exact Integrable.of_dominated (fun t => (F (boundary t)).re * poissonKernel z t)
-    (fun t => M * poissonKernel z t) hMaj hDom
+  have hf_meas : AEStronglyMeasurable (fun t : ℝ => (F (boundary t)).re) :=
+    (aestronglyMeasurable_const.mul
+      (measurable_id'.aestronglyMeasurable)).re
+  have hf_bound : ∀ᵐ t : ℝ, ‖(F (boundary t)).re‖ ≤ M :=
+    Filter.Eventually.of_forall (by intro t; simpa using hBnd t)
+  -- Apply bounded-multiplier integrability
+  simpa [Real.norm_eq_abs, mul_comm, mul_left_comm, mul_assoc]
+    using hker.bdd_mul' hf_meas hf_bound
 
 /-- Specialized integrability for the pinch field at boundary with `M = 2`.
 Given outer existence `hOuterExist`, any fixed interior point `z` with
@@ -508,29 +495,26 @@ lemma integrable_boundary_kernel_of_bounded'
   let O : ℂ → ℂ := RH.RS.OuterHalfPlane.choose_outer hOuterExist
   have hBME : RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s / riemannXi_ext s) :=
     (RH.RS.OuterHalfPlane.choose_outer_spec hOuterExist).2
-  -- Uniform boundary bound |Re F| ≤ 2
+  -- Uniform boundary bound |Re F| ≤ 2, expressed using RS.boundary then transferred
   have hBnd2 : ∀ t : ℝ,
       |(F_pinch RH.RS.det2 O (boundary t)).re| ≤ (2 : ℝ) := by
     intro t
-    -- Case split on boundary nonvanishing; if denom vanishes, the expression reduces to 0
-    by_cases hO : O (boundary t) = 0
-    · by_cases hXi : riemannXi_ext (boundary t) = 0
-      · -- F_pinch(boundary t) = 0 ⇒ bound holds
-        have : (F_pinch RH.RS.det2 O (boundary t)) = 0 := by
-          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-        simpa [this] using (abs_nonneg ((F_pinch RH.RS.det2 O (boundary t)).re)).le.trans (by norm_num)
-      · -- O=0, ξ≠0 still gives bound via direct inequality |Re w| ≤ 2|J|
-        -- Use general inequality through the previously proved boundary lemma when possible
-        have h := RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO]) (by exact hXi)
-        simpa using h
-    · by_cases hXi : riemannXi_ext (boundary t) = 0
-      · -- ξ=0 (O≠0): same as above, F_pinch(boundary t) = 0 under field convention
-        have : (F_pinch RH.RS.det2 O (boundary t)) = 0 := by
-          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-        simpa [this] using (abs_nonneg ((F_pinch RH.RS.det2 O (boundary t)).re)).le.trans (by norm_num)
-      · -- Nonvanishing case: apply the RS boundary bound lemma
-        have h := RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
-        simpa using h
+    -- Convert to the RS.boundary version used by the lemma, then transport back by `simp`.
+    have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
+      by_cases hO : O (RH.RS.boundary t) = 0
+      · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+            simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+          simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+        · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO]) (by exact hXi)
+      · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+            simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+          simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+        · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
+    -- Now rewrite RS.boundary to local `boundary`
+    simpa [boundary, RH.RS.boundary]
+      using hRS
   -- Apply the general integrability lemma with M = 2
   exact integrable_boundary_kernel_of_bounded
     (F := F_pinch RH.RS.det2 O) (z := z) (M := 2) hz hBnd2

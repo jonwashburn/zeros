@@ -105,11 +105,15 @@ lemma psi_integral_one : ∫ t, psi t ∂(volume) = 1 := by
 /-- The Poisson smoothing of ψ at height b and horizontal coordinate x. -/
 @[simp] def poissonSmooth (b x : ℝ) : ℝ := ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t)
 
-@[simp] def c0_plateau : ℝ := 1 / (4 * Real.pi)
+@[simp] def c0_plateau : ℝ := 4⁻¹ * Real.pi⁻¹
 
 lemma c0_plateau_pos : 0 < c0_plateau := by
-  have : 0 < 4 * Real.pi := mul_pos (by norm_num) Real.pi_pos
-  simpa [c0_plateau, one_div] using inv_pos.mpr this
+  have h4 : 0 < (4 : ℝ) := by norm_num
+  have hπ : 0 < Real.pi := Real.pi_pos
+  have h4inv : 0 < (4 : ℝ)⁻¹ := inv_pos.mpr h4
+  have hπinv : 0 < Real.pi⁻¹ := inv_pos.mpr hπ
+  have : 0 < (4 : ℝ)⁻¹ * Real.pi⁻¹ := mul_pos h4inv hπinv
+  simpa [c0_plateau] using this
 
 /-- Uniform plateau lower bound: (P_b * ψ)(x) ≥ 1/(4π) for 0 < b ≤ 1, |x| ≤ 1. -/
 theorem poisson_plateau_lower_bound
@@ -294,39 +298,47 @@ theorem poisson_plateau_lower_bound
       simpa [hfun, integral_indicator, hmeasJ] using h1
     -- Reorder factors to match the statement
     simpa [mul_comm, mul_left_comm, mul_assoc] using h2
-  -- Integral over S ≥ integral over J, then rewrite |J| = 2b
-  have base : ∫ t in S, poissonKernel b (x - t) ≥ (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) := by
+  -- Integral over S ≥ integral over J; rewrite |J| = 2b and compute constants to get π⁻¹ ≤ ∫_S ...
+  have base2 : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := by
     have hge := ge_trans int_mono constJ
-    simpa [measJ_toReal, mul_comm, mul_left_comm, mul_assoc] using hge
-  -- Multiply by (1/4) via ψ definition to finish
-  have : (1 / (4 : ℝ)) * (∫ t in S, poissonKernel b (x - t)) ≥ (1 / (4 : ℝ)) * (1 / Real.pi) := by
-    have : (1 / (4 : ℝ)) * (∫ t in S, poissonKernel b (x - t))
-            ≥ (1 / (4 : ℝ)) * ((b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)) :=
-      mul_le_mul_of_nonneg_left base (by norm_num)
-    -- (1/4) · (b⁻¹ · (π⁻¹·2⁻¹) · (2b)) = (1/4) · π⁻¹
-    have hbne : (b : ℝ) ≠ 0 := by exact ne_of_gt hb
+    have hbne : (b : ℝ) ≠ 0 := ne_of_gt hb
     have hcollapse : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) = Real.pi⁻¹ := by
       have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
       calc
         (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
-            = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by
-                  ring
+            = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by ring
         _ = (Real.pi⁻¹ * 2⁻¹) * 2 := by simpa [this]
         _ = Real.pi⁻¹ := by simp [one_div]
-    simpa [hcollapse]
-      using this
-  -- Small commutativity fact for constants
-  have hcomm : Real.pi⁻¹ * 4⁻¹ = 4⁻¹ * Real.pi⁻¹ := by
-    have : (1 / Real.pi) * (1 / 4 : ℝ) = (1 / 4 : ℝ) * (1 / Real.pi) := by
-      simpa [one_div, mul_comm]
-    simpa [one_div] using this
-  -- Rewrite to poissonSmooth and c0
+    -- move from ≥ to ≤ by commuting sides
+    have : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) ≤ ∫ t in S, poissonKernel b (x - t) := by
+      simpa [measJ_toReal, mul_comm, mul_left_comm, mul_assoc] using hge
+    simpa [hcollapse] using this
+  -- Since 0 ≤ π⁻¹ and (1/4) ≤ 1, we have (1/4)·π⁻¹ ≤ π⁻¹ ≤ ∫_S ...
+  have hπ_nonneg : 0 ≤ (1 / Real.pi) := by
+    have : 0 ≤ Real.pi := (le_of_lt Real.pi_pos)
+    simpa [one_div] using inv_nonneg.mpr this
+  have hshrink : (1 / (4 : ℝ)) * (1 / Real.pi) ≤ (1 / Real.pi) := by
+    have hle : (1 / (4 : ℝ)) ≤ (1 : ℝ) := by norm_num
+    exact mul_le_of_le_one_left hπ_nonneg hle
+  -- also useful: rewrite b*(b⁻¹*π⁻¹) into π⁻¹ explicitly (for later simpa's)
+  have hbne : (b : ℝ) ≠ 0 := ne_of_gt hb
+  have hbbinv : b * b⁻¹ = (1 : ℝ) := by field_simp [hbne]
+  have hcollapse2 : b * (b⁻¹ * Real.pi⁻¹) = Real.pi⁻¹ := by
+    calc
+      b * (b⁻¹ * Real.pi⁻¹)
+          = (b * b⁻¹) * Real.pi⁻¹ := by ring
+      _ = Real.pi⁻¹ := by simpa [hbbinv]
+  -- strengthen base2 into the expected b-form when needed
+  have base_b_form : b * (b⁻¹ * Real.pi⁻¹) ≤ ∫ t in S, poissonKernel b (x - t) := by
+    have : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := base2
+    simpa [hcollapse2]
+  have : (1 / (4 : ℝ)) * (1 / Real.pi) ≤ ∫ t in S, poissonKernel b (x - t) := by
+    exact le_trans (by simpa [mul_comm, mul_left_comm, mul_assoc] using hshrink) base2
+  -- Rewrite to `poissonSmooth` and `c0_plateau`
   have conv_eq : poissonSmooth b x = ∫ t in S, poissonKernel b (x - t) := rfl
-  have c0_eq : c0_plateau = (1 / (4 : ℝ)) * (1 / Real.pi) := by simp [c0_plateau, one_div]
-  -- Compare with ψ convolution: (P_b * ψ)(x) = (1/4) * ∫_{-2}^2 P_b(x - t) dt
-  -- We present the bound directly in terms of `poissonSmooth` and `c0_plateau`.
-  -- Final rearrangement
-  simpa [conv_eq, c0_eq, one_div, mul_comm, mul_left_comm, mul_assoc, hcomm] using this
+  have c0_eq : c0_plateau = (1 / (4 : ℝ)) * (1 / Real.pi) := by
+    simp [c0_plateau, one_div, mul_comm, mul_left_comm, mul_assoc]
+  simpa [conv_eq, c0_eq, one_div] using this
 
 /-!
 Existence form consumed by the wedge assembly: pick ψ, prove the basic
@@ -373,13 +385,16 @@ lemma poisson_plateau_c0 :
         simpa [mul_comm, mul_left_comm, mul_assoc] using this.const_mul (1/4 : ℝ)
       have hset : ∫ t, (Icc (-2 : ℝ) 2).indicator (fun t => (1/4 : ℝ) * poissonKernel b (x - t)) t ∂(volume)
                     = ∫ t in Icc (-2 : ℝ) 2, (1/4 : ℝ) * poissonKernel b (x - t) ∂(volume) := by
-        simpa [integral_indicator, isClosed_Icc.measurableSet]
-          using hInt_on'
+        have hmeas : MeasurableSet (Icc (-2 : ℝ) 2) := isClosed_Icc.measurableSet
+        simpa [integral_indicator, hmeas] using hInt_on'
       -- pull out the constant from the set integral
       have hlin : (∫ t in Icc (-2 : ℝ) 2, (1/4 : ℝ) * poissonKernel b (x - t) ∂(volume))
                     = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
-        simp [mul_comm, mul_left_comm, mul_assoc]
-      simpa [hlin] using hset
+        have hconst : (∫ t in Icc (-2 : ℝ) 2, (1/4 : ℝ) * poissonKernel b (x - t) ∂(volume))
+                        = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
+          simp [mul_comm, mul_left_comm, mul_assoc]
+        simpa using hconst
+      simpa [hlin, one_div] using hset
     have conv_eq : (∫ t, poissonKernel b (x - t) * psi t ∂(volume))
                     = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
       have hpt' : (fun t => poissonKernel b (x - t) * psi t)
