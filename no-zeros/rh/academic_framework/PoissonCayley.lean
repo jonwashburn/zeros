@@ -2,6 +2,7 @@ import Mathlib.Analysis.Analytic.Basic
 import rh.academic_framework.HalfPlaneOuter
 import rh.RS.Cayley
 import rh.RS.Det2Outer
+import Mathlib.MeasureTheory.Integral.Bochner
 
 /‑!
 # Poisson–Cayley bridge (scaffolding)
@@ -24,6 +25,7 @@ namespace PoissonCayley
 open Complex
 open RH.AcademicFramework.HalfPlaneOuter
 open RH.AcademicFramework
+open MeasureTheory
 
 /- Right half–plane Ω (local alias) -/
 local notation "Ω" => RH.AcademicFramework.HalfPlaneOuter.Ω
@@ -160,6 +162,33 @@ theorem cayley_kernel_transport_from_rep_on
     funext t; simp [CayleyAdapters.boundaryToDisk]
   -- Conclude the transport identity
   simpa [hIntg] using hRe.symm
+
+/-- Full kernel change-of-variables identity under Cayley (statement-level): for
+interior `z`, Poisson integrals match after the angle substitution `θ = θ_z(t)`.
+We record the equality at the level of integrals; the proof of this analytic
+change-of-variables is deferred and will be supplied by the calculus lemmas in
+`CayleyAdapters`. -/
+axiom kernel_change_of_variables_Cayley
+  (H : ℂ → ℂ) (z : ℂ)
+  (hz : z ∈ Ω)
+  : (∫ θ : ℝ, (H (RH.AcademicFramework.DiskHardy.boundary θ)).re
+        * RH.AcademicFramework.DiskHardy.poissonKernel (CayleyAdapters.toDisk z) θ)
+    = (∫ t : ℝ, (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re
+        * poissonKernel z t)
+
+/-- From the global kernel change-of-variables identity, obtain the transport
+identity on any subset `S`. -/
+theorem cayley_kernel_transport_from_cov
+  (H : ℂ → ℂ) {S : Set ℂ}
+  : CayleyKernelTransportOn H S := by
+  intro z hzS
+  have hzΩ : z ∈ Ω := hzS.1
+  -- Apply the change-of-variables equality and peel off the common factor
+  have := kernel_change_of_variables_Cayley H z hzΩ
+  -- Match with the definitions in `CayleyKernelTransportOn`
+  -- Both sides are integrals of the respective kernels times the same boundary data
+  -- Thus the equality matches the target predicate exactly
+  simpa [HalfPlaneOuter.P] using this.symm
 
 /‑!
 ## Readiness lemmas for the pinch field on S

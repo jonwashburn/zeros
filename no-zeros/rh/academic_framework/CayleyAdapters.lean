@@ -1,4 +1,5 @@
 import rh.academic_framework.DiskHardy
+import Mathlib.Analysis.Calculus.Deriv
 import rh.academic_framework.HalfPlaneOuter
 
 namespace RH
@@ -6,6 +7,7 @@ namespace AcademicFramework
 namespace CayleyAdapters
 
 open Complex RH.AcademicFramework
+open scoped Real
 
 /-- Cayley map from the right half-plane Ω = {Re s > 1/2} to the unit disk. -/
 @[simp] def toDisk (s : ℂ) : ℂ := (s - (1 : ℂ)) / s
@@ -68,6 +70,88 @@ lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1
         simpa
       simpa using Real.sqrt_pos.mpr this
     exact ne_of_gt this))
+
+/-!
+## Change-of-variables helpers for Cayley
+
+We record algebraic identities used in the half‑plane↔disk Poisson kernel
+change‑of‑variables calculation.
+-/
+
+open Complex
+
+/-- Closed form for `boundaryToDisk t` as a rational expression in `t`. -/
+lemma boundaryToDisk_closed_form (t : ℝ) :
+  boundaryToDisk t =
+    ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)) / ((t : ℂ)^2 + (1/4 : ℂ)) := by
+  -- boundaryToDisk t = toDisk (1/2 + i t) = ((-1/2 + i t) / (1/2 + i t))
+  simp [boundaryToDisk, toDisk, HalfPlaneOuter.boundary,
+        sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
+        mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
+  -- rewrite (a+bi) algebraically into the rational form
+  ring
+
+/-- Absolute value of `toDisk z` as the ratio `|z−1|/|z|` (valid for `z ≠ 0`). -/
+lemma abs_toDisk (z : ℂ) (hz : z ≠ 0) :
+  Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
+  simp [toDisk, Complex.abs_div, hz]
+
+/-- `1 - ‖toDisk z‖^2` in terms of `z` (valid for `z ≠ 0`). -/
+lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
+  1 - (Complex.abs (toDisk z))^2 =
+    ((2 : ℝ) * z.re - 1) / (Complex.abs z)^2 := by
+  have h : Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z :=
+    abs_toDisk z hz
+  -- 1 - (|z-1|/|z|)^2 = (|z|^2 - |z-1|^2) / |z|^2
+  have : 1 - (Complex.abs (z - 1) / Complex.abs z)^2
+        = ((Complex.abs z)^2 - (Complex.abs (z - 1))^2) / (Complex.abs z)^2 := by
+    field_simp [pow_two, mul_comm, mul_left_comm, mul_assoc]
+  -- |z|^2 - |z-1|^2 = 2 Re z - 1
+  have hdiff : (Complex.abs z)^2 - (Complex.abs (z - 1))^2
+      = (2 : ℝ) * z.re - 1 := by
+    -- Expand |z-1|^2 = |z|^2 - 2 Re z + 1
+    have hsq : (Complex.abs (z - 1))^2 = (Complex.abs z)^2 - 2 * z.re + 1 := by
+      simpa using Complex.abs.sub_sq z (1 : ℂ)
+    linear_combination hsq
+  simpa [h, this, hdiff]
+
+/-- Real parameters `a(z) = Re z − 1/2` and `b(z) = Im z` for change-of-variables. -/
+def a (z : ℂ) : ℝ := z.re - (1/2 : ℝ)
+def b (z : ℂ) : ℝ := z.im
+
+lemma a_pos_of_mem_Ω {z : ℂ} (hz : z ∈ HalfPlaneOuter.Ω) : 0 < a z := by
+  simpa [a, HalfPlaneOuter.Ω, Set.mem_setOf_eq] using (hz : (1/2 : ℝ) < z.re)
+
+/-- Angle map for a fixed interior point `z`: θ_z(t) := 2 · arctan((t − b)/a). -/
+def theta_of (z : ℂ) (t : ℝ) : ℝ := 2 * Real.arctan ((t - b z) / (a z))
+
+/-- Derivative of the angle map: dθ/dt = 2a / ((t − b)^2 + a^2). -/
+lemma hasDerivAt_theta_of {z : ℂ} (hz : z ∈ HalfPlaneOuter.Ω) (t : ℝ) :
+  HasDerivAt (fun t => theta_of z t)
+    (2 * (a z) / ((t - b z)^2 + (a z)^2)) t := by
+  -- θ(t) = 2 * arctan(u(t)), u(t) = (t - b)/a
+  have ha_ne : (a z) ≠ 0 := ne_of_gt (a_pos_of_mem_Ω hz)
+  -- derivative of u(t) = (t - b)/a is 1/a
+  have hDu : HasDerivAt (fun t => (t - b z) / (a z)) ((1 : ℝ) / (a z)) t := by
+    simpa [one_div, a, b] using (HasDerivAt.const_sub t (b z)).div_const (a z)
+  -- derivative of arctan is 1 / (1 + u^2)
+  have hDatan : HasDerivAt (fun u => Real.arctan u)
+      (1 / (1 + ((t - b z) / (a z))^2)) ((t - b z) / (a z)) :=
+    Real.hasDerivAt_arctan _
+  -- chain rule and scale by 2
+  have hChain : HasDerivAt (fun t => Real.arctan ((t - b z) / (a z)))
+      (((1 : ℝ) / (a z)) * (1 / (1 + ((t - b z) / (a z))^2))) t :=
+    hDatan.comp t hDu
+  have hSimpl : ((1 : ℝ) / (a z)) * (1 / (1 + ((t - b z) / (a z))^2))
+      = (a z) / ((t - b z)^2 + (a z)^2) := by
+    -- (1/a) * 1 / (1 + ((t-b)/a)^2) = a / ((t-b)^2 + a^2)
+    field_simp [pow_two, mul_comm, mul_left_comm, mul_assoc, ha_ne]
+  have hDer : HasDerivAt (fun t => Real.arctan ((t - b z) / (a z)))
+      ((a z) / ((t - b z)^2 + (a z)^2)) t := by
+    simpa [hSimpl]
+      using hChain
+  simpa [theta_of, two_mul] using hDer.const_mul (2 : ℝ)
+
 
 /-- Bridge (packaging form): Given the Cayley relation between `F` and a disk-side
 transform `Hdisk`, together with half-plane analyticity, boundary integrability,
