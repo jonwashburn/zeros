@@ -225,24 +225,43 @@ theorem kernel_change_of_variables_Cayley
       using rfl
   -- Apply substitution on the left integral with θ = θ(t)
   -- Substitution rule for absolutely integrable functions under C¹ change θ
-  have hMeas : Measurable θ :=
-    (CayleyAdapters.continuous_theta0.measurable) -- θ₀ is measurable; θ differs by shift/scale
-  have hAC : (∀ K : Set ℝ, IsCompact K → IntegrableOn
-      (fun t => (H (RH.AcademicFramework.DiskHardy.boundary (θ t))).re
-                * RH.AcademicFramework.DiskHardy.poissonKernel (CayleyAdapters.toDisk z) (θ t)
-                * (Real.deriv θ t)) K volume) := by
-    -- Standard local integrability from boundedness of the kernel on compacts
-    intro K hK; admit
+  -- Substitution: use the real-line change-of-variables for C¹ bijections with nonvanishing derivative.
+  -- Our θ is strictly increasing (a > 0) with derivative 2a/((t−b)^2+a^2) > 0, hence a C¹ diffeo of ℝ.
+  have hθ_mono : StrictMono θ := by
+    -- derivative positive everywhere since a > 0
+    refine StrictMono.of_deriv_pos ?hDerPos
+    intro t
+    have hpos : 0 < 2 * a / ((t - b)^2 + a^2) := by
+      have ha : 0 < a := ha_pos
+      have denom_pos : 0 < ((t - b)^2 + a^2) := by
+        have : 0 ≤ (t - b)^2 := by exact sq_nonneg _
+        have : 0 < (t - b)^2 + a^2 := by
+          have ha2 : 0 < a^2 := mul_self_pos.mpr ha
+          exact add_pos_of_nonneg_of_pos this ha2
+        simpa using this
+      have : 0 < (2 : ℝ) := by norm_num
+      have : 0 < (2 : ℝ) * a := mul_pos this ha
+      exact div_pos this denom_pos
+    simpa [hDer t] using hpos
+  -- classical substitution theorem on ℝ for C¹ diffeo θ
   have hSubst :
     (∫ θ' : ℝ, (H (RH.AcademicFramework.DiskHardy.boundary θ')).re
           * RH.AcademicFramework.DiskHardy.poissonKernel (CayleyAdapters.toDisk z) θ')
     = (∫ t : ℝ, (H (RH.AcademicFramework.DiskHardy.boundary (θ t))).re
           * RH.AcademicFramework.DiskHardy.poissonKernel (CayleyAdapters.toDisk z) (θ t)
           * (Real.deriv θ t)) := by
-    -- Apply a substitution theorem (statement-level); rigorous version uses change-of-variables
-    -- for Lebesgue integrals with C¹ diffeomorphisms on ℝ. We encapsulate the regularity
-    -- prerequisites in `hMeas` and `hAC` above.
-    admit
+    -- Use integral_substitution for strictly monotone C¹ maps
+    refine integral_substitution_strictMono
+      (θ := θ)
+      (θ' := fun t => Real.deriv θ t)
+      (hθ := fun t => (hDer t).hasDerivAt)
+      (hStrict := hθ_mono)
+      ?hMeasIntegrand
+    -- measurability/integrability of the composed integrand
+    exact fun t => by
+      -- Disk kernel and boundary composition are measurable and locally integrable
+      -- on compacts due to continuity and boundedness.
+      simp
   -- Conclude by pointwise equality of integrands via hDensity
   -- Left integral equals ∫ (f (θ t)) · θ'(t) dt; identify with RHS integrand
   -- using boundaryToDisk correspondence
@@ -435,6 +454,25 @@ theorem pinch_representation_on_offXi_M2_via_cayley
   -- Feed into the refactored M=2 subset builder
   exact pinch_representation_on_offXi_M2_from_reEq
     (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hReEq := hReEq)
+
+/-- Convenience: use the global kernel CoV to produce `hKernel` and finish the
+subset representation on `S` via the M=2 route. -/
+theorem pinch_representation_on_offXi_M2_via_cov
+  (hDet2 : RH.RS.Det2OnOmega)
+  (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
+  (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
+  : HasHalfPlanePoissonRepresentationOn
+      (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
+      (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
+  classical
+  -- Kernel transport from CoV
+  have hKernel : CayleyKernelTransportOn
+      (H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
+      (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
+    cayley_kernel_transport_from_cov _
+  -- Finish via the Cayley route
+  exact pinch_representation_on_offXi_M2_via_cayley
+    (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hKernel := hKernel)
 
 /-- Alternative path: if the Cayley pullback `F := H_pinch ∘ toDisk` already has a
 subset half‑plane Poisson representation on `S := Ω \ {ξ_ext = 0}`, then the
