@@ -410,34 +410,195 @@ lemma poisson_plateau_c0 :
         (hcont.intervalIntegrable (μ := volume) (-2 : ℝ) 2)
       have hle : (-2 : ℝ) ≤ 2 := by norm_num
       simpa [intervalIntegrable_iff_integrableOn_Icc_of_le hle] using hInt
-    have hindEq : ∫ t, (Icc (-2 : ℝ) 2).indicator (fun t => (1/4 : ℝ) * poissonKernel b (x - t)) t ∂(volume)
-                    = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
-      have := integral_indicator_const_mul_Icc (1/4 : ℝ) (fun t => poissonKernel b (x - t)) hInt_on
-      simpa [one_div] using this
+    -- Convert convolution to a set integral and pull out 1/4
+    have hindEq : ∫ t, (Icc (-2 : ℝ) 2).indicator (fun t => (4⁻¹ : ℝ) * poissonKernel b (x - t)) t ∂(volume)
+                    = (4⁻¹ : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
+      have := integral_indicator_const_mul_Icc (4⁻¹ : ℝ) (fun t => poissonKernel b (x - t)) hInt_on
+      simpa using this
     -- same equality but expressed with "kernel times constant-indicator" on the left
     have hindEq_expected :
-        ∫ t, poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (1/4 : ℝ)) t ∂(volume)
-          = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
+        ∫ t, poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (4⁻¹ : ℝ)) t ∂(volume)
+          = (4⁻¹ : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
       have hptfun :
-          (fun t => poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (1/4 : ℝ)) t)
-            = (Icc (-2 : ℝ) 2).indicator (fun t => (1/4 : ℝ) * poissonKernel b (x - t)) := by
+          (fun t => poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (4⁻¹ : ℝ)) t)
+            = (Icc (-2 : ℝ) 2).indicator (fun t => (4⁻¹ : ℝ) * poissonKernel b (x - t)) := by
         funext t
         by_cases ht : t ∈ Icc (-2 : ℝ) 2
         · simp [Set.indicator_of_mem ht, mul_comm, mul_left_comm, mul_assoc]
         · simp [Set.indicator_of_not_mem ht]
       simpa [hptfun] using hindEq
     have conv_eq : (∫ t, poissonKernel b (x - t) * psi t ∂(volume))
-                    = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
+                    = (4⁻¹ : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := by
       -- Express via the "kernel times constant-indicator" form
       have hpt' : (fun t => poissonKernel b (x - t) * psi t)
-                = (fun t => poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (1/4 : ℝ)) t) := by
+                = (fun t => poissonKernel b (x - t) * (Icc (-2 : ℝ) 2).indicator (fun _ => (4⁻¹ : ℝ)) t) := by
         funext t; by_cases ht : t ∈ Icc (-2 : ℝ) 2
         · simp [psi, Set.indicator_of_mem ht, mul_comm, mul_left_comm, mul_assoc]
         · simp [psi, Set.indicator_of_not_mem ht]
       simpa [hpt'] using hindEq_expected
-    -- apply the set bound proved above
-    have base := poisson_plateau_lower_bound (b := b) (x := x) hb hb1 hx
-    simpa [c0_plateau, conv_eq, one_div, mul_comm, mul_left_comm, mul_assoc] using base
+    -- Prove the stronger set integral bound π⁻¹ ≤ ∫_I kernel, then scale by 1/4
+    -- Set S := [-2,2] and J := [x-b, x+b] ⊆ S
+    set S : Set ℝ := Icc (-2 : ℝ) 2
+    have hb0 : 0 ≤ b := le_of_lt hb
+    have hxI : -1 ≤ x ∧ x ≤ 1 := abs_le.mp hx
+    have hJsubset : Icc (x - b) (x + b) ⊆ S := by
+      intro t ht; exact ⟨by linarith [hxI.1, hb1, ht.1], by linarith [hxI.2, hb1, ht.2]⟩
+    have hnonneg : ∀ t, 0 ≤ poissonKernel b (x - t) :=
+      fun t => poissonKernel_nonneg (b := b) (u := x - t) hb0
+    have int_mono : ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t)
+                      ≤ ∫ t in S, poissonKernel b (x - t) := by
+      have hpt : (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t))
+                    ≤ S.indicator (fun t => poissonKernel b (x - t)) := by
+        intro t; by_cases htJ : t ∈ Icc (x - b) (x + b)
+        · have htS : t ∈ S := hJsubset htJ
+          have : poissonKernel b (x - t) ≤ poissonKernel b (x - t) := le_rfl
+          simpa [Set.indicator_of_mem htS, Set.indicator_of_mem htJ]
+            using this
+        · by_cases htS : t ∈ S
+          · have : 0 ≤ poissonKernel b (x - t) := hnonneg t
+            simpa [Set.indicator_of_mem htS, Set.indicator_of_not_mem htJ] using this
+          · have : 0 ≤ 0 := le_rfl
+            simpa [Set.indicator_of_not_mem htS, Set.indicator_of_not_mem htJ] using this
+      have hS_meas : MeasurableSet S := isClosed_Icc.measurableSet
+      have hJ_meas : MeasurableSet (Icc (x - b) (x + b)) := isClosed_Icc.measurableSet
+      have hcont : Continuous fun t : ℝ => poissonKernel b (x - t) := by
+        have hden : Continuous fun t : ℝ => (x - t) ^ 2 + b ^ 2 :=
+          Continuous.add ((continuous_const.sub continuous_id).pow 2) continuous_const
+        have hpos : ∀ t, (x - t) ^ 2 + b ^ 2 ≠ 0 := by
+          intro t; have : 0 < b ^ 2 := sq_pos_iff.mpr (ne_of_gt hb)
+          exact ne_of_gt (add_pos_of_nonneg_of_pos (sq_nonneg _) this)
+        have hrec : Continuous fun t : ℝ => 1 / ((x - t) ^ 2 + b ^ 2) :=
+          continuous_const.div hden (by intro t; exact hpos t)
+        simpa [poissonKernel, one_div, div_eq_mul_inv, pow_two, mul_comm, mul_left_comm, mul_assoc]
+          using continuous_const.mul (continuous_const.mul hrec)
+      have hIntS : IntegrableOn (fun t : ℝ => poissonKernel b (x - t)) S volume := by
+        have hInt : IntervalIntegrable (fun t : ℝ => poissonKernel b (x - t)) volume (-2 : ℝ) 2 :=
+          (hcont.intervalIntegrable (μ := volume) (-2 : ℝ) 2)
+        have hle : (-2 : ℝ) ≤ 2 := by norm_num
+        simpa [intervalIntegrable_iff_integrableOn_Icc_of_le hle] using hInt
+      have hIntJ : IntegrableOn (fun t : ℝ => poissonKernel b (x - t)) (Icc (x - b) (x + b)) volume := by
+        have hInt : IntervalIntegrable (fun t : ℝ => poissonKernel b (x - t)) volume (x - b) (x + b) :=
+          (hcont.intervalIntegrable (μ := volume) (x - b) (x + b))
+        have hle : (x - b) ≤ (x + b) := by linarith [hb0]
+        simpa [intervalIntegrable_iff_integrableOn_Icc_of_le hle] using hInt
+      have hintJ : Integrable ((Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t))) := by
+        simpa [integrable_indicator_iff, hJ_meas] using hIntJ
+      have hintS : Integrable (S.indicator fun t => poissonKernel b (x - t)) := by
+        simpa [integrable_indicator_iff, hS_meas] using hIntS
+      have := integral_mono_ae (μ := volume) hintJ hintS (ae_of_all _ hpt)
+      simpa [integral_indicator, hS_meas, hJ_meas]
+        using this
+    -- Pointwise lower bound on J and integrate to get a constant times |J|
+    have kernel_lb : ∀ t ∈ Icc (x - b) (x + b), b⁻¹ * (Real.pi⁻¹ * 2⁻¹) ≤ poissonKernel b (x - t) := by
+      intro t ht
+      have hdist : |x - t| ≤ b := by
+        have h1 : -b ≤ t - x := by linarith [ht.1]
+        have h2 : t - x ≤ b := by linarith [ht.2]
+        have : |t - x| ≤ b := abs_le.mpr ⟨h1, h2⟩
+        simpa [abs_sub_comm] using this
+      have hbpos : 0 < b := hb
+      have hb2pos : 0 < b ^ 2 := sq_pos_iff.mpr (ne_of_gt hbpos)
+      have sq_le : (x - t) ^ 2 ≤ b ^ 2 := by
+        have habs : |x - t| ≤ |b| := by simpa [abs_of_nonneg hb0, abs_sub_comm] using hdist
+        simpa [pow_two] using (sq_le_sq.mpr habs)
+      have den_le : (x - t) ^ 2 + b ^ 2 ≤ 2 * b ^ 2 := by
+        have := add_le_add_right sq_le (b ^ 2); simpa [two_mul] using this
+      have den_pos : 0 < (x - t) ^ 2 + b ^ 2 := add_pos_of_nonneg_of_pos (sq_nonneg _) hb2pos
+      have inv_le : (1 : ℝ) / (2 * b ^ 2) ≤ (1 : ℝ) / ((x - t) ^ 2 + b ^ 2) :=
+        one_div_le_one_div_of_le den_pos den_le
+      have cnonneg : 0 ≤ (1 / Real.pi) * b :=
+        mul_nonneg (le_of_lt (one_div_pos.mpr Real.pi_pos)) hb0
+      have hstep := mul_le_mul_of_nonneg_left inv_le cnonneg
+      have hbne : (b : ℝ) ≠ 0 := ne_of_gt hbpos
+      have : b⁻¹ * (Real.pi⁻¹ * 2⁻¹)
+          ≤ (1 / Real.pi) * b * (1 / ((x - t) ^ 2 + b ^ 2)) := by
+        simpa [one_div, pow_two, hbne, mul_comm, mul_left_comm, mul_assoc] using hstep
+      simpa [poissonKernel, one_div, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        using this
+    have measJ_toReal : (volume (Icc (x - b) (x + b))).toReal = 2 * b := by
+      have hxblt : x - b ≤ x + b := by linarith [hb0]
+      calc
+        (volume (Icc (x - b) (x + b))).toReal
+            = (ENNReal.ofReal ((x + b) - (x - b))).toReal := by
+                simpa [Real.volume_Icc, hxblt, sub_eq_add_neg]
+        _ = ((x + b) - (x - b)) := by
+                have hnn : 0 ≤ ((x + b) - (x - b)) := by linarith [hb0]
+                simpa [ENNReal.toReal_ofReal, hnn]
+        _ = 2 * b := by ring
+    have constJ : (∫ t in Icc (x - b) (x + b), poissonKernel b (x - t))
+                    ≥ (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal := by
+      have hmeasJ : MeasurableSet (Icc (x - b) (x + b)) := isClosed_Icc.measurableSet
+      have hμJ : (volume (Icc (x - b) (x + b))) < ⊤ := by simp [Real.volume_Icc]
+      have hint_on : IntegrableOn (fun t : ℝ => poissonKernel b (x - t)) (Icc (x - b) (x + b)) volume := by
+        have hcont : Continuous fun t : ℝ => poissonKernel b (x - t) := by
+          have hden : Continuous fun t : ℝ => (x - t) ^ 2 + b ^ 2 :=
+            Continuous.add ((continuous_const.sub continuous_id).pow 2) continuous_const
+          have hpos : ∀ t, (x - t) ^ 2 + b ^ 2 ≠ 0 := by
+            intro t; have : 0 < b ^ 2 := sq_pos_iff.mpr (ne_of_gt hb)
+            exact ne_of_gt (add_pos_of_nonneg_of_pos (sq_nonneg _) this)
+          have hrec : Continuous fun t : ℝ => 1 / ((x - t) ^ 2 + b ^ 2) :=
+            continuous_const.div hden (by intro t; exact hpos t)
+          simpa [poissonKernel, one_div, div_eq_mul_inv, pow_two, mul_comm, mul_left_comm, mul_assoc]
+            using continuous_const.mul (continuous_const.mul hrec)
+        have hInt : IntervalIntegrable (fun t : ℝ => poissonKernel b (x - t)) volume (x - b) (x + b) :=
+          (by
+            have hc : Continuous fun t : ℝ => poissonKernel b (x - t) := by exact hcont
+            exact (hc.intervalIntegrable (μ := volume) (x - b) (x + b)))
+        have hle : (x - b) ≤ (x + b) := by linarith [hb0]
+        simpa [intervalIntegrable_iff_integrableOn_Icc_of_le hle] using hInt
+      have hint : Integrable ((Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t))) := by
+        simpa [integrable_indicator_iff, hmeasJ] using hint_on
+      have hint_c : Integrable ((Icc (x - b) (x + b)).indicator (fun _ => (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)))) := by
+        have : IntegrableOn (fun _ => (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))) (Icc (x - b) (x + b)) volume :=
+          (integrableOn_const.mpr (Or.inr (by simp [Real.volume_Icc])))
+        simpa [integrable_indicator_iff, hmeasJ] using this
+      have hpt : (Icc (x - b) (x + b)).indicator (fun _ => (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)))
+                  ≤ᵐ[volume]
+                  (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) := by
+        refine Filter.Eventually.of_forall (fun t => ?_)
+        by_cases ht : t ∈ Icc (x - b) (x + b)
+        · have hk := kernel_lb t ht
+          simpa [Set.indicator_of_mem ht] using hk
+        · simp [Set.indicator_of_not_mem ht]
+      have hineq := integral_mono_ae (μ := volume) hint_c hint hpt
+      have hmeasJ : MeasurableSet (Icc (x - b) (x + b)) := isClosed_Icc.measurableSet
+      have hconst : ∫ t, (Icc (x - b) (x + b)).indicator (fun _ => (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))) t
+                      = (volume (Icc (x - b) (x + b))).toReal * (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) := by
+        simpa [integral_indicator, hmeasJ, integral_const, mul_comm, mul_left_comm, mul_assoc]
+          using rfl
+      have hfun : ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t
+                    = ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+        simp [integral_indicator, hmeasJ]
+      have h1 : (volume (Icc (x - b) (x + b))).toReal * (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))
+                ≤ ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t := by
+        simpa [hconst, mul_comm, mul_left_comm, mul_assoc] using hineq
+      simpa [hfun, integral_indicator, hmeasJ] using h1
+    have base2 : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := by
+      have hbne : (b : ℝ) ≠ 0 := ne_of_gt hb
+      have hJ_len : (volume (Icc (x - b) (x + b))).toReal = 2 * b := measJ_toReal
+      have hS_ge :
+          ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t)
+            ≤ ∫ t in S, poissonKernel b (x - t) := by
+        simpa using int_mono
+      calc
+        Real.pi⁻¹
+            = (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) := by
+                  have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
+                  calc
+                    (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
+                        = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by ring
+                    _ = (Real.pi⁻¹ * 2⁻¹) * 2 := by simpa [this]
+                    _ = Real.pi⁻¹ := by simp [one_div]
+        _ ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+              simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using constJ
+        _ ≤ ∫ t in S, poissonKernel b (x - t) := hS_ge
+    -- Finally, scale base2 by 1/4 and rewrite via conv_eq
+    have h4nonneg : 0 ≤ (1 / (4 : ℝ)) := by norm_num
+    have : c0_plateau ≤ (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) := by
+      have := base2
+      have h := mul_le_mul_of_nonneg_left this (by norm_num : 0 ≤ (1 / (4 : ℝ)))
+      simpa [c0_plateau, one_div, mul_comm, mul_left_comm, mul_assoc] using h
+    simpa [conv_eq] using this
 
 end RS
 end RH
