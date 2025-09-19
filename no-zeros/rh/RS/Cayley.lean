@@ -191,6 +191,8 @@ lemma boundary_Re_F_pinch_le_two
     |((F_pinch det2 O) (boundary t)).re| ≤ Complex.abs ((F_pinch det2 O) (boundary t)) :=
       Complex.abs_re_le_abs _
     _ = (2 : ℝ) := hFabs
+
+/-! A convenience variant is avoided here to keep boundary casework at the call site. -/
 /-- Analyticity of `J_pinch det2 O` on the off-zeros set `Ω \ {ξ_ext = 0}`.
 
 Requires: `det2` analytic on `Ω`, `O` analytic and zero-free on `Ω`, and

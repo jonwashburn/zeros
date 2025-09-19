@@ -18,12 +18,12 @@
    "././././rh/RS/Cayley.lean:186:14: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"},
   {"message":
-   "././././rh/RS/Cayley.lean:222:21: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
+   "././././rh/RS/Cayley.lean:224:21: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"},
   {"message":
-   "././././rh/RS/Cayley.lean:235:10: unused variable `hz`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "././././rh/RS/Cayley.lean:237:10: unused variable `hz`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"},
   {"message":
-   "././././rh/RS/Cayley.lean:272:3: unused variable `hDet2`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "././././rh/RS/Cayley.lean:274:3: unused variable `hDet2`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "7946237530954708520"}
+ "depHash": "15953373760297596979"}
