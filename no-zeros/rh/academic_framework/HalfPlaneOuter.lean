@@ -3,8 +3,10 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.Basic
 import rh.academic_framework.CompletedXi
 import Mathlib.MeasureTheory.Integral.Bochner
+import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 import rh.RS.Det2Outer
 import rh.RS.PoissonAI
+import rh.RS.Cayley
 -- keep RS imports minimal to avoid cycles
 import rh.academic_framework.DiskHardy
 
@@ -45,6 +47,14 @@ def Ω : Set ℂ := {s : ℂ | (1/2 : ℝ) < s.re}
 -- Local notation for convenience
 local notation "Ω" => Ω
 
+/-- Boundary parametrization of the line Re s = 1/2. -/
+@[simp] def boundary (t : ℝ) : ℂ := (1 / 2 : ℝ) + Complex.I * (t : ℂ)
+
+@[simp] lemma boundary_mk_eq (t : ℝ) : boundary t = Complex.mk (1/2) t := by
+  refine Complex.ext ?hre ?him
+  · simp [boundary]
+  · simp [boundary]
+
 /-- An outer on Ω: analytic and zero‑free on Ω. -/
 structure OuterWitness (O : ℂ → ℂ) : Prop where
   analytic : AnalyticOn ℂ O Ω
@@ -76,13 +86,7 @@ real function `u : ℝ → ℝ` is the boundary log-modulus and lies in BMO. The
 are used to state the standard Poisson-outer construction on the half-plane
 at the Prop level, without committing to a particular analytic implementation. -/
 
-/-- Boundary parametrization of the line Re s = 1/2. -/
-@[simp] def boundary (t : ℝ) : ℂ := (1 / 2 : ℝ) + Complex.I * (t : ℂ)
-
-@[simp] lemma boundary_mk_eq (t : ℝ) : boundary t = Complex.mk (1/2) t := by
-  refine Complex.ext ?hre ?him
-  · simp [boundary]
-  · simp [boundary]
+-- (moved above first use)
 
 /-- Placeholder: `u ∈ BMO(ℝ)` (used as an interface predicate only). -/
 @[simp] def BMO_on_ℝ (_u : ℝ → ℝ) : Prop := True
@@ -197,7 +201,7 @@ theorem HasHalfPlanePoissonTransport
   intro hBoundary z hz
   -- Convert boundary a.e. nonnegativity to the `boundary` parametrization
   have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := by
-    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F ((1/2 : ℝ) + Complex.I * (t : ℂ))).re := hBoundary
+    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F (Complex.mk (1/2) t)).re := hBoundary
     exact h0.mono (by
       intro t ht
       simpa [boundary_mk_eq] using ht)
@@ -269,7 +273,7 @@ def boundaryPoissonAI_from_rep_Jpinch (det2 O : ℂ → ℂ) : Prop :=
   HasHalfPlanePoissonRepresentation (F_pinch det2 O) →
     BoundaryPoissonAI (F_pinch det2 O)
 
-/‑! ## Representation on a subset (off‑zeros variant)
+/-! ## Representation on a subset (off‑zeros variant)
 
 We provide a subset‑restricted Poisson representation interface. This is useful
 when `F` may have isolated singularities (e.g. poles) on `Ω`; the representation
@@ -299,12 +303,16 @@ theorem HasHalfPlanePoissonTransport_on
     exact h0.mono (by intro t ht; simpa [boundary_mk_eq] using ht)
   -- positivity of the Poisson operator applied to nonnegative boundary data
   have hzΩ : z ∈ Ω := hRep.subset_Ω hzS
-  have hpos :=
-    P_nonneg_of_ae_nonneg
-      (u := fun t : ℝ => (F (boundary t)).re)
-      (hInt := by intro w hw; simpa using hRep.integrable w (hRep.subset_Ω hw))
-      (hu_nonneg := hBoundary')
-      (by simpa [Ω, Set.mem_setOf_eq] using hzΩ)
+  have hker : 0 ≤ᵐ[volume] fun t : ℝ => poissonKernel z t := by
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    exact poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using hzΩ) t
+  have hprod :
+      0 ≤ᵐ[volume] fun t : ℝ => (F (boundary t)).re * poissonKernel z t := by
+    exact ((hBoundary').and hker).mono (by intro t ht; exact mul_nonneg ht.1 ht.2)
+  have hI : Integrable (fun t : ℝ => (F (boundary t)).re * poissonKernel z t) :=
+    hRep.integrable z hzS
+  have hpos : 0 ≤ ∫ t, (F (boundary t)).re * poissonKernel z t :=
+    integral_nonneg_of_ae (μ := volume) hprod
   simpa [hRep.re_eq z hzS] using hpos
 
 /-- Pinch specialization (off‑zeros): representation on `Ω \ Z(ξ_ext)` yields
@@ -404,7 +412,7 @@ theorem pinch_representation_on_offXi
   , re_eq := by
       intro z hz; simpa using (hReEq z hz) };
 
-/‑! ## Integrability helper for boundary kernels (simple sufficient condition)
+/-! ## Integrability helper for boundary kernels (simple sufficient condition)
 
 We record a convenient sufficient condition ensuring integrability of the
 kernel‑weighted boundary trace `t ↦ (Re F(1/2+it)) · P(z,t)` for a fixed
@@ -437,10 +445,18 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
           add_comm, add_left_comm, add_assoc, pow_two]
   -- `t ↦ 1/(1 + ((t - b)/a)^2)` is integrable (affine change of variables)
   have hBase : Integrable (fun u : ℝ => 1 / (1 + u^2)) := by
-    simpa using Real.integrable_one_div_one_add_sq
+    -- current mathlib lemma name
+    simpa [one_div] using integrable_inv_one_add_sq
   have hScaled : Integrable (fun t : ℝ => 1 / (1 + ((t - b) / a)^2)) := by
-    -- Integrability is preserved by affine changes of variables on ℝ
-    simpa [sub_eq_add_neg, one_div] using hBase.comp_mul_add (c := (1 / a)) (d := - b / a)
+    -- Integrability is preserved by translation; scaling by nonzero preserves integrability
+    have htrans := hBase.comp_sub_right b
+    have ha_ne : a ≠ 0 := ne_of_gt ha
+    have hscale := hBase.comp_mul_right' (hR := (1 / a)) (by
+      -- 1/a ≠ 0
+      exact inv_ne_zero ha_ne)
+    -- Combine translation and scaling in any order (both preserve Integrable)
+    -- Use translation result then rewrite to the target form
+    simpa [sub_eq_add_neg, one_div, div_eq_mul_inv, pow_two] using htrans
   -- Multiply by the constant `(1 / (π a))`
   have hConst : Integrable (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) :=
     hScaled.const_mul _
@@ -466,7 +482,7 @@ lemma integrable_boundary_kernel_of_bounded
       exact poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using hz) t
     have : |(F (boundary t)).re * poissonKernel z t|
         = |(F (boundary t)).re| * poissonKernel z t := by
-      simpa [abs_mul, Real.abs_of_nonneg hnonneg]
+      simpa [abs_mul, abs_of_nonneg hnonneg]
     simpa [this, mul_comm, mul_left_comm, mul_assoc] using
       (mul_le_mul_of_nonneg_right (hBnd t) hnonneg)
   -- Conclude by dominated convergence (bounded by an integrable majorant)
@@ -542,8 +558,6 @@ lemma poisson_formula_re_selfcontained
   (hAnalytic : AnalyticOn ℂ F Ω)
   (hBound2 : ∀ t : ℝ, |(F (boundary t)).re| ≤ (2 : ℝ))
   (hL1loc : ∀ K : Set ℝ, IsCompact K → IntegrableOn (fun t => (F (boundary t)).re) K volume)
-  (Hdisk : ℂ → ℂ)
-  (hRel : Set.EqOn F (fun z => Hdisk (RH.AcademicFramework.CayleyAdapters.toDisk z)) Ω)
   (hReEq : ∀ z ∈ Ω,
     (F z).re = P (fun t : ℝ => (F (boundary t)).re) z)
   : HasHalfPlanePoissonRepresentation F := by
@@ -553,9 +567,11 @@ lemma poisson_formula_re_selfcontained
     intro z hz
     have hzRe : (1/2 : ℝ) < z.re := by simpa [Ω, Set.mem_setOf_eq] using hz
     exact integrable_boundary_kernel_of_bounded (F := F) z (2 : ℝ) hzRe hBound2
-  -- Package into the half-plane representation via the Cayley bridge (no admits here).
-  exact RH.AcademicFramework.CayleyAdapters.HalfPlanePoisson_from_Disk
-    F Hdisk hRel hAnalytic hIntegrable hReEq
+  -- Package directly
+  exact {
+    analytic := hAnalytic
+  , integrable := hIntegrable
+  , re_eq := hReEq }
 
 end HalfPlaneOuter
 end AcademicFramework
