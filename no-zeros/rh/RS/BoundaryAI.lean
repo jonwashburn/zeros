@@ -1,4 +1,4 @@
-import rh.RS.TentShadow
+-- TentShadow gated to reduce build surface; BoundaryWedge provides needed glue
 import rh.academic_framework.HalfPlaneOuter
 import rh.RS.BoundaryWedge
 

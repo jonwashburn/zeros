@@ -4,7 +4,6 @@ import rh.Cert.KxiPPlus
 import rh.RS.BoundaryWedge
 import rh.RS.CRGreenOuter
 import rh.RS.PoissonPlateau
-import rh.RS.TentShadow
 
 /-!
 RS bridge: Concrete Carleson ⇒ (P+).

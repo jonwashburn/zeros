@@ -5,7 +5,7 @@ import rh.RS.CRGreenOuter
 import rh.RS.Cayley
 import rh.academic_framework.HalfPlaneOuter
 import rh.RS.PoissonPlateau
-import rh.rh.RS.TentShadow
+-- TentShadow gated; this file should not depend on it directly
 import rh.rh.RS.WhitneyGeometryDefs
 import rh.academic_framework.CompletedXi
 import rh.Cert.KxiWhitney

@@ -170,16 +170,27 @@ lemma boundary_Re_F_pinch_le_two
   (hO : O (boundary t) ≠ 0)
   (hXi : riemannXi_ext (boundary t) ≠ 0) :
   |((F_pinch det2 O) (boundary t)).re| ≤ (2 : ℝ) := by
-  -- |Re w| ≤ |w|
-  have h1 : |((F_pinch det2 O) (boundary t)).re| ≤ Complex.abs ((F_pinch det2 O) (boundary t)) := by
-    exact Complex.abs_re_le_abs _
-  -- |F_pinch| = |2| * |J_pinch| and |J_pinch| = 1 from previous lemma
-  have hJ : Complex.abs (J_pinch det2 O (boundary t)) = 1 :=
+  -- |Re(2·J)| ≤ |2·J| = |2|·|J| = 2·1 = 2
+  have hJb : Complex.abs (J_pinch det2 O (boundary t)) = 1 :=
     boundary_abs_J_pinch_eq_one (O := O) hBME t hO hXi
-  have hFabs : Complex.abs ((F_pinch det2 O) (boundary t)) = 2 := by
-    have := Complex.abs.map_mul (2 : ℂ) (J_pinch det2 O (boundary t))
-    simpa [F_pinch, Complex.abs_ofReal, hJ, mul_comm] using this
-  simpa [hFabs] using h1
+  -- Rewrite the boundary point explicitly as 1/2 + i t if needed by downstream simp
+  have hJ : Complex.abs (J_pinch det2 O ((2⁻¹ : ℂ) + Complex.I * (t : ℂ))) = 1 := by
+    -- boundary t = 1/2 + i t (definitional), but avoid importing HalfPlaneOuter here
+    simpa using hJb
+  have hFabs : Complex.abs ((F_pinch det2 O) (boundary t)) = (2 : ℝ) := by
+    calc
+      Complex.abs ((F_pinch det2 O) (boundary t))
+          = Complex.abs ((2 : ℂ) * J_pinch det2 O (boundary t)) := by
+              simp [F_pinch]
+      _ = Complex.abs (2 : ℂ) * Complex.abs (J_pinch det2 O (boundary t)) := by
+              simpa using
+                (Complex.abs.map_mul (2 : ℂ) (J_pinch det2 O (boundary t)))
+      _ = (2 : ℝ) * 1 := by simp [Complex.abs_ofReal, hJ]
+      _ = (2 : ℝ) := by norm_num
+  calc
+    |((F_pinch det2 O) (boundary t)).re| ≤ Complex.abs ((F_pinch det2 O) (boundary t)) :=
+      Complex.abs_re_le_abs _
+    _ = (2 : ℝ) := hFabs
 /-- Analyticity of `J_pinch det2 O` on the off-zeros set `Ω \ {ξ_ext = 0}`.
 
 Requires: `det2` analytic on `Ω`, `O` analytic and zero-free on `Ω`, and

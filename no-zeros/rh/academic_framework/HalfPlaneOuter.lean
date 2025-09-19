@@ -3,8 +3,9 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.Basic
 import rh.academic_framework.CompletedXi
 import Mathlib.MeasureTheory.Integral.Bochner
-import rh.RS.Cayley
-import rh.RS.TentShadow
+import rh.RS.Det2Outer
+import rh.RS.PoissonAI
+-- keep RS imports minimal to avoid cycles
 import rh.academic_framework.DiskHardy
 
 /-!
@@ -76,7 +77,7 @@ are used to state the standard Poisson-outer construction on the half-plane
 at the Prop level, without committing to a particular analytic implementation. -/
 
 /-- Boundary parametrization of the line Re s = 1/2. -/
-@[simp] def boundary (t : ℝ) : ℂ := (1 / 2 : ℂ) + Complex.I * (t : ℂ)
+@[simp] def boundary (t : ℝ) : ℂ := (1 / 2 : ℝ) + Complex.I * (t : ℂ)
 
 @[simp] lemma boundary_mk_eq (t : ℝ) : boundary t = Complex.mk (1/2) t := by
   refine Complex.ext ?hre ?him
@@ -163,7 +164,7 @@ def PPlus (F : ℂ → ℂ) : Prop :=
 
 lemma P_nonneg_of_ae_nonneg
     {u : ℝ → ℝ}
-    (hInt : ∀ {z : ℂ}, z ∈ Ω → Integrable (fun t : ℝ => u t * poissonKernel z t))
+  (hInt : ∀ {z : ℂ}, z ∈ Ω → Integrable (fun t : ℝ => u t * poissonKernel z t))
     (hu_nonneg : ∀ᵐ t : ℝ, 0 ≤ u t) :
     ∀ ⦃z : ℂ⦄, z ∈ Ω → 0 ≤ P u z := by
   intro z hz
@@ -196,7 +197,7 @@ theorem HasHalfPlanePoissonTransport
   intro hBoundary z hz
   -- Convert boundary a.e. nonnegativity to the `boundary` parametrization
   have hBoundary' : ∀ᵐ t : ℝ, 0 ≤ (F (boundary t)).re := by
-    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F (Complex.mk (1/2) t)).re := hBoundary
+    have h0 : ∀ᵐ t : ℝ, 0 ≤ (F ((1/2 : ℝ) + Complex.I * (t : ℂ))).re := hBoundary
     exact h0.mono (by
       intro t ht
       simpa [boundary_mk_eq] using ht)
@@ -223,7 +224,7 @@ for the negativity selection route. -/
 def BoundaryPoissonAI (F : ℂ → ℂ) : Prop :=
   ∀ᵐ x : ℝ,
     Filter.Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
-      (nhdsWithin 0 (Ioi 0)) (nhds (RH.RS.boundaryRe F x))
+      (nhdsWithin 0 (Set.Ioi 0)) (nhds (RH.RS.boundaryRe F x))
 
 /-- Prop-level adapter: a Poisson representation of `F` implies the
 boundary Poisson approximate-identity `BoundaryPoissonAI F`. -/
