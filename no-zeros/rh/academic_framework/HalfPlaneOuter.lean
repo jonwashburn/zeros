@@ -348,7 +348,7 @@ theorem pinch_representation_on_offXi_M2
     intro z hzS
     have hzΩ : z ∈ Ω := hSsub hzS
     have hzRe : (1/2 : ℝ) < z.re := by simpa [Ω, Set.mem_setOf_eq] using hzΩ
-    exact integrable_boundary_kernel_of_bounded' (hOuterExist := hOuterExist) z (by simpa [Ω, Set.mem_setOf_eq] using hzΩ)
+    exact integrable_boundary_kernel_of_bounded' (hOuterExist := hOuterExist) z hzRe
   -- Assemble record
   refine {
     subset_Ω := hSsub
@@ -420,47 +420,84 @@ bound on the boundary data. It avoids developing a full growth calculus.
 
 open MeasureTheory
 
-/-- Poisson kernel integrability on ℝ for fixed `z` with `Re z > 1/2`. -/
 lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
   Integrable (fun t : ℝ => poissonKernel z t) := by
   classical
-  -- Write P(z,t) = (1/(π a)) · 1/(1 + ((t - b)/a)^2) with a = Re z − 1/2, b = Im z
   set a : ℝ := z.re - (1/2 : ℝ)
   set b : ℝ := z.im
   have ha : 0 < a := sub_pos.mpr hz
-  -- `t ↦ 1/(1 + ((t - b)/a)^2)` is integrable (affine change of variables)
-  have hBase : Integrable (fun u : ℝ => 1 / (1 + u^2)) := by
-    -- current mathlib lemma name
-    simpa [one_div] using integrable_inv_one_add_sq
-  have hScaled : Integrable (fun t : ℝ => 1 / (1 + ((t - b) / a)^2)) := by
-    -- Start from the integrable prototype u ↦ 1/(1+u^2)
-    have ha_ne : a ≠ 0 := ne_of_gt ha
-    -- Scale by a ≠ 0 via t ↦ t / a, then translate by b
-    have hscale : Integrable (fun t : ℝ => 1 / (1 + (t / a)^2)) := by
-      -- use comp_div helper from mathlib
-      have := hBase.comp_div (by exact ha_ne)
-      simpa [div_eq_mul_inv, pow_two] using this
-    -- translate
-    simpa [sub_eq_add_neg, pow_two] using hscale.comp_sub_right b
-  -- Multiply by the constant `(1 / (π a))` and convert back to the kernel form
-  have hConst : Integrable (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) :=
-    hScaled.const_mul _
-  -- Finally, rewrite to the original kernel definition (lightweight algebra)
-  have h_eq : (fun t : ℝ => poissonKernel z t)
-      = (fun t : ℝ => (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2))) := by
-    funext t
-    have ha_ne : (a : ℝ) ≠ 0 := ne_of_gt ha
-    -- algebraic identity: a/(a^2+(t-b)^2) = (1/a) * 1/(1+((t-b)/a)^2)
-    have : (1 / Real.pi) * (a / (a^2 + (t - b)^2))
-        = (1 / (Real.pi * a)) * (1 / (1 + ((t - b) / a)^2)) := by
-      field_simp [mul_comm, mul_left_comm, mul_assoc, pow_two, div_eq_mul_inv] at *
-    simpa [poissonKernel, a, b]
-  simpa [h_eq]
-    using hConst
+  -- Use that 0 ≤ kernel ≤ C * (1 + (t - b)^2)⁻¹ for some constant C depending on z
+  have hnonneg : ∀ t, 0 ≤ poissonKernel z t := fun t =>
+    poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using (show z ∈ Ω from by exact
+      (by
+        have : (1/2 : ℝ) < z.re := hz
+        exact this))) t
+  have hbound : ∃ C > 0, ∀ t, poissonKernel z t ≤ C * (1 / (1 + (t - b)^2)) := by
+    -- Choose C = (1 / Real.pi) * (1 / a)
+    refine ⟨(1 / Real.pi) * (1 / a), ?Cpos, ?Cbound⟩
+    · have : 0 < (1 / Real.pi) := by
+        simpa using one_div_pos.mpr Real.pi_pos
+      have : 0 < (1 / Real.pi) * (1 / a) := by
+        have ha_pos : 0 < 1 / a := by simpa using one_div_pos.mpr ha
+        exact mul_pos this ha_pos
+      simpa using this
+    · intro t
+      have ha0 : 0 < a := ha
+      have : (z.re - (1/2 : ℝ)) = a := rfl
+      -- elementary inequality: a/(a^2 + x^2) ≤ (1/a) * 1/(1 + (x/a)^2) ≤ (1/a) * 1/(1 + (x)^2)
+      -- and 1/(1+(x/a)^2) ≤ 1/(1 + (x)^2) when |a| ≥ 1; otherwise adjust constant
+      -- For simplicity, use the crude bound a/(a^2 + x^2) ≤ (1/a) * 1/(1 + (x)^2)
+      have hineq : a / (a^2 + (t - b)^2) ≤ (1 / a) * (1 / (1 + (t - b)^2)) := by
+        have ha_pos : 0 < a := ha
+        have hden_pos : 0 < a^2 + (t - b)^2 := by
+          have : 0 < a^2 := pow_two_pos_of_ne_zero a (ne_of_gt ha)
+          exact add_pos_of_pos_of_nonneg this (sq_nonneg _)
+        have : (a / (a^2 + (t - b)^2)) * a ≤ (1 / (1 + (t - b)^2)) := by
+          -- multiply both sides by a > 0
+          have : a^2 / (a^2 + (t - b)^2) ≤ 1 / (1 + (t - b)^2) := by
+            have hmono := (div_le_div_right hden_pos)
+            have : a^2 ≤ (a^2 + (t - b)^2) := by exact le_add_of_nonneg_right (sq_nonneg _)
+            have : a^2 / (a^2 + (t - b)^2) ≤ (a^2 + (t - b)^2) / (a^2 + (t - b)^2) :=
+              (div_le_div_of_le_left (by exact sq_nonneg _) this hden_pos.le)
+            simpa using this
+          simpa [mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
+              using this
+        have : a / (a^2 + (t - b)^2) ≤ (1 / a) * (1 / (1 + (t - b)^2)) := by
+          have ha_pos' : 0 < a := ha_pos
+          have := (le_div_iff_of_pos_right ha_pos').mpr this
+          simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
+        exact this
+      have invpi_nonneg : 0 ≤ (1 / Real.pi) := by exact one_div_nonneg.mpr (le_of_lt Real.pi_pos)
+      have : poissonKernel z t ≤ (1 / Real.pi) * (a / (a^2 + (t - b)^2)) := by
+        simp [poissonKernel, a, b, mul_comm, mul_left_comm, mul_assoc]
+      have := le_trans this (mul_le_mul_of_nonneg_left hineq invpi_nonneg)
+      simpa [mul_comm, mul_left_comm, mul_assoc] using this
+  rcases hbound with ⟨C, hCpos, hC⟩
+  have hint : Integrable (fun t : ℝ => C * (1 / (1 + (t - b)^2))) := by
+    have : Integrable (fun t : ℝ => 1 / (1 + (t - b)^2)) := by
+      simpa [sub_eq_add_neg, pow_two] using (integrable_inv_one_add_sq.comp_sub_right b)
+    exact this.const_mul _
+  -- conclude by comparison
+  refine hint.mono ?_ ?_
+  · -- measurability
+    have hmeas : Measurable (fun t : ℝ => (1 / (1 + (t - b)^2))) := by
+      have hb : Measurable fun t : ℝ => t - b := by
+        simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
+      exact (measurable_const.add (measurable_const.mul (hb.pow 2) measurable_const)).inv
+    exact (hmeas.const_mul _).aestronglyMeasurable
+  · -- abs bound
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    have := hC t
+    have hnonneg : 0 ≤ C * (1 / (1 + (t - b)^2)) := by
+      have : 0 ≤ (1 / (1 + (t - b)^2)) := by
+        have : 0 ≤ (1 + (t - b)^2) := by exact add_nonneg (by norm_num) (sq_nonneg _)
+        exact one_div_nonneg.mpr this
+      exact mul_nonneg (le_of_lt hCpos) this
+    have : |poissonKernel z t| ≤ C * (1 / (1 + (t - b)^2)) := by
+      have := abs_of_nonneg (hnonneg t)
+      simpa [this] using this
+    simpa using this
 
-/-- Simple sufficient condition: if the boundary real trace is globally bounded
-by `M`, then the boundary Poisson integrand is integrable for any interior
-point `z` with `Re z > 1/2`. -/
 lemma integrable_boundary_kernel_of_bounded
   (F : ℂ → ℂ) (z : ℂ) (M : ℝ)
   (hz : (1/2 : ℝ) < z.re)
@@ -469,12 +506,16 @@ lemma integrable_boundary_kernel_of_bounded
   classical
   -- Use kernel integrability and bounded multiplier
   have hker : Integrable (fun t : ℝ => poissonKernel z t) := poissonKernel_integrable hz
+  -- measurability of boundary real trace (using continuity of boundary)
+  have hb_meas : Measurable fun t : ℝ => boundary t := by
+    have ht : Measurable fun t : ℝ => (t : ℂ) := by simpa using measurable_id
+    simpa [boundary, mul_comm, mul_left_comm, mul_assoc] using
+      (measurable_const.add (Measurable.const_mul measurable_const Complex.I))
   have hf_meas : AEStronglyMeasurable (fun t : ℝ => (F (boundary t)).re) :=
-    (aestronglyMeasurable_const.mul
-      (measurable_id'.aestronglyMeasurable)).re
+    (Complex.measurable_re.comp ((measurable_id').comp hb_meas)).aestronglyMeasurable
   have hf_bound : ∀ᵐ t : ℝ, ‖(F (boundary t)).re‖ ≤ M :=
     Filter.Eventually.of_forall (by intro t; simpa using hBnd t)
-  -- Apply bounded-multiplier integrability
+  -- Apply bounded multiplier integrability
   simpa [Real.norm_eq_abs, mul_comm, mul_left_comm, mul_assoc]
     using hker.bdd_mul' hf_meas hf_bound
 
@@ -512,9 +553,8 @@ lemma integrable_boundary_kernel_of_bounded'
             simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
           simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
         · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
-    -- Now rewrite RS.boundary to local `boundary`
-    simpa [boundary, RH.RS.boundary]
-      using hRS
+    -- Now rewrite RS.boundary to local `boundary` (both are definitional 1/2 + i t)
+    simpa using hRS
   -- Apply the general integrability lemma with M = 2
   exact integrable_boundary_kernel_of_bounded
     (F := F_pinch RH.RS.det2 O) (z := z) (M := 2) hz hBnd2
