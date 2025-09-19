@@ -332,7 +332,7 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
           have hXnn : 0 ≤ (t - b) ^ 2 := by exact sq_nonneg _
           have hcoef : a ^ 2 - 1 ≤ 0 := by
             have : a ≤ 1 := hA_le_one
-            have : a ^ 2 ≤ (1 : ℝ) ^ 2 := pow_le_pow_of_le_left (le_of_lt ha) this 2
+            have : a ^ 2 ≤ (1 : ℝ) ^ 2 := pow_le_pow_left (le_of_lt ha) this 2
             simpa [pow_two] using sub_nonpos.mpr this
           have : (a ^ 2 - 1) * (t - b) ^ 2 ≤ 0 :=
             mul_nonpos_of_nonpos_of_nonneg hcoef hXnn
@@ -348,7 +348,7 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
         have : a * (1 + (t - b) ^ 2) ≤ a * (a ^ 2 + (t - b) ^ 2) := by
           have : (1 : ℝ) ≤ a ^ 2 := by
             have : (1 : ℝ) ≤ a := h_one_le_A
-            have := pow_le_pow_of_le_left (le_of_lt ha) this 2
+            have := pow_le_pow_left (le_of_lt ha) this 2
             simpa [pow_two] using this
           have hx : (1 + (t - b) ^ 2) ≤ (a ^ 2 + (t - b) ^ 2) := by
             have hnn : 0 ≤ (t - b) ^ 2 := sq_nonneg _
@@ -385,7 +385,9 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
     have hmeas : Measurable (fun t : ℝ => 1 / (1 + (t - b) ^ 2)) := by
       have hb : Measurable fun t : ℝ => t - b := by
         simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
-      exact (measurable_const.add (hb.pow 2)).inv
+      have hdenom : Measurable (fun t : ℝ => 1 + (t - b) ^ 2) := by
+        exact measurable_const.add (hb.pow 2)
+      exact hdenom.inv
     exact (hmeas.const_mul _).aestronglyMeasurable
   · -- absolute-value bound
     refine Filter.Eventually.of_forall (fun t => ?_)
@@ -414,7 +416,9 @@ lemma integrable_boundary_kernel_of_bounded
     have hmeas : Measurable (fun t : ℝ => 1 / (1 + (t - (0 : ℝ)) ^ 2)) := by
       have hb : Measurable fun t : ℝ => t - (0 : ℝ) := by
         simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
-      exact (measurable_const.add (hb.pow 2)).inv
+      have hdenom : Measurable (fun t : ℝ => 1 + (t - (0 : ℝ)) ^ 2) := by
+        exact measurable_const.add (hb.pow 2)
+      exact hdenom.inv
     exact (hmeas.const_mul _).aestronglyMeasurable
   · -- pointwise absolute value bound using |Re F| ≤ M and kernel nonnegativity
     refine Filter.Eventually.of_forall (fun t => ?_)
@@ -446,7 +450,7 @@ lemma integrable_boundary_kernel_of_bounded
           have := (div_le_div_of_pos_right (mul_le_mul_of_nonneg_left (by
               have : (z.re - (1/2 : ℝ)) ^ 2 ≤ 1 := by
                 have : z.re - (1/2 : ℝ) ≤ 1 := hle
-                have := pow_le_pow_of_le_left (le_of_lt ha') this 2
+                have := pow_le_pow_left (le_of_lt ha') this 2
                 simpa [pow_two] using this
               exact add_le_add_left this _
             ) (le_of_lt ha')) hpos1)
@@ -462,7 +466,7 @@ lemma integrable_boundary_kernel_of_bounded
             have : 0 < (z.re - (1/2 : ℝ)) ^ 2 := by simpa [pow_two] using mul_self_pos.mpr this
             exact add_pos_of_pos_of_nonneg this hx
           have : 1 ≤ (z.re - (1/2 : ℝ)) ^ 2 := by
-            have := pow_le_pow_of_le_left (le_of_lt ha') hge 2
+            have := pow_le_pow_left (le_of_lt ha') hge 2
             simpa [one_pow, pow_two] using this
           have hxle : (1 + (t - 0) ^ 2) ≤ ((z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2) := by
             have : (1 : ℝ) ≤ (z.re - (1/2 : ℝ)) ^ 2 := this
