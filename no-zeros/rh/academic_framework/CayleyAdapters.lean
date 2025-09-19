@@ -1,5 +1,6 @@
 import rh.academic_framework.DiskHardy
 import Mathlib.Analysis.Calculus.Deriv
+import Mathlib.Analysis.Trigonometry.Trigonometric
 import rh.academic_framework.HalfPlaneOuter
 
 namespace RH
@@ -115,6 +116,77 @@ lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
     linear_combination hsq
   simpa [h, this, hdiff]
 
+/-- The boundary point `s = 1/2 + i t` is never zero. -/
+lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuter.boundary t ≠ 0 := by
+  intro h
+  have : (HalfPlaneOuter.boundary t).re = (0 : ℝ) := by simpa [h]
+  simp [HalfPlaneOuter.boundary] at this
+
+/-- Difference of Cayley images in terms of original points. Requires both nonzero. -/
+lemma toDisk_sub (u v : ℂ) (hu : u ≠ 0) (hv : v ≠ 0) :
+  toDisk u - toDisk v = (u - v) / (u * v) := by
+  -- toDisk w = 1 - 1/w
+  simp [toDisk, sub_eq_add_neg, add_comm, add_left_comm, add_assoc, div_eq_mul_inv,
+        mul_comm, mul_left_comm, mul_assoc, inv_mul_eq_iff_eq_mul₀ hu, inv_mul_eq_iff_eq_mul₀ hv]
+  field_simp [hu, hv]
+
+/-- Absolute value of the boundary/disk difference in terms of original points. -/
+lemma abs_boundaryToDisk_sub_toDisk (t : ℝ) (z : ℂ) (hz : z ≠ 0) :
+  Complex.abs (boundaryToDisk t - toDisk z)
+    = Complex.abs (HalfPlaneOuter.boundary t - z)
+        / (Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z) := by
+  have hs0 : HalfPlaneOuter.boundary t ≠ 0 := boundary_ne_zero t
+  have hdiff : boundaryToDisk t - toDisk z
+      = (HalfPlaneOuter.boundary t - z) / (HalfPlaneOuter.boundary t * z) := by
+    -- use the general difference formula specialized to u=s, v=z
+    simpa [boundaryToDisk] using toDisk_sub (u := HalfPlaneOuter.boundary t) (v := z) hs0 hz
+  -- take absolute values
+  simpa [hdiff, Complex.abs_div, Complex.abs_mul]
+
+/-- Core density identity: rewrite `(1 - |w|^2)/|ξ − w|^2` in half‑plane variables. -/
+lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuter.Ω) (t : ℝ) :
+  let w := toDisk z
+  let ξ := boundaryToDisk t
+  (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
+    = ((2 : ℝ) * z.re - 1) * (Complex.abs (HalfPlaneOuter.boundary t))^2
+        / (Complex.abs (HalfPlaneOuter.boundary t - z))^2 := by
+  classical
+  intro w ξ
+  have hz0 : z ≠ 0 := by
+    -- Re z > 1/2 ⇒ z ≠ 0
+    intro h; have : (0 : ℝ) < (1/2 : ℝ) := by norm_num
+    have hRe : (1/2 : ℝ) < z.re := by simpa [HalfPlaneOuter.Ω, Set.mem_setOf_eq] using hzΩ
+    exact (lt_irrefl _ (lt_trans this hRe))
+  have hs0 : HalfPlaneOuter.boundary t ≠ 0 := boundary_ne_zero t
+  -- Evaluate denominator via difference identity
+  have hDen : (Complex.abs (ξ - w))^2
+      = (Complex.abs (HalfPlaneOuter.boundary t - z))^2
+          / ((Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2) := by
+    have := abs_boundaryToDisk_sub_toDisk t z hz0
+    -- square both sides
+    have : (Complex.abs (boundaryToDisk t - toDisk z))^2
+        = (Complex.abs (HalfPlaneOuter.boundary t - z))^2
+            / ((Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z)^2) := by
+      simpa [pow_two, mul_pow] using congrArg (fun r => r^2) this
+    -- simplify (ab)^2 = a^2 b^2
+    simpa [ξ, w, pow_two, mul_pow] using this
+  -- Evaluate numerator via one_minus_absSq_toDisk
+  have hNum : 1 - (Complex.abs w)^2
+      = ((2 : ℝ) * z.re - 1) / (Complex.abs z)^2 := by
+    simpa [w] using one_minus_absSq_toDisk z hz0
+  -- assemble the ratio
+  have hPos : (Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z)^2
+      = (Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2 := by
+    ring
+  -- compute: (A/|z|^2) / (B/(|s|^2|z|^2)) = A*|s|^2/B
+  have : (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
+      = (((2 : ℝ) * z.re - 1) / (Complex.abs z)^2)
+          / ((Complex.abs (HalfPlaneOuter.boundary t - z))^2
+              / ((Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2)) := by
+    simpa [hNum, hDen]
+  -- finish with field algebra
+  field_simp [this]
+
 /-- Real parameters `a(z) = Re z − 1/2` and `b(z) = Im z` for change-of-variables. -/
 def a (z : ℂ) : ℝ := z.re - (1/2 : ℝ)
 def b (z : ℂ) : ℝ := z.im
@@ -151,6 +223,143 @@ lemma hasDerivAt_theta_of {z : ℂ} (hz : z ∈ HalfPlaneOuter.Ω) (t : ℝ) :
     simpa [hSimpl]
       using hChain
   simpa [theta_of, two_mul] using hDer.const_mul (2 : ℝ)
+
+/-- z‑independent boundary angle: θ₀(t) := π − 2 arctan(2t), so that
+`boundaryToDisk t = DiskHardy.boundary (θ₀ t)`. -/
+def theta0 (t : ℝ) : ℝ := Real.pi - 2 * Real.arctan (2 * t)
+
+/-- Regularity: derivative of θ₀ is `dθ₀/dt = - 4 / (1 + 4 t^2)`. -/
+lemma hasDerivAt_theta0 (t : ℝ) :
+  HasDerivAt theta0 (-(4 : ℝ) / (1 + 4 * t^2)) t := by
+  -- θ₀(t) = π − 2 * arctan (2t)
+  have hDu : HasDerivAt (fun t : ℝ => 2 * t) (2 : ℝ) t := by
+    simpa using (hasDerivAt_id' t).const_mul (2 : ℝ)
+  have hDatan : HasDerivAt (fun u : ℝ => Real.arctan u) (1 / (1 + (2 * t)^2)) (2 * t) := by
+    simpa using Real.hasDerivAt_arctan (2 * t)
+  have hChain : HasDerivAt (fun t : ℝ => Real.arctan (2 * t))
+      ((2 : ℝ) * (1 / (1 + (2 * t)^2))) t :=
+    hDatan.comp t hDu
+  have hSimp : (2 : ℝ) * (1 / (1 + (2 * t)^2)) = 4 / (1 + 4 * t^2) := by
+    field_simp [pow_two, mul_comm, mul_left_comm, mul_assoc]
+  have hDer : HasDerivAt (fun t : ℝ => Real.arctan (2 * t)) (4 / (1 + 4 * t^2)) t := by
+    simpa [hSimp] using hChain
+  -- Combine with scaling by -2 and addition of constant π
+  have hMain : HasDerivAt (fun t : ℝ => - 2 * Real.arctan (2 * t)) (-(8 : ℝ) / (1 + 4 * t^2)) t := by
+    simpa [two_mul, mul_comm, mul_left_comm, mul_assoc] using hDer.const_mul (-2 : ℝ)
+  -- final scaling: -(8)/(...) / 2 = -(4)/(...) since θ₀ = π + ( -2 * arctan(2t) )
+  simpa [theta0, sub_eq_add_neg, add_comm, add_left_comm, add_assoc, two_mul]
+    using hMain
+
+/-- Continuity of θ₀. -/
+lemma continuous_theta0 : Continuous theta0 := by
+  -- built from continuous arctan and polynomial maps
+  refine Continuous.sub ?h1 ?h2
+  · exact continuous_const
+  · exact (continuous_const.mul (Real.continuous_arctan.comp (continuous_const.mul continuous_id))).mul continuous_const
+
+/-- Measurability of θ₀. -/
+lemma measurable_theta0 : Measurable theta0 :=
+  (continuous_theta0.measurable)
+
+/-- Trig identities: cos(2 arctan u) and sin(2 arctan u). -/
+lemma cos_double_arctan (u : ℝ) :
+  Real.cos (2 * Real.arctan u) = (1 - u^2) / (1 + u^2) := by
+  -- cos(2x) = cos^2 x - sin^2 x; use cos(arctan u) and sin(arctan u)
+  have hcos : Real.cos (Real.arctan u) = 1 / Real.sqrt (1 + u^2) := Real.cos_arctan _
+  have hsin : Real.sin (Real.arctan u) = u / Real.sqrt (1 + u^2) := Real.sin_arctan _
+  have hcos2 : (Real.cos (Real.arctan u))^2 = 1 / (1 + u^2) := by
+    simpa [pow_two] using by
+      have := congrArg (fun x => x^2) hcos
+      simpa [pow_two, one_div] using this
+  have hsin2 : (Real.sin (Real.arctan u))^2 = u^2 / (1 + u^2) := by
+    simpa [pow_two] using by
+      have := congrArg (fun x => x^2) hsin
+      simpa [pow_two, one_div] using this
+  have hcos2' : Real.cos (2 * Real.arctan u) =
+      (Real.cos (Real.arctan u))^2 - (Real.sin (Real.arctan u))^2 := by
+    have := Real.cos_two_mul (Real.arctan u)
+    simpa [two_mul] using this
+  simpa [hcos2, hsin2] using hcos2'
+
+lemma sin_double_arctan (u : ℝ) :
+  Real.sin (2 * Real.arctan u) = (2 * u) / (1 + u^2) := by
+  -- sin(2x) = 2 sin x cos x; use cos/sin of arctan
+  have hcos : Real.cos (Real.arctan u) = 1 / Real.sqrt (1 + u^2) := Real.cos_arctan _
+  have hsin : Real.sin (Real.arctan u) = u / Real.sqrt (1 + u^2) := Real.sin_arctan _
+  have hsin2 : Real.sin (2 * Real.arctan u)
+      = 2 * Real.sin (Real.arctan u) * Real.cos (Real.arctan u) := by
+    have := Real.sin_two_mul (Real.arctan u)
+    simpa [two_mul] using this
+  simpa [hsin, hcos, one_div, pow_two, mul_comm, mul_left_comm, mul_assoc]
+    using hsin2
+
+/-- Boundary angle equality (statement): the Cayley image of the half‑plane
+boundary at height `t` is the unit‑circle point at angle `θ₀(t)`.
+Proof proceeds by explicit trigonometric evaluation of `exp(iθ₀)` and the
+closed form `boundaryToDisk_closed_form`.
+This proof will be completed by expanding `Complex.exp (I θ)` and
+double/half‑angle formulas. -/
+theorem boundaryToDisk_eq_boundary_theta0 (t : ℝ) :
+  boundaryToDisk t = DiskHardy.boundary (theta0 t) := by
+  -- boundaryToDisk has a closed rational form
+  have hrat := boundaryToDisk_closed_form t
+  -- Trig evaluation for θ₀(t) := π − 2 arctan(2t)
+  have hcos0 : Real.cos (theta0 t) = (4 * t^2 - 1) / (1 + 4 * t^2) := by
+    have : Real.cos (Real.pi - 2 * Real.arctan (2 * t))
+        = - Real.cos (2 * Real.arctan (2 * t)) := by
+      simpa [theta0, two_mul] using Real.cos_pi_sub (2 * Real.arctan (2 * t))
+    have hcos2 := cos_double_arctan (2 * t)
+    simpa [theta0, two_mul, hcos2, mul_pow, pow_two, sub_eq_add_neg, add_comm, add_left_comm,
+           add_assoc, mul_comm, mul_left_comm, mul_assoc]
+      using this
+  have hsin0 : Real.sin (theta0 t) = (4 * t) / (1 + 4 * t^2) := by
+    have : Real.sin (Real.pi - 2 * Real.arctan (2 * t))
+        = Real.sin (2 * Real.arctan (2 * t)) := by
+      simpa [theta0, two_mul] using Real.sin_pi_sub (2 * Real.arctan (2 * t))
+    have hsin2 := sin_double_arctan (2 * t)
+    simpa [theta0, two_mul, hsin2, mul_pow, pow_two, sub_eq_add_neg, add_comm, add_left_comm,
+           add_assoc, mul_comm, mul_left_comm, mul_assoc]
+      using this
+  -- Rewrite the unit-circle boundary via cos/sin
+  have hExp : DiskHardy.boundary (theta0 t)
+      = ((4 * (t:ℝ)^2 - 1 : ℝ) + Complex.I * (4 * t)) / (1 + 4 * t^2) := by
+    -- exp(iθ) = cos θ + i sin θ
+    have : Complex.exp (Complex.I * (theta0 t))
+        = Complex.ofReal (Real.cos (theta0 t)) + Complex.I * Complex.ofReal (Real.sin (theta0 t)) := by
+      simpa using Complex.exp_mul_I (theta0 t)
+    -- convert to a single fraction
+    simp [DiskHardy.boundary, this, hcos0, hsin0, Complex.ofReal_div, Complex.ofReal_mul,
+          Complex.ofReal_add, Complex.ofReal_sub, Complex.ofReal_pow, Complex.ofReal_one,
+          Complex.ofReal_bit0, Complex.ofReal_bit1, Complex.ofReal_mul, mul_comm, mul_left_comm,
+          mul_assoc, add_comm, add_left_comm, add_assoc, two_mul, sub_eq_add_neg, pow_two]
+  -- Also rewrite the rational form to the same denominator to compare
+  have hrat' : boundaryToDisk t
+      = ((4 * (t:ℝ)^2 - 1 : ℝ) + Complex.I * (4 * t)) / (1 + 4 * t^2) := by
+    -- boundaryToDisk t = ((t^2 - 1/4) + i t) / (t^2 + 1/4)
+    -- multiply numerator and denominator by 4 using (a/b) = (4a)/(4b)
+    have h4nz : (4 : ℂ) ≠ 0 := by norm_num
+    have hscaled :
+        ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)) / ((t : ℂ)^2 + (1/4 : ℂ))
+        = ((4 : ℂ) * ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)))
+            / ((4 : ℂ) * ((t : ℂ)^2 + (1/4 : ℂ))) := by
+      -- (a/b) = (c*a)/(c*b)
+      simpa using (mul_div_mul_left
+        (((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)))
+        (((t : ℂ)^2 + (1/4 : ℂ))) (4 : ℂ)).symm
+    have hnum : (4 : ℂ) * ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ))
+        = (((4 : ℂ) * (t : ℂ)^2 - 1) + Complex.I * ((4 : ℂ) * (t : ℂ))) := by
+      ring
+    have hden : (4 : ℂ) * ((t : ℂ)^2 + (1/4 : ℂ))
+        = ((4 : ℂ) * (t : ℂ)^2 + 1) := by
+      ring
+    -- combine
+    simpa [hrat, hscaled, hnum, hden, Complex.ofReal_mul, Complex.ofReal_add,
+           Complex.ofReal_one, Complex.ofReal_bit0, Complex.ofReal_bit1,
+           Complex.ofReal_pow, mul_comm, mul_left_comm, mul_assoc, add_comm,
+           add_left_comm, add_assoc, pow_two, two_mul, sub_eq_add_neg]
+
+  -- Conclude by transitivity
+  simpa [hExp] using hrat'
 
 
 /-- Bridge (packaging form): Given the Cayley relation between `F` and a disk-side
