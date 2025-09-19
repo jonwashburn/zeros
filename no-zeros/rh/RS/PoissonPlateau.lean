@@ -264,8 +264,7 @@ theorem poisson_plateau_lower_bound
       have hden : Continuous fun t : ℝ => (x - t) ^ 2 + b ^ 2 :=
         Continuous.add ((continuous_const.sub continuous_id).pow 2) continuous_const
       have hpos : ∀ t, (x - t) ^ 2 + b ^ 2 ≠ 0 := by
-        intro t
-        have : 0 < b ^ 2 := sq_pos_iff.mpr (ne_of_gt hb)
+        intro t; have : 0 < b ^ 2 := sq_pos_iff.mpr (ne_of_gt hb)
         exact ne_of_gt (add_pos_of_nonneg_of_pos (sq_nonneg _) this)
       have hrec : Continuous fun t : ℝ => 1 / ((x - t) ^ 2 + b ^ 2) :=
         continuous_const.div hden (by intro t; exact hpos t)
@@ -312,40 +311,39 @@ theorem poisson_plateau_lower_bound
         = ∫ t in Icc (x - b) (x + b), Real.pi⁻¹ * (b / ((x - t) ^ 2 + b ^ 2)) := by
       simp [integral_indicator, hmeasJ]
     -- Start from hineq and rewrite both sides step by step
-    have h1 : (volume (Icc (x - b) (x + b))).toReal * (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))
+    have h1 : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
               ≤ ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t := by
       simpa [hconst, mul_comm, mul_left_comm, mul_assoc] using hineq
-    have h2 : (volume (Icc (x - b) (x + b))).toReal * (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))
+    have h2 : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
               ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
       simpa [hfun, integral_indicator, hmeasJ] using h1
-    -- Reorder factors to match the statement
-    simpa [mul_comm, mul_left_comm, mul_assoc] using h2
+    -- Finish the claimed inequality
+    exact h2
   -- Integral over S ≥ integral over J; rewrite |J| = 2b and compute constants to get π⁻¹ ≤ ∫_S ...
   have base2 : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := by
-    -- Chain the two inequalities and rewrite the measure factor
     have hbne : (b : ℝ) ≠ 0 := ne_of_gt hb
     have hJ_len : (volume (Icc (x - b) (x + b))).toReal = 2 * b := measJ_toReal
-    have hconst_len :
-        (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
-      -- From `constJ` by rewriting the measure
-      simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using constJ
-    have hS_ge :
-        ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) ≤ ∫ t in S, poissonKernel b (x - t) := by
-      -- from `int_mono` by commuting sides
-      simpa using int_mono
-    have hchain :
-        (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) ≤ ∫ t in S, poissonKernel b (x - t) :=
-      le_trans hconst_len hS_ge
+    have hS_ge : ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t)
+        ≤ ∫ t in S, poissonKernel b (x - t) := by simpa using int_mono
+    -- Convert constJ into a form with explicit 2*b on the left
+    have constJ' : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
+        ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+      -- start from constJ and rewrite the measure factor
+      have : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
+          ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+        simpa [mul_comm, mul_left_comm, mul_assoc] using constJ
+      simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using this
     have hcollapse : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) = Real.pi⁻¹ := by
-      have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
+      have : b⁻¹ * (2 * b) = (2 : ℝ) := by field_simp [hbne]
       calc
         (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
             = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by ring
         _ = (Real.pi⁻¹ * 2⁻¹) * 2 := by simpa [this]
         _ = Real.pi⁻¹ := by simp [one_div]
-    have : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := by
-      simpa [hcollapse] using hchain
-    exact this
+    calc
+      Real.pi⁻¹ = (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) := by simpa [eq_comm] using hcollapse
+      _ ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := constJ'
+      _ ≤ ∫ t in S, poissonKernel b (x - t) := hS_ge
   -- Since 0 ≤ π⁻¹ and (1/4) ≤ 1, we have (1/4)·π⁻¹ ≤ π⁻¹ ≤ ∫_S ...
   have hπ_nonneg : 0 ≤ (1 / Real.pi) := by
     have : 0 ≤ Real.pi := (le_of_lt Real.pi_pos)
@@ -569,10 +567,11 @@ lemma poisson_plateau_c0 :
       have hfun : ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t
                     = ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
         simp [integral_indicator, hmeasJ]
-      have h1 : (volume (Icc (x - b) (x + b))).toReal * (b⁻¹ * (Real.pi⁻¹ * 2⁻¹))
+      have h1 : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
                 ≤ ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t := by
         simpa [hconst, mul_comm, mul_left_comm, mul_assoc] using hineq
-      simpa [hfun, integral_indicator, hmeasJ] using h1
+      exact (by
+        simpa [hfun, integral_indicator, hmeasJ, mul_comm, mul_left_comm, mul_assoc] using h1)
     have base2 : Real.pi⁻¹ ≤ ∫ t in S, poissonKernel b (x - t) := by
       have hbne : (b : ℝ) ≠ 0 := ne_of_gt hb
       have hJ_len : (volume (Icc (x - b) (x + b))).toReal = 2 * b := measJ_toReal
@@ -580,17 +579,23 @@ lemma poisson_plateau_c0 :
           ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t)
             ≤ ∫ t in S, poissonKernel b (x - t) := by
         simpa using int_mono
+      -- rewrite the constant factor on J to 2*b first
+      have constJ' : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
+          ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+        have : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
+            ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
+          simpa [mul_comm, mul_left_comm, mul_assoc] using constJ
+        simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using this
+      have hcollapse : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) = Real.pi⁻¹ := by
+        have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
+        calc
+          (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
+              = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by ring
+          _ = (Real.pi⁻¹ * 2⁻¹) * 2 := by simpa [this]
+          _ = Real.pi⁻¹ := by simp [one_div]
       calc
-        Real.pi⁻¹
-            = (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) := by
-                  have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
-                  calc
-                    (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b)
-                        = (Real.pi⁻¹ * 2⁻¹) * (b⁻¹ * (2 * b)) := by ring
-                    _ = (Real.pi⁻¹ * 2⁻¹) * 2 := by simpa [this]
-                    _ = Real.pi⁻¹ := by simp [one_div]
-        _ ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
-              simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using constJ
+        Real.pi⁻¹ = (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) := by simpa [eq_comm] using hcollapse
+        _ ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := constJ'
         _ ≤ ∫ t in S, poissonKernel b (x - t) := hS_ge
     -- Finally, scale base2 by 1/4 and rewrite via conv_eq
     have h4nonneg : 0 ≤ (1 / (4 : ℝ)) := by norm_num
@@ -598,7 +603,8 @@ lemma poisson_plateau_c0 :
       have := base2
       have h := mul_le_mul_of_nonneg_left this (by norm_num : 0 ≤ (1 / (4 : ℝ)))
       simpa [c0_plateau, one_div, mul_comm, mul_left_comm, mul_assoc] using h
-    simpa [conv_eq] using this
+    -- Rewrite the right-hand side into the convolution form via the indicator identity
+    simpa [c0_plateau, one_div, hindEq_expected, mul_comm, mul_left_comm, mul_assoc] using this
 
 end RS
 end RH

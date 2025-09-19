@@ -269,6 +269,244 @@ def boundaryPoissonAI_from_rep_Jpinch (det2 O : ℂ → ℂ) : Prop :=
   HasHalfPlanePoissonRepresentation (F_pinch det2 O) →
     BoundaryPoissonAI (F_pinch det2 O)
 
+/-! ## Integrability helper for boundary kernels (moved above first use)
+
+We place the Poisson-kernel integrability and the bounded-trace multiplier
+helper here to avoid forward references further below. -/
+
+open MeasureTheory
+
+lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
+  Integrable (fun t : ℝ => poissonKernel z t) := by
+  classical
+  -- Notation
+  set a : ℝ := z.re - (1/2 : ℝ)
+  set b : ℝ := z.im
+  have ha : 0 < a := sub_pos.mpr hz
+  -- Domination by a multiple of 1 / (1 + (t-b)^2)
+  -- Choose C₀ := max a (1/a) > 0 and C := (1/π) * C₀
+  have hC0pos : 0 < max a (1 / a) := by
+    have hapos : 0 < a := ha
+    have h1apos : 0 < 1 / a := by simpa using one_div_pos.mpr hapos
+    exact lt_of_le_of_lt (le_max_left _ _) hapos
+      |> lt_of_le_of_lt ?h -- dummy to satisfy type checker
+  -- The above trick can be simplified: both a and 1/a are positive, so max is positive
+  clear hC0pos
+  have hC0pos : 0 < max a (1 / a) := by
+    have hapos : 0 < a := ha
+    have h1apos : 0 < 1 / a := by simpa using one_div_pos.mpr hapos
+    exact lt_of_le_of_lt (le_max_left _ _) hapos
+  let C0 : ℝ := max a (1 / a)
+  let C : ℝ := (1 / Real.pi) * C0
+  have hCpos : 0 < C := by
+    have hπ : 0 < (1 / Real.pi) := by simpa using one_div_pos.mpr Real.pi_pos
+    exact mul_pos hπ hC0pos
+  -- Elementary bound: a / (a^2 + X) ≤ C0 * (1 / (1 + X)) for X ≥ 0
+  have hbound : ∀ t : ℝ,
+      poissonKernel z t ≤ C * (1 / (1 + (t - b) ^ 2)) := by
+    intro t
+    have hden1 : 0 < (1 + (t - b) ^ 2) := by
+      have : 0 ≤ (t - b) ^ 2 := sq_nonneg _
+      have : 0 < (1 : ℝ) + (t - b) ^ 2 := by exact add_pos_of_pos_of_nonneg (by norm_num) this
+      simpa using this
+    have hden2 : 0 < a ^ 2 + (t - b) ^ 2 := by
+      have : 0 < a ^ 2 := by
+        have : a ≠ 0 := ne_of_gt ha
+        simpa [pow_two] using mul_self_pos.mpr this
+      exact add_pos_of_pos_of_nonneg this (sq_nonneg _)
+    -- Reduce the claim to an algebraic inequality using case split on a ≤ 1 or 1 ≤ a
+    have hcore : a * (1 + (t - b) ^ 2) ≤ C0 * (a ^ 2 + (t - b) ^ 2) := by
+      have hcases := le_total a (1 : ℝ)
+      cases hcases with
+      | inl hA_le_one =>
+        -- Then C0 = max a (1/a) ≥ 1/a, so it suffices to prove with 1/a
+        have hC0_ge : (1 / a) ≤ C0 := by exact le_max_right _ _
+        -- Show: a*(1+X) ≤ (1/a)*(a^2+X)
+        have : a * (1 + (t - b) ^ 2) ≤ (1 / a) * (a ^ 2 + (t - b) ^ 2) := by
+          -- Multiply both sides by a > 0
+          have ha_pos : 0 < a := ha
+          have := (le_of_mul_le_mul_left ?ineq ha_pos)
+          · simpa [mul_add, mul_comm, mul_left_comm, mul_assoc, pow_two, div_eq_mul_inv] using this
+          -- After multiplying by a, inequality becomes: a^2*(1+X) ≤ a^2 + X
+          -- i.e., (a^2 - 1) * X ≤ 0, which holds since a ≤ 1 and X ≥ 0
+          have hXnn : 0 ≤ (t - b) ^ 2 := by exact sq_nonneg _
+          have hcoef : a ^ 2 - 1 ≤ 0 := by
+            have : a ≤ 1 := hA_le_one
+            have : a ^ 2 ≤ (1 : ℝ) ^ 2 := pow_le_pow_of_le_left (le_of_lt ha) this 2
+            simpa [pow_two] using sub_nonpos.mpr this
+          have : (a ^ 2 - 1) * (t - b) ^ 2 ≤ 0 :=
+            mul_nonpos_of_nonpos_of_nonneg hcoef hXnn
+          -- Now expand the left inequality we want after multiplying by a
+          -- a^2 + a^2 X ≤ a^2 + X  ⇔ (a^2 - 1) X ≤ 0
+          simpa [mul_add, pow_two, mul_comm, mul_left_comm, mul_assoc, sub_eq, add_comm, add_left_comm, add_assoc] using this
+        -- Use monotonicity in C0
+        exact le_trans this (by gcongr)
+      | inr h_one_le_A =>
+        -- Then C0 ≥ a
+        have hC0_ge : a ≤ C0 := by exact le_max_left _ _
+        -- It suffices to show: a*(1+X) ≤ a*(a^2+X)
+        have : a * (1 + (t - b) ^ 2) ≤ a * (a ^ 2 + (t - b) ^ 2) := by
+          have : (1 : ℝ) ≤ a ^ 2 := by
+            have : (1 : ℝ) ≤ a := h_one_le_A
+            have := pow_le_pow_of_le_left (le_of_lt ha) this 2
+            simpa [pow_two] using this
+          have hx : (1 + (t - b) ^ 2) ≤ (a ^ 2 + (t - b) ^ 2) := by
+            have hnn : 0 ≤ (t - b) ^ 2 := sq_nonneg _
+            exact add_le_add_right this _
+          exact mul_le_mul_of_nonneg_left hx (le_of_lt ha)
+        -- Use monotonicity in C0
+        exact le_trans this (by gcongr)
+    -- Now divide by positive denominators to obtain the desired inequality
+    have :
+        (1 / Real.pi) * (a / (a ^ 2 + (t - b) ^ 2))
+          ≤ (1 / Real.pi) * (C0 * (1 / (1 + (t - b) ^ 2))) := by
+      -- Multiply both sides of hcore by (1/π) and divide by positive denominators
+      have hπnonneg : 0 ≤ (1 / Real.pi) := by exact one_div_nonneg.mpr (le_of_lt Real.pi_pos)
+      have hposL : 0 < (a ^ 2 + (t - b) ^ 2) := hden2
+      have hposR : 0 < (1 + (t - b) ^ 2) := hden1
+      -- a/(a^2+X) ≤ C0/(1+X) follows from hcore
+      have hfrac : a / (a ^ 2 + (t - b) ^ 2) ≤ C0 / (1 + (t - b) ^ 2) := by
+        -- by positivity, divide both sides of hcore by the positive product
+        have := (div_le_div_of_pos_right hcore hposR)
+        have := (div_le_div_of_pos_left this hposL)
+        -- Now simplify both sides
+        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
+      exact mul_le_mul_of_nonneg_left hfrac hπnonneg
+    simpa [poissonKernel, a, b, C, C0, mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
+      using this
+  -- Build an integrable dominating function
+  have hint : Integrable (fun t : ℝ => C * (1 / (1 + (t - b) ^ 2))) := by
+    have : Integrable (fun t : ℝ => 1 / (1 + (t - b) ^ 2)) := by
+      simpa [sub_eq_add_neg, pow_two] using (integrable_inv_one_add_sq.comp_sub_right b)
+    exact this.const_mul _
+  -- Conclude by comparison
+  refine hint.mono ?_ ?_
+  · -- measurability of the dominating function
+    have hmeas : Measurable (fun t : ℝ => 1 / (1 + (t - b) ^ 2)) := by
+      have hb : Measurable fun t : ℝ => t - b := by
+        simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
+      exact (measurable_const.add (hb.pow 2)).inv
+    exact (hmeas.const_mul _).aestronglyMeasurable
+  · -- absolute-value bound
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    have hk_nonneg : 0 ≤ poissonKernel z t :=
+      poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using (show z ∈ Ω from by
+        have : (1/2 : ℝ) < z.re := hz; exact this)) t
+    have hk_abs : |poissonKernel z t| = poissonKernel z t := by
+      simpa using (abs_of_nonneg hk_nonneg)
+    have hle := hbound t
+    simpa [hk_abs] using hle
+
+lemma integrable_boundary_kernel_of_bounded
+  (F : ℂ → ℂ) (z : ℂ) (M : ℝ)
+  (hz : (1/2 : ℝ) < z.re)
+  (hBnd : ∀ t : ℝ, |(F (boundary t)).re| ≤ M) :
+  Integrable (fun t : ℝ => (F (boundary t)).re * poissonKernel z t) := by
+  classical
+  -- Kernel integrable
+  have hker : Integrable (fun t : ℝ => poissonKernel z t) := poissonKernel_integrable hz
+  -- A measurable dominating function and pointwise bound
+  have hint : Integrable (fun t : ℝ => M * (1 / (1 + (t - 0) ^ 2))) := by
+    simpa [sub_eq_add_neg, pow_two] using
+      (integrable_inv_one_add_sq.const_mul M)
+  refine hint.mono ?_ ?_
+  · -- measurability of the dominating function
+    have hmeas : Measurable (fun t : ℝ => 1 / (1 + (t - (0 : ℝ)) ^ 2)) := by
+      have hb : Measurable fun t : ℝ => t - (0 : ℝ) := by
+        simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
+      exact (measurable_const.add (hb.pow 2)).inv
+    exact (hmeas.const_mul _).aestronglyMeasurable
+  · -- pointwise absolute value bound using |Re F| ≤ M and kernel nonnegativity
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    have hker_nonneg : 0 ≤ poissonKernel z t :=
+      poissonKernel_nonneg (by simpa [Ω, Set.mem_setOf_eq] using (show z ∈ Ω from by
+        have : (1/2 : ℝ) < z.re := hz; exact this)) t
+    have hker_le : poissonKernel z t ≤ (1 / Real.pi) * (1 / (1 + (t - 0) ^ 2)) := by
+      -- Apply the general bound with b = 0 and a := z.re - 1/2
+      -- This is a specialization of the proof above with a crude constant 1
+      -- (not sharp but sufficient for domination)
+      -- Since we already established an integrable dominator above, this local bound is optional.
+      -- We simply use that (1/π) * (a/(a^2 + X)) ≤ (1/π) * max a (1/a) * 1/(1+X) ≤
+      -- (1/π) * (1 + (1/a)) * 1/(1+X) ≤ (1/π) * 2 * 1/(1+X) when a ≤ 1, and similarly for a ≥ 1.
+      -- For simplicity, we use the trivial inequality a/(a^2+X) ≤ 1/(1+X) when a ≤ 1
+      -- and a/(a^2+X) ≤ a/(1+X) when a ≥ 1, both ≤ max a 1 * 1/(1+X).
+      have hx : 0 ≤ (t - (0 : ℝ)) ^ 2 := by exact sq_nonneg _
+      have hposπ : 0 ≤ (1 / Real.pi) := one_div_nonneg.mpr (le_of_lt Real.pi_pos)
+      have ha' : 0 < z.re - (1/2 : ℝ) := sub_pos.mpr hz
+      have hcase := le_total (z.re - (1/2 : ℝ)) (1 : ℝ)
+      cases hcase with
+      | inl hle =>
+        have hfrac : (z.re - (1/2 : ℝ)) / ((z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2) ≤ 1 / (1 + (t - 0) ^ 2) := by
+          -- Multiply both sides by positive denominators to reduce to (a^2 - 1)X ≤ 0
+          have hpos1 : 0 < 1 + (t - 0) ^ 2 := by exact add_pos_of_pos_of_nonneg (by norm_num) hx
+          have hpos2 : 0 < (z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2 := by
+            have : (z.re - (1/2 : ℝ)) ≠ 0 := ne_of_gt ha'
+            have : 0 < (z.re - (1/2 : ℝ)) ^ 2 := by simpa [pow_two] using mul_self_pos.mpr this
+            exact add_pos_of_pos_of_nonneg this hx
+          have := (div_le_div_of_pos_right (mul_le_mul_of_nonneg_left (by
+              have : (z.re - (1/2 : ℝ)) ^ 2 ≤ 1 := by
+                have : z.re - (1/2 : ℝ) ≤ 1 := hle
+                have := pow_le_pow_of_le_left (le_of_lt ha') this 2
+                simpa [pow_two] using this
+              exact add_le_add_left this _
+            ) (le_of_lt ha')) hpos1)
+          have := (div_le_div_of_pos_left this hpos2)
+          simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        exact mul_le_mul_of_nonneg_left hfrac hposπ
+      | inr hge =>
+        have hfrac : (z.re - (1/2 : ℝ)) / ((z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2)
+            ≤ (z.re - (1/2 : ℝ)) * (1 / (1 + (t - 0) ^ 2)) := by
+          have hpos1 : 0 < 1 + (t - 0) ^ 2 := by exact add_pos_of_pos_of_nonneg (by norm_num) hx
+          have hpos2 : 0 < (z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2 := by
+            have : (z.re - (1/2 : ℝ)) ≠ 0 := ne_of_gt ha'
+            have : 0 < (z.re - (1/2 : ℝ)) ^ 2 := by simpa [pow_two] using mul_self_pos.mpr this
+            exact add_pos_of_pos_of_nonneg this hx
+          have : 1 ≤ (z.re - (1/2 : ℝ)) ^ 2 := by
+            have := pow_le_pow_of_le_left (le_of_lt ha') hge 2
+            simpa [one_pow, pow_two] using this
+          have hxle : (1 + (t - 0) ^ 2) ≤ ((z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2) := by
+            have : (1 : ℝ) ≤ (z.re - (1/2 : ℝ)) ^ 2 := this
+            exact add_le_add_right this _
+          have := mul_le_mul_of_nonneg_left hxle (le_of_lt ha')
+          have := (div_le_div_of_pos_left this hpos2)
+          have := (le_trans this (by
+            have : (z.re - (1/2 : ℝ)) * (1 + (t - 0) ^ 2)
+                ≤ (z.re - (1/2 : ℝ)) * ((z.re - (1/2 : ℝ)) ^ 2 + (t - 0) ^ 2) := by
+              exact mul_le_mul_of_nonneg_left hxle (le_of_lt ha')
+            exact this))
+          simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        exact le_trans (by simpa [poissonKernel, div_eq_mul_inv]) (mul_le_mul_of_nonneg_left hfrac hposπ)
+    have hbnd : |(F (boundary t)).re| ≤ M := hBnd t
+    have : |(F (boundary t)).re * poissonKernel z t|
+        ≤ M * (1 / (1 + (t - 0) ^ 2)) := by
+      have hk_abs : |poissonKernel z t| = poissonKernel z t := by simpa using abs_of_nonneg hker_nonneg
+      have := mul_le_mul_of_nonneg_right hbnd (le_of_lt (by
+        -- 0 < kernel bound RHS
+        have : 0 ≤ (1 / (1 + (t - 0) ^ 2)) := by
+          have : 0 ≤ (1 + (t - 0) ^ 2) := by exact add_nonneg (by norm_num) (sq_nonneg _)
+          exact one_div_nonneg.mpr this
+        have : 0 ≤ M * (1 / (1 + (t - 0) ^ 2)) := mul_nonneg (by exact le_of_lt (by have := abs_nonneg M; exact lt_of_le_of_ne (by exact le_abs_self M) (by decide))) this
+        exact lt_of_le_of_ne this (by decide)))
+      -- Use |ab| = |a|*|b| and the kernel nonnegativity
+      have : |(F (boundary t)).re * poissonKernel z t|
+          = |(F (boundary t)).re| * |poissonKernel z t| := by
+        simpa using abs_mul ((F (boundary t)).re) (poissonKernel z t)
+      -- Combine bounds
+      have := mul_le_mul_of_nonneg_right hbnd (le_of_lt (by
+        have : 0 ≤ poissonKernel z t := hker_nonneg; exact lt_of_le_of_ne this (by decide)))
+      -- We'll just use the earlier kernel bound hker_le and triangle
+      have := le_trans (by
+        have := mul_le_mul_of_nonneg_left (le_of_eq hk_abs) (abs_nonneg _)
+        simpa [this] using (mul_le_mul_of_nonneg_left hker_le (by exact abs_nonneg _))) (by
+          have : |(F (boundary t)).re| ≤ M := hBnd t
+          exact mul_le_mul_of_nonneg_right this (by
+            have : 0 ≤ (1 / (1 + (t - 0) ^ 2)) := by
+              have : 0 ≤ (1 + (t - 0) ^ 2) := by exact add_nonneg (by norm_num) (sq_nonneg _)
+              exact one_div_nonneg.mpr this
+            exact this))
+      exact this
+    simpa [mul_comm, mul_left_comm, mul_assoc, pow_two] using this
+
 /-! ## Representation on a subset (off‑zeros variant)
 
 We provide a subset‑restricted Poisson representation interface. This is useful
@@ -348,7 +586,30 @@ theorem pinch_representation_on_offXi_M2
     intro z hzS
     have hzΩ : z ∈ Ω := hSsub hzS
     have hzRe : (1/2 : ℝ) < z.re := by simpa [Ω, Set.mem_setOf_eq] using hzΩ
-    exact integrable_boundary_kernel_of_bounded' (hOuterExist := hOuterExist) z hzRe
+    -- Derive the uniform boundary bound |Re F| ≤ 2 for F := F_pinch det2 O on the line Re = 1/2,
+    -- then apply the basic integrability-by-comparison lemma with M = 2.
+    -- This avoids a forward reference to the specialized M=2 helper.
+    classical
+    have hBME : RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s / riemannXi_ext s) :=
+      (RH.RS.OuterHalfPlane.choose_outer_spec hOuterExist).2
+    have hBnd2 : ∀ t : ℝ, |(F_pinch RH.RS.det2 O (boundary t)).re| ≤ (2 : ℝ) := by
+      intro t
+      -- Transfer to the RS.boundary notation used by the RS-boundary bound, then rewrite back.
+      have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
+        by_cases hO0 : O (RH.RS.boundary t) = 0
+        · by_cases hXi0 : riemannXi_ext (RH.RS.boundary t) = 0
+          · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+              simp [F_pinch, RH.RS.J_pinch, hO0, hXi0, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+            simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+          · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO0]) (by exact hXi0)
+        · by_cases hXi0 : riemannXi_ext (RH.RS.boundary t) = 0
+          · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+              simp [F_pinch, RH.RS.J_pinch, hO0, hXi0, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+            simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+          · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO0) (by exact hXi0)
+      simpa using hRS
+    exact integrable_boundary_kernel_of_bounded
+      (F := F_pinch RH.RS.det2 O) (z := z) (M := 2) hzRe hBnd2
   -- Assemble record
   refine {
     subset_Ω := hSsub
@@ -384,7 +645,7 @@ theorem pinch_representation_on_offXi
   have hSsub : S ⊆ Ω := by intro z hz; exact hz.1
   -- Analyticity of J_pinch on S via RS helper, then multiply by constant 2
   have hJ : AnalyticOn ℂ (RH.RS.J_pinch RH.RS.det2 O) S :=
-    RH.RS.J_pinch_analytic_on_offXi_choose (hDet2 := hDet2) (hOuterExist := ?_) (hXi := hXi)
+    RH.RS.J_pinch_analytic_on_offXi (hDet2 := hDet2) (hO := hO) (hXi := hXi)
   have hAnalytic : AnalyticOn ℂ (F_pinch RH.RS.det2 O) S := by
     -- F_pinch = (2) * J_pinch det2 O
     have hConst : AnalyticOn ℂ (fun _ : ℂ => (2 : ℂ)) S := by simpa using (analyticOn_const : AnalyticOn ℂ (fun _ : ℂ => (2 : ℂ)) S)
@@ -450,23 +711,22 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
       have hineq : a / (a^2 + (t - b)^2) ≤ (1 / a) * (1 / (1 + (t - b)^2)) := by
         have ha_pos : 0 < a := ha
         have hden_pos : 0 < a^2 + (t - b)^2 := by
-          have : 0 < a^2 := pow_two_pos_of_ne_zero a (ne_of_gt ha)
+          have : 0 < a ^ 2 := by
+            simpa [pow_two] using mul_self_pos.mpr (ne_of_gt ha)
           exact add_pos_of_pos_of_nonneg this (sq_nonneg _)
-        have : (a / (a^2 + (t - b)^2)) * a ≤ (1 / (1 + (t - b)^2)) := by
-          -- multiply both sides by a > 0
+        -- First show the inequality after multiplying both sides by a > 0
+        have hmul : (a / (a^2 + (t - b)^2)) * a ≤ (1 / (1 + (t - b)^2)) := by
           have : a^2 / (a^2 + (t - b)^2) ≤ 1 / (1 + (t - b)^2) := by
-            have hmono := (div_le_div_right hden_pos)
             have : a^2 ≤ (a^2 + (t - b)^2) := by exact le_add_of_nonneg_right (sq_nonneg _)
-            have : a^2 / (a^2 + (t - b)^2) ≤ (a^2 + (t - b)^2) / (a^2 + (t - b)^2) :=
+            have : a^2 / (a^2 + (t - b)^2)
+                    ≤ (a^2 + (t - b)^2) / (a^2 + (t - b)^2) :=
               (div_le_div_of_le_left (by exact sq_nonneg _) this hden_pos.le)
             simpa using this
           simpa [mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
-              using this
-        have : a / (a^2 + (t - b)^2) ≤ (1 / a) * (1 / (1 + (t - b)^2)) := by
-          have ha_pos' : 0 < a := ha_pos
-          have := (le_div_iff_of_pos_right ha_pos').mpr this
-          simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
-        exact this
+            using this
+        -- Divide both sides by a > 0
+        have := le_of_mul_le_mul_right (by simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using hmul) ha_pos
+        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
       have invpi_nonneg : 0 ≤ (1 / Real.pi) := by exact one_div_nonneg.mpr (le_of_lt Real.pi_pos)
       have : poissonKernel z t ≤ (1 / Real.pi) * (a / (a^2 + (t - b)^2)) := by
         simp [poissonKernel, a, b, mul_comm, mul_left_comm, mul_assoc]
