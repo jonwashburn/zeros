@@ -200,7 +200,7 @@ theorem poisson_plateau_lower_bound
       have hmul := mul_le_mul_of_nonneg_left this hfactor_nonneg
       simpa [one_div, pow_two, mul_comm, mul_left_comm, mul_assoc, hbne] using hmul
     have hdiv : (1 : ℝ) / (2 * b) ≤ b / ((x - t) ^ 2 + b ^ 2) := by
-      have := (le_div_iff hdenpos).mpr hineq'
+      have := (le_div_iff₀ (ne_of_gt hdenpos)).mpr hineq'
       simpa [div_eq_mul_inv] using this
     -- Multiply by 1/π
     have hπ_nonneg : 0 ≤ (1 / Real.pi) := by
@@ -217,10 +217,11 @@ theorem poisson_plateau_lower_bound
   -- Lower bound the integral over J by a constant times its length 2b
   have measJ_toReal : (volume (Icc (x - b) (x + b))).toReal = 2 * b := by
     have hxblt : x - b ≤ x + b := by linarith [hb0]
+    have hlen_nonneg : 0 ≤ (x + b) - (x - b) := by linarith [hb0]
     have : (volume (Icc (x - b) (x + b))).toReal = ((x + b) - (x - b)) := by
-      have hlen_nonneg : 0 ≤ (x + b) - (x - b) := by linarith [hb0]
-      simp [Real.volume_Icc, hxblt, ENNReal.toReal_ofReal, sub_eq_add_neg, hlen_nonneg]
-    simpa [two_mul, sub_eq_add_neg] using this
+      simp [Real.volume_Icc, hxblt, ENNReal.toReal_ofReal, hlen_nonneg]
+    -- ((x+b) - (x-b)) simplifies to 2*b
+    simpa [two_mul, sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
   have constJ : (1 / (2 * Real.pi * b)) * (volume (Icc (x - b) (x + b))).toReal
                   ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
     set J : Set ℝ := Icc (x - b) (x + b)
@@ -265,10 +266,15 @@ theorem poisson_plateau_lower_bound
     -- turn indicators back into set integrals and evaluate the constant side
     have hconst_val : ∫ t in J, (1 / (2 * Real.pi * b))
                         = (1 / (2 * Real.pi * b)) * (volume J).toReal := by
-      simp [integral_const, hmeasJ, mul_comm]
+      simp [integral_const, hmeasJ]
     have hset : ∫ t in J, (1 / (2 * Real.pi * b)) ≤ ∫ t in J, poissonKernel b (x - t) := by
       simpa [integral_indicator, hmeasJ] using hineq
-    simpa [J, hconst_val] using hset
+    have hset' : (1 / (2 * Real.pi * b)) * (volume J).toReal ≤ ∫ t in J, poissonKernel b (x - t) := by
+      simpa [hconst_val, mul_comm, mul_left_comm, mul_assoc] using hset
+    -- reorder constants to match later usage
+    have hset'' : (volume J).toReal * (1 / (2 * Real.pi * b)) ≤ ∫ t in J, poissonKernel b (x - t) := by
+      simpa [mul_comm, mul_left_comm, mul_assoc] using hset'
+    simpa [J] using hset''
   -- Integral over S ≥ integral over J
   have base : (1 / Real.pi) ≤ ∫ t in S, poissonKernel b (x - t) := by
     -- From constJ on J and S-mono, substitute |J| = 2b and simplify constants
@@ -276,12 +282,12 @@ theorem poisson_plateau_lower_bound
                         ≤ ∫ t in S, poissonKernel b (x - t) := int_mono
     have hSJ := le_trans constJ int_mono_le
     -- Left side equals (1/(2πb)) * (2b) = 1/π
-    have hLHS : (1 / (2 * Real.pi * b)) * (volume (Icc (x - b) (x + b))).toReal = (1 / Real.pi) := by
+    have : (1 / (2 * Real.pi * b)) * (volume (Icc (x - b) (x + b))).toReal
+          = 1 / Real.pi := by
       have hbne : b ≠ 0 := ne_of_gt hb
+      -- (1/(2πb)) * (2b) = 1/π
       field_simp [measJ_toReal, one_div, hbne, mul_comm, mul_left_comm, mul_assoc]
-    have hEqSym : (1 / Real.pi) = (1 / (2 * Real.pi * b)) * (volume (Icc (x - b) (x + b))).toReal := by
-      simpa using hLHS.symm
-    simpa [hEqSym] using hSJ
+    exact this.le.trans hSJ
   -- Conclude: ∫_S P ≥ 1/π, hence Real.pi⁻¹ ≤ poissonSmooth b x
   have conv_eq : poissonSmooth b x = ∫ t in S, poissonKernel b (x - t) := rfl
   simpa [conv_eq, one_div] using base
@@ -338,13 +344,27 @@ lemma poisson_plateau_c0 :
       -- use integral_mul_left over the restricted measure
       simpa [mul_comm, mul_left_comm, mul_assoc] using
         (integral_mul_left (1/4 : ℝ) (fun t => poissonKernel b (x - t)) (μ := volume.restrict (Icc (-2 : ℝ) 2)))
-    -- apply the 1/π bound on S = [-2,2] and scale by 1/4
-    have baseS := poisson_plateau_lower_bound (b := b) (x := x) hb hb1 hx
+    -- apply the 1/π bound on S = [-2,2] and scale by 1/4, then conclude via equalities
+    have baseS : (1 / Real.pi) ≤ ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) := by
+      -- expand def of poissonSmooth to rewrite the bound
+      have := poisson_plateau_lower_bound (b := b) (x := x) hb hb1 hx
+      simpa [poissonSmooth] using this
     have hpos4 : 0 ≤ (1 / 4 : ℝ) := by norm_num
-    have hscaled := mul_le_mul_of_nonneg_left baseS hpos4
-    -- conclude
-    simpa [c0_plateau, hset_conv, hpull, one_div, mul_comm, mul_left_comm, mul_assoc]
-      using hscaled
+    have hscaled : (1 / 4 : ℝ) * (1 / Real.pi)
+                    ≤ (1 / 4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) :=
+      mul_le_mul_of_nonneg_left baseS hpos4
+    calc
+      ∫ t, poissonKernel b (x - t) * psi t ∂(volume)
+          = ∫ t in Icc (-2 : ℝ) 2, (1/4 : ℝ) * poissonKernel b (x - t) ∂(volume) := hset_conv
+      _   = (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) ∂(volume) := hpull
+      _   ≥ (1 / 4 : ℝ) * (1 / Real.pi) := by
+              simpa [mul_comm, mul_left_comm, mul_assoc]
+                using hscaled
+    -- rewrite RHS to the desired numeric constant c0
+    have : (1 / 4 : ℝ) * (1 / Real.pi) = c0_plateau := by
+      simp [c0_plateau, one_div, mul_comm, mul_left_comm, mul_assoc]
+    -- flip sides to match ≥ c0
+    exact this.ge
 
 end RS
 end RH
