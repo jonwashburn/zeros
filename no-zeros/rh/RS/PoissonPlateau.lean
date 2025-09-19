@@ -76,7 +76,7 @@ lemma psi_hasCompactSupport : HasCompactSupport psi := by
       · intro ht
         have : psi t = (1 / (4 : ℝ)) := by simp [psi, Set.indicator_of_mem ht]
         exact by simpa [this]
-    simpa [tsupport, this, isClosed_Icc.closure_eq]
+    simp [tsupport, this, isClosed_Icc.closure_eq]
   simpa [hts] using (isCompact_Icc : IsCompact (Icc (-2 : ℝ) 2))
 
 lemma psi_integral_one : ∫ t, psi t ∂(volume) = 1 := by
@@ -86,15 +86,14 @@ lemma psi_integral_one : ∫ t, psi t ∂(volume) = 1 := by
   -- Use indicator integral with integrability on a finite-measure set
   have hμS : (volume (Icc (-2 : ℝ) 2)) < ⊤ := by
     simp [Real.volume_Icc]
-  have hIntS : IntegrableOn (fun _ => (1 / (4 : ℝ))) (Icc (-2 : ℝ) 2) (volume) :=
-    integrableOn_const.mpr (Or.inr hμS)
+  -- hIntS was unused; removing it
   have hindEq : ∫ t, (Icc (-2 : ℝ) 2).indicator (fun _ => (1 / (4 : ℝ))) t ∂(volume)
       = ∫ t in Icc (-2 : ℝ) 2, (1 / (4 : ℝ)) ∂(volume) := by
-    simpa [integral_indicator, hmeas] using hIntS
+    simp [integral_indicator, hmeas]
   calc
     ∫ t, psi t ∂(volume)
         = ∫ t, (Icc (-2 : ℝ) 2).indicator (fun _ => (1 / (4 : ℝ))) t ∂(volume) := by
-              simpa [hpt]
+              simp [hpt]
     _   = ∫ t in Icc (-2 : ℝ) 2, (1 / (4 : ℝ)) ∂(volume) := hindEq
     _   = (volume (Icc (-2 : ℝ) 2)).toReal * (1 / (4 : ℝ)) := by
               simp [integral_const]
@@ -116,12 +115,11 @@ private lemma integral_indicator_const_mul_Icc (c : ℝ) (f : ℝ → ℝ)
   ∫ t, (Icc (-2 : ℝ) 2).indicator (fun t => c * f t) t
     = c * ∫ t in Icc (-2 : ℝ) 2, f t := by
   have hmeasI : MeasurableSet (Icc (-2 : ℝ) 2) := isClosed_Icc.measurableSet
-  have hInt' : IntegrableOn (fun t => c * f t) (Icc (-2 : ℝ) 2) volume := by
-    simpa [mul_comm, mul_left_comm, mul_assoc] using hInt.const_mul c
+  -- hInt' was unused; moving the computation inline
   have hind_to_set :
       ∫ t, (Icc (-2 : ℝ) 2).indicator (fun t => c * f t) t
         = ∫ t in Icc (-2 : ℝ) 2, c * f t := by
-    simpa [integral_indicator, hmeasI] using hInt'
+    simp [integral_indicator, hmeasI]
   simpa [setIntegral_const_mul_Icc] using hind_to_set
 
 /-- The Poisson smoothing of ψ at height b and horizontal coordinate x. -/
@@ -305,11 +303,7 @@ theorem poisson_plateau_lower_bound
                   = ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
       -- ∫ indicator f = ∫_J f
       simp [integral_indicator, hmeasJ]
-    -- Same identification for the expanded kernel form used by simp
-    have hfun_explicit : ∫ t,
-        (Icc (x - b) (x + b)).indicator (fun t => Real.pi⁻¹ * (b / ((x - t) ^ 2 + b ^ 2))) t
-        = ∫ t in Icc (x - b) (x + b), Real.pi⁻¹ * (b / ((x - t) ^ 2 + b ^ 2)) := by
-      simp [integral_indicator, hmeasJ]
+    -- Removed unused hfun_explicit
     -- Start from hineq and rewrite both sides step by step
     have h1 : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
               ≤ ∫ t, (Icc (x - b) (x + b)).indicator (fun t => poissonKernel b (x - t)) t := by
@@ -332,7 +326,8 @@ theorem poisson_plateau_lower_bound
       have : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
           ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
         simpa [mul_comm, mul_left_comm, mul_assoc] using constJ
-      simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using this
+      rw [hJ_len] at this
+      simpa [mul_comm, mul_left_comm, mul_assoc] using this
     have hcollapse : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) = Real.pi⁻¹ := by
       have : b⁻¹ * (2 * b) = (2 : ℝ) := by field_simp [hbne]
       calc
@@ -526,7 +521,7 @@ lemma poisson_plateau_c0 :
     have constJ : (∫ t in Icc (x - b) (x + b), poissonKernel b (x - t))
                     ≥ (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal := by
       have hmeasJ : MeasurableSet (Icc (x - b) (x + b)) := isClosed_Icc.measurableSet
-      have hμJ : (volume (Icc (x - b) (x + b))) < ⊤ := by simp [Real.volume_Icc]
+      -- Removed unused hμJ
       have hint_on : IntegrableOn (fun t : ℝ => poissonKernel b (x - t)) (Icc (x - b) (x + b)) volume := by
         have hcont : Continuous fun t : ℝ => poissonKernel b (x - t) := by
           have hden : Continuous fun t : ℝ => (x - t) ^ 2 + b ^ 2 :=
@@ -585,7 +580,8 @@ lemma poisson_plateau_c0 :
         have : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (volume (Icc (x - b) (x + b))).toReal
             ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := by
           simpa [mul_comm, mul_left_comm, mul_assoc] using constJ
-        simpa [hJ_len, mul_comm, mul_left_comm, mul_assoc] using this
+        rw [hJ_len] at this
+        simpa [mul_comm, mul_left_comm, mul_assoc] using this
       have hcollapse : (b⁻¹ * (Real.pi⁻¹ * 2⁻¹)) * (2 * b) = Real.pi⁻¹ := by
         have : b⁻¹ * (2 * b) = 2 := by field_simp [hbne]
         calc
@@ -598,7 +594,6 @@ lemma poisson_plateau_c0 :
         _ ≤ ∫ t in Icc (x - b) (x + b), poissonKernel b (x - t) := constJ'
         _ ≤ ∫ t in S, poissonKernel b (x - t) := hS_ge
     -- Finally, scale base2 by 1/4 and rewrite via conv_eq
-    have h4nonneg : 0 ≤ (1 / (4 : ℝ)) := by norm_num
     have : c0_plateau ≤ (1/4 : ℝ) * ∫ t in Icc (-2 : ℝ) 2, poissonKernel b (x - t) := by
       have := base2
       have h := mul_le_mul_of_nonneg_left this (by norm_num : 0 ≤ (1 / (4 : ℝ)))
