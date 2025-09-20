@@ -1088,17 +1088,17 @@ lemma whitney_carleson_coercivity_aepos
   exact localWedge_from_pairing_and_uniformTest (α := (1 : ℝ)) ψ F hKxi pairing hPlateau
 
 
-/‑! ### Algebraic endgame (finite‑sum contradiction)
+/-! ### Algebraic endgame (finite-sum contradiction)
 
-This section implements the pure finite‑sum contradiction used at the end of the
+This section implements the pure finite-sum contradiction used at the end of the
 Whitney–plateau argument. It requires no measure theory—only elementary
 inequalities on finite sums—and can be consumed by a wrapper once the geometric
 ingredients (capture, decomposition, small remainder, boundary negativity, and
 shadow–energy comparability) have been assembled.
 
-The goal is to avoid re‑proving measure/covering facts here while still keeping
-the RS glue self‑contained.
-‑/
+The goal is to avoid re-proving measure/covering facts here while still keeping
+the RS glue self-contained.
+-/
 
 namespace AlgebraicEndgame
 
@@ -1200,7 +1200,7 @@ variable {ι : Type*}
 /‑ From a decomposition `A i = B i + R i`, a lower bound on the sum of `A`, a
 boundary negativity bound on the sum of `B`, and a smallness bound on the sum of
 remainders `R`, together with a shadow–energy comparability and energy capture,
-derive a contradiction (False) under a quantitative numeric separation. ‑/
+derive a contradiction (False) under a quantitative numeric separation. -/
 lemma whitney_coercivity_sum_contradiction
   (S : Finset ι)
   (E Ilen A B R : ι → ℝ)
@@ -1307,12 +1307,12 @@ lemma whitney_coercivity_sum_contradiction
 end AlgebraicEndgame
 
 
-/‑! ### Wrapper: conclude `(P+)` from a global Whitney–plateau coercivity package
+/-! ### Wrapper: conclude `(P+)` from a global Whitney–plateau coercivity package
 
-This is a statement‑level adapter. Once a finite Whitney selection and its
+This is a statement-level adapter. Once a finite Whitney selection and its
 quantitative bounds are constructed upstream, invoke this lemma to obtain the
 boundary wedge `(P+)`.
-‑/
+-/
 lemma aepos_from_global_whitney_coercivity
   (F : ℂ → ℂ) {ι : Type*} (S : Finset ι)
   (E Ilen A B R : ι → ℝ)
@@ -1336,12 +1336,12 @@ lemma aepos_from_global_whitney_coercivity
   exact this.elim
 
 
-/‑! ### Packaged variant (record) for downstream wiring
+/-! ### Packaged variant (record) for downstream wiring
 
 This small record packages the finite Whitney selection and all quantitative
 inequalities used by the endgame. Downstream code can build an instance and
 feed it to the following wrapper to obtain `(P+)` for `F`.
-‑/
+-/
 
 structure GlobalWhitneyCoercivityPkg (ι : Type*) where
   S : Finset ι
@@ -1372,19 +1372,19 @@ lemma PPlus_from_GlobalWhitneyCoercivityPkg
     (hc0 := G.hc0) (hη := G.hη) (hγ := G.hγ) (hκ := G.hκ) (hε := G.hε) (hStrict := G.hStrict)
 
 
-/‑! ## Minimal helper APIs (Window/Whitney) for local construction
+/-! ## Minimal helper APIs (Window/Whitney) for local construction
 
-These are lightweight, self‑contained adapters that allow the Whitney selection
-and per‑ring test packaging to be wired without introducing import cycles.
+These are lightweight, self-contained adapters that allow the Whitney selection
+and per-ring test packaging to be wired without introducing import cycles.
 They are intentionally permissive and can be tightened later.
-‑/
+-/
 
 namespace RS
 namespace Window
 
 /‑ Selection of a base interval and boundary window from the failure of `(P+)`.
 This is a permissive adapter returning a short interval in `[−1,1]` and a height
-`b ∈ (0,1]`. It does not encode negativity; downstream code should refine. ‑/
+`b ∈ (0,1]`. It does not encode negativity; downstream code should refine. -/
 lemma density_interval_of_not_PPlus
   (F : ℂ → ℂ) (ε κ : ℝ)
   (hε : 0 < ε ∧ ε < 1) (hκ : 0 < κ ∧ κ < 1)
@@ -1395,7 +1395,7 @@ lemma density_interval_of_not_PPlus
 
 /‑ Per‑ring test package existence: returns trivial data satisfying the
 volumetric and decomposition bounds (with zero constants/tests). This is
-adequate for wiring; analytic versions can replace it later. ‑/
+adequate for wiring; analytic versions can replace it later. -/
 lemma per_ring_test_package
   (ψ : ℝ → ℝ) (F : ℂ → ℂ)
   (I : Set ℝ) (b : ℝ)
@@ -1424,21 +1424,21 @@ lemma per_ring_test_package
     simp [RS.boxEnergy, sqnormR2]
 
 /‑ Plateau coercivity adapter (per ring).
-Removed permissive stub returning `c⋆ = 0`. Supply analytic per-ring coercivity downstream. ‑/
+Removed permissive stub returning `c⋆ = 0`. Supply analytic per-ring coercivity downstream. -/
 
 end Window
 
 namespace Whitney
 
 /‑ Disjoint rings capture (interface): permissive adapter exposing disjointness
-and a pass‑through packing bound. Analytic versions can refine geometry. ‑/
+and a pass-through packing bound. Analytic versions can refine geometry. -/
 structure DisjointRings (ι : Type*) where
   Q : ι → Set (ℝ × ℝ)
   disjoint : True
   subTent : True
   depth : True
 
-/‑ Carleson packing bound (pass‑through). ‑/
+/- Carleson packing bound (pass-through). -/
 theorem carleson_packing_bound
   {Kξ : ℝ} (hCar : ConcreteHalfPlaneCarleson Kξ) (hKξ0 : 0 ≤ Kξ)
   {ι : Type*} (S : Finset ι)
@@ -1614,16 +1614,16 @@ theorem local_pairing_bound_from_IBP_and_Carleson
   classical
   -- Sqrt-form Carleson budget
   have hCarlSqrt :
-      Real.sqrt (RS.boxEnergy gradU σ Q) ≤ Real.sqrt (Kξ * lenI) := by
-    exact RS.sqrt_boxEnergy_bound_of_ConcreteHalfPlaneCarleson hCar gradU σ Q hEnergy_le
+      Real.sqrt (RH.RS.CRGreenOuter.boxEnergyCRGreen gradU σ Q) ≤ Real.sqrt (Kξ * lenI) := by
+    exact RH.RS.CRGreenOuter.sqrt_boxEnergy_bound_of_ConcreteHalfPlaneCarleson hCar gradU σ Q hEnergy_le
   -- Whitney analytic bound from Green+trace decomposition inputs
   have hAnalytic :
       |∫ t in I, ψ t * B t|
-        ≤ (Cψ_pair + Cψ_rem) * Real.sqrt (RS.boxEnergy gradU σ Q) := by
+        ≤ (Cψ_pair + Cψ_rem) * Real.sqrt (RH.RS.CRGreenOuter.boxEnergyCRGreen gradU σ Q) := by
     -- If χ vanishes a.e. on side/top boundary pieces, we can derive Rside=Rtop=0
     -- via side_top_zero_from_ae_zero and then apply the Whitney packaging.
     -- Here we assume hSideZero, hTopZero are already available in inputs.
-    exact RS.CRGreen_pairing_whitney_from_green_trace
+    exact RH.RS.CRGreenOuter.CRGreen_pairing_whitney_from_green_trace
       U W ψ χ I α' σ Q gradU gradChiVpsi B Cψ_pair Cψ_rem
       hPairVol Rside Rtop Rint hEqDecomp hSideZero hTopZero hRintBound
   -- Push through the Carleson budget (monotonicity by nonnegativity)
@@ -1849,7 +1849,7 @@ theorem Theta_Schur_offXi_from_certificate
 /-- Alias wrapper: deduce `(P+)` from the pairing package, a Carleson budget,
 and a plateau lower bound by forwarding to `whitney_carleson_coercivity_aepos`.
 This exposes a simpler name for downstream callers. -/
-lemma whitney_plateau_aepos_of_pairing_and_plateau
+lemma whitney_plateau_aepos_of_pairing_and_plateau_v2
   (ψ : ℝ → ℝ) (F : ℂ → ℂ) (Kξ c0 : ℝ)
   (hKξ0 : 0 ≤ Kξ) (hCar : ConcreteHalfPlaneCarleson Kξ)
   (hc0 : 0 < c0)
