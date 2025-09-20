@@ -363,17 +363,22 @@ lemma poissonKernel_integrable {z : ℂ} (hz : (1/2 : ℝ) < z.re) :
     have :
         (1 / Real.pi) * (a / (a ^ 2 + (t - b) ^ 2))
           ≤ (1 / Real.pi) * (C0 * (1 / (1 + (t - b) ^ 2))) := by
-      -- Multiply both sides of hcore by (1/π) and divide by positive denominators
-      have hπnonneg : 0 ≤ (1 / Real.pi) := by exact one_div_nonneg.mpr (le_of_lt Real.pi_pos)
+      -- Multiply both sides of hcore by (1/π), then by (1+X) and divide by (a^2+X)
+      have hπnonneg : 0 ≤ (1 / Real.pi) := one_div_nonneg.mpr (le_of_lt Real.pi_pos)
       have hposL : 0 < (a ^ 2 + (t - b) ^ 2) := hden2
       have hposR : 0 < (1 + (t - b) ^ 2) := hden1
-      -- a/(a^2+X) ≤ C0/(1+X) follows from hcore by dividing by positive factors
-      have h₁ : a ≤ C0 * ((a ^ 2 + (t - b) ^ 2) / (1 + (t - b) ^ 2)) := by
-        have := div_le_div_of_nonneg_right hcore (le_of_lt hposR)
-        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
+      -- From hcore: a*(1+X) ≤ C0*(a^2+X). Divide both sides by (a^2+X)>0 and by (1+X)>0 appropriately
       have hfrac : a / (a ^ 2 + (t - b) ^ 2) ≤ C0 / (1 + (t - b) ^ 2) := by
         have hposL' : 0 ≤ (a ^ 2 + (t - b) ^ 2) := le_of_lt hposL
-        have := div_le_div_of_nonneg_left h₁ hposL'
+        have hposR' : 0 ≤ (1 + (t - b) ^ 2) := le_of_lt hposR
+        -- a/(a^2+X) ≤ C0/(1+X) ↔ a*(1+X) ≤ C0*(a^2+X)
+        have := (mul_le_mul_of_nonneg_right hcore hposR')
+        -- Now divide both sides by positive (a^2+X)*(1+X)
+        have hxpos : 0 < (a ^ 2 + (t - b) ^ 2) * (1 + (t - b) ^ 2) :=
+          mul_pos hposL hposR
+        have hxpos' : 0 ≤ (a ^ 2 + (t - b) ^ 2) * (1 + (t - b) ^ 2) := le_of_lt hxpos
+        have := (div_le_div_of_nonneg_right this hxpos')
+        -- Simplify both sides
         simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using this
       exact mul_le_mul_of_nonneg_left hfrac hπnonneg
     simpa [poissonKernel, a, b, C, C0, mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
@@ -601,14 +606,18 @@ theorem pinch_representation_on_offXi_M2
     have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
       by_cases hO : O (RH.RS.boundary t) = 0
       · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
-        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
-            simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-          simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+            have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+              simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+            simpa [this]
+          simpa [this]
         · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO]) (by exact hXi)
       · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
-        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
-            simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-          simpa [this] using (le_of_eq (by norm_num : (2 : ℝ) = 2))
+        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+            have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+              simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+            simpa [this]
+          simpa [this]
         · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
     simpa using hRS
   -- Integrability via M=2 bound derived internally
