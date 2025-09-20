@@ -151,42 +151,63 @@ lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuterV2.Ω) (t : �
         / (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2 := by
   classical
   intro w ξ
-  -- Nonvanishing of z
+  -- Abbreviation for the boundary point
+  set s : ℂ := HalfPlaneOuterV2.boundary t with hs
+  -- Nonvanishing of z and s
   have hz0 : z ≠ 0 := by
     intro hz; subst hz
-    -- 0 ∉ Ω since Re 0 = 0 ≤ 1/2, contradicting hzΩ
-    have : (1 / 2 : ℝ) < (0 : ℂ).re := by
+    have hlt : (1 / 2 : ℝ) < (0 : ℝ) := by
       simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hzΩ
-    exact (lt_irrefl _ this)
+    have : ¬ ((1 / 2 : ℝ) < 0) := by norm_num
+    exact (this hlt).elim
+  have hs0 : s ≠ 0 := by
+    simpa [hs] using boundary_ne_zero t
   -- Denominator equality from abs difference formula
   have hDen_abs :
-      Complex.abs (ξ - w)
-        = Complex.abs (HalfPlaneOuterV2.boundary t - z)
-            / (Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z) := by
-    simpa [ξ, w] using abs_boundaryToDisk_sub_toDisk t z hz0
+      Complex.abs (ξ - w) = Complex.abs (s - z) / (Complex.abs s * Complex.abs z) := by
+    simpa [ξ, w, hs] using abs_boundaryToDisk_sub_toDisk t z hz0
   -- Square both sides
   have hDen : Complex.abs (ξ - w) ^ 2
-      = Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2 /
-          ((Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2) * (Complex.abs z ^ 2)) := by
-    have := congrArg (fun x : ℝ => x ^ 2) hDen_abs
-    simpa [pow_two, mul_pow, div_pow] using this
+      = Complex.abs (s - z) ^ 2 / (Complex.abs s ^ 2 * Complex.abs z ^ 2) := by
+    have h2 := congrArg (fun x : ℝ => x ^ 2) hDen_abs
+    -- Use (a/b)^2 = a^2 / b^2 and |ab|^2 = |a|^2 |b|^2; avoid expanding x^2 to x*x
+    simpa [div_pow, mul_pow] using h2
   -- Numerator identity
   have hNum : 1 - Complex.abs w ^ 2
       = ((2 : ℝ) * z.re - 1) / Complex.abs z ^ 2 := by
     simpa [w] using one_minus_absSq_toDisk z hz0
-  -- Combine and simplify with ring_nf over ℝ
+  -- Nonzero denominators for field_simp
   have hzabs_ne : Complex.abs z ^ 2 ≠ 0 := by
     have hzabs : Complex.abs z ≠ 0 := AbsoluteValue.ne_zero Complex.abs hz0
     exact pow_ne_zero 2 hzabs
-  -- Main algebra: ((A/B) / (C/(D*B))) = (A*D)/C, with A=2Re z −1, B=|z|^2, C=|s−z|^2, D=|s|^2
-  have :
+  have hsabs_ne : Complex.abs s ^ 2 ≠ 0 := by
+    have hsabs : Complex.abs s ≠ 0 := AbsoluteValue.ne_zero Complex.abs hs0
+    exact pow_ne_zero 2 hsabs
+  have hzRe : (1 / 2 : ℝ) < z.re := by
+    simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hzΩ
+  have hsminusz_ne : s - z ≠ 0 := by
+    intro h
+    have hRe0 : (s - z).re = 0 := by simpa using congrArg Complex.re h
+    have : (s - z).re = (1 / 2 : ℝ) - z.re := by
+      simp [hs, HalfPlaneOuterV2.boundary_re]
+    have : (1 / 2 : ℝ) - z.re = 0 := by simpa [this] using hRe0
+    have : (1 / 2 : ℝ) = z.re := by linarith
+    exact (ne_of_gt hzRe) (by simpa using this.symm)
+  have hsminusz_abs_ne : Complex.abs (s - z) ^ 2 ≠ 0 := by
+    have : Complex.abs (s - z) ≠ 0 := AbsoluteValue.ne_zero Complex.abs hsminusz_ne
+    exact pow_ne_zero 2 this
+  -- Combine and simplify in one algebra step: ((A/B) / (C/(D*B))) = (A*D)/C
+  have hRewrite :
+    ((1 - Complex.abs w ^ 2) / Complex.abs (ξ - w) ^ 2)
+      = (((2 : ℝ) * z.re - 1) / Complex.abs z ^ 2) /
+          (Complex.abs (s - z) ^ 2 / (Complex.abs s ^ 2 * Complex.abs z ^ 2)) := by
+    simpa [hNum, hDen]
+  have hAlg :
     (((2 : ℝ) * z.re - 1) / Complex.abs z ^ 2) /
-      (Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2 /
-        (Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2 * Complex.abs z ^ 2))
-    = (((2 : ℝ) * z.re - 1) * Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2)
-        / (Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2) := by
-    field_simp [hzabs_ne, mul_comm, mul_left_comm, mul_assoc]
-  simpa [hNum, hDen, this]
+      (Complex.abs (s - z) ^ 2 / (Complex.abs s ^ 2 * Complex.abs z ^ 2))
+    = (((2 : ℝ) * z.re - 1) * Complex.abs s ^ 2) / Complex.abs (s - z) ^ 2 := by
+    field_simp [hzabs_ne, hsabs_ne, hsminusz_abs_ne, mul_comm, mul_left_comm, mul_assoc]
+  simpa [hs] using hRewrite.trans hAlg
 
 /-- Real parameters `a(z) = Re z − 1/2` and `b(z) = Im z` for change-of-variables. -/
 def a (z : ℂ) : ℝ := z.re - (1/2 : ℝ)
