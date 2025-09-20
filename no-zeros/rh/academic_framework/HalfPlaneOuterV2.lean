@@ -51,6 +51,13 @@ lemma boundary_re (t : ℝ) : (boundary t).re = 1/2 := by simp [boundary]
 
 lemma boundary_im (t : ℝ) : (boundary t).im = t := by simp [boundary]
 
+@[simp] lemma boundary_mk_eq (t : ℝ) :
+  boundary t = { re := (1/2 : ℝ), im := t } := by
+  -- Prove equality by matching real and imaginary parts
+  apply Complex.ext
+  · simp [boundary]
+  · simp [boundary]
+
 /-- An outer function on Ω: analytic and non-vanishing -/
 structure IsOuter (O : ℂ → ℂ) : Prop where
   analytic : AnalyticOn ℂ O Ω
