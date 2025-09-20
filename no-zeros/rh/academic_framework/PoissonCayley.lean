@@ -109,14 +109,14 @@ theorem reEq_on_from_disk_via_cayley
   intro z hzS
   have h1 : (F z).re = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re := by
     have := hEqInterior hzS
-    simpa using congrArg Complex.realPart this
+    simpa using congrArg Complex.re this
   have h2 :
       poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
         = poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z := by
     -- pointwise equality of boundary integrands via boundary identification
     have : (fun t : ℝ => (F (boundary t)).re)
             = (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) := by
-      funext t; simpa [EqOnBoundary] using congrArg Complex.realPart (hEqBoundary t)
+      funext t; simpa [EqOnBoundary] using congrArg Complex.re (hEqBoundary t)
     simpa [this]
   have h3 :
       poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z

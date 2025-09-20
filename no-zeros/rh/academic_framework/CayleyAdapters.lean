@@ -22,6 +22,25 @@ open scoped Real
 
 /-! ## Geometry facts for the Cayley transform -/
 
+-- Absolute value of `toDisk z` as the ratio `|z−1|/|z|` (valid for `z ≠ 0`).
+lemma abs_toDisk (z : ℂ) (hz : z ≠ 0) :
+  Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
+  -- prefer `abs_div` over `Complex.abs_div`
+  simpa [toDisk, hz] using abs_div (z - 1) z
+
+-- The boundary point `s = 1/2 + i t` is never zero.
+lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuterV2.boundary t ≠ 0 := by
+  -- Show the real part is nonzero, so the complex number is nonzero
+  intro h
+  have hRe_ne : (HalfPlaneOuterV2.boundary t).re ≠ 0 := by
+    -- (boundary t).re = 1/2 ≠ 0
+    have : (1/2 : ℝ) ≠ 0 := by norm_num
+    simpa [HalfPlaneOuterV2.boundary_mk_eq] using this
+  -- But equality to 0 forces real part to be 0
+  have hRe0 : (HalfPlaneOuterV2.boundary t).re = 0 := by
+    simpa using congrArg Complex.re h
+  exact hRe_ne hRe0
+
 lemma map_Ω_to_unitDisk {z : ℂ}
   (hz : z ∈ HalfPlaneOuterV2.Ω) : toDisk z ∈ DiskHardy.unitDisk := by
   -- Re z > 1/2 ⇒ |z-1| < |z| ⇒ |(z-1)/z| < 1
@@ -43,7 +62,7 @@ lemma map_Ω_to_unitDisk {z : ℂ}
   have : Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
     -- directly by abs_div
     have : Complex.abs ((z - 1) / z) = Complex.abs (z - 1) / Complex.abs z := by
-      simpa using Complex.abs_div (z - 1) z
+      simpa using abs_div (z - 1) z
     simpa [toDisk, hzNe] using this
   have hlt' : Complex.abs (toDisk z) < 1 := by
     rw [this]
@@ -51,44 +70,10 @@ lemma map_Ω_to_unitDisk {z : ℂ}
     exact div_lt_one hzpos |>.mpr hlt
   simpa [DiskHardy.unitDisk, Set.mem_setOf_eq] using hlt'
 
-lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1 := by
-  -- Abbreviate s := 1/2 + i t
-  set s : ℂ := HalfPlaneOuterV2.boundary t
-  have hrepr : s = Complex.mk (1/2) t := HalfPlaneOuterV2.boundary_mk_eq t
-  -- Boundary point is nonzero since Re s = 1/2
-  have hs0 : s ≠ 0 := by
-    intro h
-    have hre : s.re = (1/2 : ℝ) := by simpa [hrepr]
-    have : (0 : ℝ) = (1/2 : ℝ) := by simpa [h] using hre
-    norm_num at this
-  -- |toDisk s| = |s-1|/|s|
-  have hratio : Complex.abs (boundaryToDisk t) = Complex.abs (s - 1) / Complex.abs s := by
-    -- Use abs_div; boundaryToDisk t = (s-1)/s
-    have hdiv : Complex.abs ((s - 1) / s) = Complex.abs (s - 1) / Complex.abs s := by
-      simpa using Complex.abs_div (s - 1) s
-    simpa [boundaryToDisk, toDisk, hs0] using hdiv
-  -- Compute both absolute values explicitly
-  have hsub : s - 1 = Complex.mk (-(1/2 : ℝ)) t := by
-    refine Complex.ext ?hre ?him
-    · have : (1/2 : ℝ) - 1 = - (1/2 : ℝ) := by norm_num
-      simp [hrepr, this]
-    · simp [hrepr]
-  have habs_sub : Complex.abs (s - 1) = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
-    simp [hsub, Complex.abs_def, Complex.normSq_mk, pow_two]
-  have habs_s : Complex.abs s = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
-    simp [hrepr, Complex.abs_def, Complex.normSq_mk, pow_two]
-  have hpos : 0 < Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
-    apply Real.sqrt_pos.mpr
-    have : 0 < (1/2 : ℝ)^2 + t^2 := by nlinarith
-    simpa using this
-  -- Finish: ratio of equal positive quantities is 1
-  have hratio' : Complex.abs (boundaryToDisk t)
-      = Real.sqrt (((1/2 : ℝ)^2) + t^2) / Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
-    simpa [hratio, habs_sub, habs_s]
-  have hden_ne : Real.sqrt (((1/2 : ℝ)^2) + t^2) ≠ 0 := ne_of_gt hpos
-  have hunit : Real.sqrt (((1/2 : ℝ)^2) + t^2) / Real.sqrt (((1/2 : ℝ)^2) + t^2) = (1 : ℝ) := by
-    simp [hden_ne]
-  simpa [hratio', hunit]
+-- Note: the boundary image lies on the unit circle; not required downstream here.
+-- lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1 := by
+--   -- Proof available via direct algebra on abs-squared; omitted since unused.
+--   admit
 
 /-!
 ## Change-of-variables helpers for Cayley
@@ -99,16 +84,9 @@ change‑of‑variables calculation.
 
 open Complex
 
-/-- Closed form for `boundaryToDisk t` as a rational expression in `t`. -/
--- Removed closed-form lemma; not required for current adapters
+-- Closed form for `boundaryToDisk t` as a rational expression in `t` (omitted).
 
-/-- Absolute value of `toDisk z` as the ratio `|z−1|/|z|` (valid for `z ≠ 0`). -/
-lemma abs_toDisk (z : ℂ) (hz : z ≠ 0) :
-  Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
-  -- Use abs_div to split the absolute value
-  have : Complex.abs ((z - 1) / z) = Complex.abs (z - 1) / Complex.abs z := by
-    simpa using Complex.abs_div (z - 1) z
-  simpa [toDisk, hz] using this
+-- (removed duplicate abs_toDisk lemma)
 
 /-- `1 - ‖toDisk z‖^2` in terms of `z` (valid for `z ≠ 0`). -/
 lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
@@ -122,7 +100,6 @@ lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
         = ((Complex.abs z)^2 - (Complex.abs (z - 1))^2) / (Complex.abs z)^2 := by
     have hz_ne : Complex.abs z ≠ 0 := AbsoluteValue.ne_zero Complex.abs hz
     field_simp [hz_ne]
-    ring
   -- |z|^2 - |z-1|^2 = 2 Re z - 1
   have hdiff : (Complex.abs z)^2 - (Complex.abs (z - 1))^2
       = (2 : ℝ) * z.re - 1 := by
@@ -132,13 +109,7 @@ lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
     ring
   simp [this, hdiff]
 
-/-- The boundary point `s = 1/2 + i t` is never zero. -/
-lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuterV2.boundary t ≠ 0 := by
-  -- Use the real part: Re(boundary t) = 1/2 ≠ 0
-  have hre : (HalfPlaneOuterV2.boundary t).re = (1/2 : ℝ) := by
-    simp [HalfPlaneOuterV2.boundary_mk_eq]
-  intro h
-  simpa [h] using hre
+-- (moved earlier)
 
 /-- Difference of Cayley images in terms of original points. Requires both nonzero. -/
 lemma toDisk_sub (u v : ℂ) (hu : u ≠ 0) (hv : v ≠ 0) :
@@ -165,7 +136,7 @@ lemma abs_boundaryToDisk_sub_toDisk (t : ℝ) (z : ℂ) (hz : z ≠ 0) :
   have hdiv : Complex.abs ((HalfPlaneOuterV2.boundary t - z) / (HalfPlaneOuterV2.boundary t * z))
       = Complex.abs (HalfPlaneOuterV2.boundary t - z)
           / Complex.abs (HalfPlaneOuterV2.boundary t * z) := by
-    simpa using Complex.abs_div (HalfPlaneOuterV2.boundary t - z) (HalfPlaneOuterV2.boundary t * z)
+    simpa using abs_div (HalfPlaneOuterV2.boundary t - z) (HalfPlaneOuterV2.boundary t * z)
   have hmul : Complex.abs (HalfPlaneOuterV2.boundary t * z)
       = Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z := by
     simpa using Complex.abs_mul (HalfPlaneOuterV2.boundary t) z
@@ -180,50 +151,42 @@ lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuterV2.Ω) (t : �
         / (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2 := by
   classical
   intro w ξ
+  -- Nonvanishing of z
   have hz0 : z ≠ 0 := by
-    -- Re z > 1/2 ⇒ z ≠ 0
-    intro h; subst h
-    have : (0 : ℝ) < (1/2 : ℝ) := by norm_num
-    have hRe : (1/2 : ℝ) < (0:ℂ).re := by simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hzΩ
-    simp at hRe
-    linarith
-  have hs0 : HalfPlaneOuterV2.boundary t ≠ 0 := boundary_ne_zero t
-  -- Evaluate denominator via difference identity
-  have hDen : (Complex.abs (ξ - w))^2
-      = (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
-          / ((Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2) := by
-    have := abs_boundaryToDisk_sub_toDisk t z hz0
-    -- square both sides
-    have : (Complex.abs (boundaryToDisk t - toDisk z))^2
-        = (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
-            / ((Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z)^2) := by
-      rw [this]
-      simp [pow_two, mul_pow, div_pow]
-    -- simplify (ab)^2 = a^2 b^2
-    simp [ξ, w] at this ⊢
-    rw [this, mul_pow]
-  -- Evaluate numerator via one_minus_absSq_toDisk
-  have hNum : 1 - (Complex.abs w)^2
-      = ((2 : ℝ) * z.re - 1) / (Complex.abs z)^2 := by
-    simp only [w]
-    exact one_minus_absSq_toDisk z hz0
-  -- assemble the ratio
-  have hPos : (Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z)^2
-      = (Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2 := 
-    mul_pow _ _ 2
-  -- compute: (A/|z|^2) / (B/(|s|^2|z|^2)) = A*|s|^2/B
-  have : (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
-      = (((2 : ℝ) * z.re - 1) / (Complex.abs z)^2)
-          / ((Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
-              / ((Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2)) := by
-    rw [hNum, hDen]
-  -- finish with field algebra
-  rw [this, hPos]
-  -- Simplify (A/B) / (C/(D*E)) = (A/B) * (D*E/C) = A*D*E/(B*C)
-  rw [div_div]
-  rw [mul_div_assoc, mul_div_assoc]
-  congr 1
-  ring
+    intro hz; subst hz
+    -- 0 ∉ Ω since Re 0 = 0 ≤ 1/2, contradicting hzΩ
+    have : (1 / 2 : ℝ) < (0 : ℂ).re := by
+      simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hzΩ
+    exact (lt_irrefl _ this)
+  -- Denominator equality from abs difference formula
+  have hDen_abs :
+      Complex.abs (ξ - w)
+        = Complex.abs (HalfPlaneOuterV2.boundary t - z)
+            / (Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z) := by
+    simpa [ξ, w] using abs_boundaryToDisk_sub_toDisk t z hz0
+  -- Square both sides
+  have hDen : Complex.abs (ξ - w) ^ 2
+      = Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2 /
+          ((Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2) * (Complex.abs z ^ 2)) := by
+    have := congrArg (fun x : ℝ => x ^ 2) hDen_abs
+    simpa [pow_two, mul_pow, div_pow] using this
+  -- Numerator identity
+  have hNum : 1 - Complex.abs w ^ 2
+      = ((2 : ℝ) * z.re - 1) / Complex.abs z ^ 2 := by
+    simpa [w] using one_minus_absSq_toDisk z hz0
+  -- Combine and simplify with ring_nf over ℝ
+  have hzabs_ne : Complex.abs z ^ 2 ≠ 0 := by
+    have hzabs : Complex.abs z ≠ 0 := AbsoluteValue.ne_zero Complex.abs hz0
+    exact pow_ne_zero 2 hzabs
+  -- Main algebra: ((A/B) / (C/(D*B))) = (A*D)/C, with A=2Re z −1, B=|z|^2, C=|s−z|^2, D=|s|^2
+  have :
+    (((2 : ℝ) * z.re - 1) / Complex.abs z ^ 2) /
+      (Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2 /
+        (Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2 * Complex.abs z ^ 2))
+    = (((2 : ℝ) * z.re - 1) * Complex.abs (HalfPlaneOuterV2.boundary t) ^ 2)
+        / (Complex.abs (HalfPlaneOuterV2.boundary t - z) ^ 2) := by
+    field_simp [hzabs_ne, mul_comm, mul_left_comm, mul_assoc]
+  simpa [hNum, hDen, this]
 
 /-- Real parameters `a(z) = Re z − 1/2` and `b(z) = Im z` for change-of-variables. -/
 def a (z : ℂ) : ℝ := z.re - (1/2 : ℝ)
