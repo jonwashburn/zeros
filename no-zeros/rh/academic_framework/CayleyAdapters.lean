@@ -29,21 +29,22 @@ lemma map_Ω_to_unitDisk {z : ℂ}
   have hzNe : z ≠ 0 := by
     intro h; subst h; simp at hzRe; linarith
   have hsq : (Complex.abs (z - 1))^2 = (Complex.abs z)^2 - 2 * z.re + 1 := by
-    rw [Complex.sq_abs, Complex.sq_abs, Complex.normSq_sub]
-    simp [Complex.normSq_one]
+    simp [Complex.sq_abs, Complex.normSq_sub, Complex.normSq_one]
     ring
   have hlt : Complex.abs (z - 1) < Complex.abs z := by
-    -- Compare squares using Re z > 1/2
+    -- Compare squares using Re z > 1/2, then drop squares on nonnegative reals
     have hlt_sq : (Complex.abs (z - 1))^2 < (Complex.abs z)^2 := by
       rw [hsq]
       have : - 2 * z.re + 1 < 0 := by linarith
       linarith
-    rw [← Complex.sq_abs, ← Complex.sq_abs] at hlt_sq
-    exact sq_lt_sq'.mp hlt_sq
+    -- Convert a^2 < b^2 to a < b using sq_lt_sq on ℝ
+    have habs_lt : |Complex.abs (z - 1)| < |Complex.abs z| := (sq_lt_sq).1 hlt_sq
+    simpa using habs_lt
   have : Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
-    simp [toDisk]
-    rw [AbsoluteValue.map_div]
-    simp [hzNe]
+    -- directly by abs_div
+    have : Complex.abs ((z - 1) / z) = Complex.abs (z - 1) / Complex.abs z := by
+      simpa using Complex.abs_div (z - 1) z
+    simpa [toDisk, hzNe] using this
   have hlt' : Complex.abs (toDisk z) < 1 := by
     rw [this]
     have hzpos : 0 < Complex.abs z := AbsoluteValue.pos Complex.abs hzNe
@@ -51,36 +52,43 @@ lemma map_Ω_to_unitDisk {z : ℂ}
   simpa [DiskHardy.unitDisk, Set.mem_setOf_eq] using hlt'
 
 lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1 := by
-  -- |(s-1)/s| = 1 when Re s = 1/2 with s = 1/2 + i t
-  have hrepr : HalfPlaneOuterV2.boundary t = Complex.mk (1/2) t := 
-    HalfPlaneOuterV2.boundary_mk_eq t
-  have hne : HalfPlaneOuterV2.boundary t ≠ 0 := by
-    rw [hrepr]
-    norm_num
-  have h1 : Complex.abs (HalfPlaneOuterV2.boundary t - 1)
-            = Real.sqrt (((- (1/2 : ℝ))^2) + t^2) := by
-    have : HalfPlaneOuterV2.boundary t - 1 = Complex.mk (- (1/2 : ℝ)) t := by
-      rw [hrepr]
-      simp [Complex.ext_iff]
-    rw [this, Complex.abs_def, Complex.normSq_mk]
-    norm_num
-  have h2 : Complex.abs (HalfPlaneOuterV2.boundary t)
-            = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
-    rw [hrepr, Complex.abs_def, Complex.normSq_mk]
-    norm_num
-  have : Complex.abs (boundaryToDisk t) = Complex.abs (HalfPlaneOuterV2.boundary t - 1) / Complex.abs (HalfPlaneOuterV2.boundary t) := by
-    simp [boundaryToDisk, toDisk]
-    rw [AbsoluteValue.map_div]
-    simp [hne]
-  have : Complex.abs (boundaryToDisk t)
-      = Real.sqrt ((1/2 : ℝ)^2 + t^2) / Real.sqrt ((1/2 : ℝ)^2 + t^2) := by
-    rw [this, h1, h2]
-    norm_num
-  rw [this]
-  have pos : 0 < Real.sqrt ((1/2 : ℝ)^2 + t^2) := by
+  -- Abbreviate s := 1/2 + i t
+  set s : ℂ := HalfPlaneOuterV2.boundary t
+  have hrepr : s = Complex.mk (1/2) t := HalfPlaneOuterV2.boundary_mk_eq t
+  -- Boundary point is nonzero since Re s = 1/2
+  have hs0 : s ≠ 0 := by
+    intro h
+    have hre : s.re = (1/2 : ℝ) := by simpa [hrepr]
+    have : (0 : ℝ) = (1/2 : ℝ) := by simpa [h] using hre
+    norm_num at this
+  -- |toDisk s| = |s-1|/|s|
+  have hratio : Complex.abs (boundaryToDisk t) = Complex.abs (s - 1) / Complex.abs s := by
+    -- Use abs_div; boundaryToDisk t = (s-1)/s
+    have hdiv : Complex.abs ((s - 1) / s) = Complex.abs (s - 1) / Complex.abs s := by
+      simpa using Complex.abs_div (s - 1) s
+    simpa [boundaryToDisk, toDisk, hs0] using hdiv
+  -- Compute both absolute values explicitly
+  have hsub : s - 1 = Complex.mk (-(1/2 : ℝ)) t := by
+    refine Complex.ext ?hre ?him
+    · have : (1/2 : ℝ) - 1 = - (1/2 : ℝ) := by norm_num
+      simp [hrepr, this]
+    · simp [hrepr]
+  have habs_sub : Complex.abs (s - 1) = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
+    simp [hsub, Complex.abs_def, Complex.normSq_mk, pow_two]
+  have habs_s : Complex.abs s = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
+    simp [hrepr, Complex.abs_def, Complex.normSq_mk, pow_two]
+  have hpos : 0 < Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
     apply Real.sqrt_pos.mpr
-    positivity
-  exact div_self pos.ne'
+    have : 0 < (1/2 : ℝ)^2 + t^2 := by nlinarith
+    simpa using this
+  -- Finish: ratio of equal positive quantities is 1
+  have hratio' : Complex.abs (boundaryToDisk t)
+      = Real.sqrt (((1/2 : ℝ)^2) + t^2) / Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
+    simpa [hratio, habs_sub, habs_s]
+  have hden_ne : Real.sqrt (((1/2 : ℝ)^2) + t^2) ≠ 0 := ne_of_gt hpos
+  have hunit : Real.sqrt (((1/2 : ℝ)^2) + t^2) / Real.sqrt (((1/2 : ℝ)^2) + t^2) = (1 : ℝ) := by
+    simp [hden_ne]
+  simpa [hratio', hunit]
 
 /-!
 ## Change-of-variables helpers for Cayley
@@ -92,18 +100,15 @@ change‑of‑variables calculation.
 open Complex
 
 /-- Closed form for `boundaryToDisk t` as a rational expression in `t`. -/
-lemma boundaryToDisk_closed_form (t : ℝ) :
-  boundaryToDisk t =
-    ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)) / ((t : ℂ)^2 + (1/4 : ℂ)) := by
-  -- boundaryToDisk t = toDisk (1/2 + i t) = ((-1/2 + i t) / (1/2 + i t))
-  sorry -- This lemma requires careful algebra but is not essential for the main proof
+-- Removed closed-form lemma; not required for current adapters
 
 /-- Absolute value of `toDisk z` as the ratio `|z−1|/|z|` (valid for `z ≠ 0`). -/
 lemma abs_toDisk (z : ℂ) (hz : z ≠ 0) :
   Complex.abs (toDisk z) = Complex.abs (z - 1) / Complex.abs z := by
-  simp [toDisk]
-  rw [AbsoluteValue.map_div]
-  simp [hz]
+  -- Use abs_div to split the absolute value
+  have : Complex.abs ((z - 1) / z) = Complex.abs (z - 1) / Complex.abs z := by
+    simpa using Complex.abs_div (z - 1) z
+  simpa [toDisk, hz] using this
 
 /-- `1 - ‖toDisk z‖^2` in terms of `z` (valid for `z ≠ 0`). -/
 lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
@@ -129,9 +134,11 @@ lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
 
 /-- The boundary point `s = 1/2 + i t` is never zero. -/
 lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuterV2.boundary t ≠ 0 := by
+  -- Use the real part: Re(boundary t) = 1/2 ≠ 0
+  have hre : (HalfPlaneOuterV2.boundary t).re = (1/2 : ℝ) := by
+    simp [HalfPlaneOuterV2.boundary_mk_eq]
   intro h
-  rw [HalfPlaneOuterV2.boundary_mk_eq] at h
-  simp at h
+  simpa [h] using hre
 
 /-- Difference of Cayley images in terms of original points. Requires both nonzero. -/
 lemma toDisk_sub (u v : ℂ) (hu : u ≠ 0) (hv : v ≠ 0) :
@@ -150,12 +157,19 @@ lemma abs_boundaryToDisk_sub_toDisk (t : ℝ) (z : ℂ) (hz : z ≠ 0) :
   have hdiff : boundaryToDisk t - toDisk z
       = (HalfPlaneOuterV2.boundary t - z) / (HalfPlaneOuterV2.boundary t * z) := by
     -- use the general difference formula specialized to u=s, v=z
-    simp only [boundaryToDisk]
-    exact toDisk_sub (HalfPlaneOuterV2.boundary t) z hs0 hz
+    have := toDisk_sub (HalfPlaneOuterV2.boundary t) z hs0 hz
+    -- boundaryToDisk t = toDisk (boundary t)
+    simpa [boundaryToDisk] using this
   -- take absolute values
   rw [hdiff]
-  simp only [map_div₀, map_mul]
-  rfl
+  have hdiv : Complex.abs ((HalfPlaneOuterV2.boundary t - z) / (HalfPlaneOuterV2.boundary t * z))
+      = Complex.abs (HalfPlaneOuterV2.boundary t - z)
+          / Complex.abs (HalfPlaneOuterV2.boundary t * z) := by
+    simpa using Complex.abs_div (HalfPlaneOuterV2.boundary t - z) (HalfPlaneOuterV2.boundary t * z)
+  have hmul : Complex.abs (HalfPlaneOuterV2.boundary t * z)
+      = Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z := by
+    simpa using Complex.abs_mul (HalfPlaneOuterV2.boundary t) z
+  simpa [hdiv, hmul]
 
 /-- Core density identity: rewrite `(1 - |w|^2)/|ξ − w|^2` in half‑plane variables. -/
 lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuterV2.Ω) (t : ℝ) :

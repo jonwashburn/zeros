@@ -1,4 +1,6 @@
 import Mathlib.Data.Complex.Basic
+import Mathlib.MeasureTheory.Integral.SetIntegral
+import Mathlib.MeasureTheory.Integral.Bochner
 import rh.RS.SchurGlobalization
 import rh.RS.H1BMOWindows
 import rh.RS.CRGreenOuter
@@ -31,6 +33,7 @@ No numerics are used here.
 noncomputable section
 
 open Complex Set RH.AcademicFramework.CompletedXi MeasureTheory
+open scoped MeasureTheory
 open scoped BigOperators
 
 namespace RH
@@ -48,7 +51,51 @@ lemma sum_shadowLen_le_of_indicator_bound
             (∑ i in S, Set.indicator (Whitney.shadow (Q i)) (fun _ => (1 : ℝ)) t)
               ≤ C * Set.indicator I (fun _ => (1 : ℝ)) t) :
   (∑ i in S, Whitney.shadowLen (Q i)) ≤ C * Whitney.length I :=
-  Whitney.shadow_overlap_sum_of_indicator_bound S Q I C hmeasI hmeasSh h_ae
+  -- The pass-through packing/overlap lemma lives in WhitneyGeometryDefs as a bound on
+  -- the sum of shadow lengths controlled by an indicator overlap inequality.
+  -- Replace the old lemma name with the available pass-through bound.
+  -- We can derive the desired bound directly by integrating the indicator inequality
+  -- and unfolding `Whitney.shadowLen`/`Whitney.length`.
+  -- Use modern set integral lemmas to pass to lengths.
+  by
+    classical
+    -- Integrate both sides over Lebesgue to get sums of lengths and |I|
+    have hmeasSh' : ∀ i ∈ S, MeasurableSet (Whitney.shadow (Q i)) := hmeasSh
+    have hnonneg : ∀ᵐ t ∂(volume), 0 ≤
+        (∑ i in S, Set.indicator (Whitney.shadow (Q i)) (fun _ => (1 : ℝ)) t) := by
+      refine Filter.Eventually.of_forall (fun t => ?_)
+      have : ∀ i ∈ S, 0 ≤ Set.indicator (Whitney.shadow (Q i)) (fun _ : ℝ => (1 : ℝ)) t := by
+        intro i hi; by_cases ht : t ∈ Whitney.shadow (Q i);
+        simp [Set.indicator_of_mem, Set.indicator_of_not_mem, ht]
+      exact Finset.sum_nonneg (by intro i hi; simpa using this i hi)
+    have hmeasI' : MeasurableSet I := hmeasI
+    have hlen_sum :
+        ∫ t, (∑ i in S, Set.indicator (Whitney.shadow (Q i)) (fun _ => (1 : ℝ)) t) ∂(volume)
+          = ∑ i in S, (volume (Whitney.shadow (Q i))).toReal := by
+      -- swap integral and finite sum
+      rw [integral_finset_sum S]
+      simp only [integral_indicator_one]
+      intro i hi
+      exact hmeasSh' i hi
+    have hlen_I : ∫ t, Set.indicator I (fun _ => (1 : ℝ)) t ∂(volume) = (volume I).toReal := by
+      rw [integral_indicator_one hmeasI']
+    -- Integrate inequality using integral_mono_ae
+    have : ∫ t, (∑ i in S, Set.indicator (Whitney.shadow (Q i)) (fun _ => (1 : ℝ)) t) ∂(volume)
+            ≤ ∫ t, C * Set.indicator I (fun _ => (1 : ℝ)) t ∂(volume) := by
+      apply MeasureTheory.integral_mono_ae
+      · apply Integrable.of_finite
+      · apply Integrable.of_finite
+      · exact h_ae
+    -- Compute right integral (pull out constant C)
+    have hright : ∫ t, C * Set.indicator I (fun _ => (1 : ℝ)) t ∂(volume)
+        = C * (volume I).toReal := by
+      simpa [hlen_I, integral_mul_left]
+    -- Replace left integral with sum of lengths
+    have hleft : ∫ t, (∑ i in S, Set.indicator (Whitney.shadow (Q i)) (fun _ => (1 : ℝ)) t) ∂(volume)
+        = ∑ i in S, (volume (Whitney.shadow (Q i))).toReal := by
+      simpa using hlen_sum
+    -- Conclude and unfold definitions of shadowLen and length
+    simpa [Whitney.shadowLen, Whitney.length, hleft, hright]
 
 /-
 Combine: local Carleson on shadows plus an indicator overlap bound implies a
@@ -71,31 +118,17 @@ lemma sum_energy_from_carleson_and_indicator_overlap
   -- From the indicator bound, get the sum of shadow lengths bound
   have hLen : (∑ i in S, Whitney.shadowLen (Q i)) ≤ C * Whitney.length I :=
     sum_shadowLen_le_of_indicator_bound S Q I C hmeasI hmeasSh h_ae
-  -- Apply the algebraic aggregation with ℓ := shadowLen(Q i)
-  exact
-    sum_energy_le_of_local_carleson_and_overlap
-      (J := S) (E := E) (ℓ := fun i => Whitney.shadowLen (Q i)) (Kξ := Kξ)
-      (C₀ := C) (lenI := Whitney.length I)
-      (hE_nonneg := by intro i hi; have := hCar_local i hi; exact
-        le_trans (by have : 0 ≤ E i := by exact le_of_lt (lt_of_le_of_lt (le_of_eq rfl) (by norm_num)); exact this)
-          (by have := (mul_nonneg hKξ_nonneg (by have : 0 ≤ Whitney.shadowLen (Q i) := by
-                -- shadow length is nonnegative by definition
-                have : 0 ≤ (volume (Whitney.shadow (Q i))).toReal := by exact le_of_lt (by
-                  -- volume is nonnegative; toReal preserves nonnegativity
-                  exact ENNReal.toReal_nonneg)
-                simpa [Whitney.shadowLen] using this
-              exact this)); exact this))
-      (hℓ_nonneg := by intro i hi;
-        -- nonnegativity of shadowLen
-        have : 0 ≤ (volume (Whitney.shadow (Q i))).toReal := ENNReal.toReal_nonneg
-        simpa [Whitney.shadowLen] using this)
-      (hCar_local := by intro i hi; simpa using hCar_local i hi)
-      (hOverlap := by simpa using hLen)
-      (hKξ_nonneg := hKξ_nonneg) (hC₀_nonneg := hC_nonneg)
-      (hlenI_nonneg := by
-        -- |I| ≥ 0
-        have : 0 ≤ (volume I).toReal := ENNReal.toReal_nonneg
-        simpa [Whitney.length] using this)
+  -- Sum local Carleson bounds and pull out constants
+  have hE_sum : (∑ i in S, E i) ≤ (∑ i in S, Kξ * Whitney.shadowLen (Q i)) :=
+    Finset.sum_le_sum (by intro i hi; simpa using hCar_local i hi)
+  have hsum_eq : (∑ i in S, Kξ * Whitney.shadowLen (Q i)) =
+      Kξ * (∑ i in S, Whitney.shadowLen (Q i)) := by
+    simp [Finset.mul_sum]
+  have hbound : Kξ * (∑ i in S, Whitney.shadowLen (Q i)) ≤ Kξ * (C * Whitney.length I) :=
+    mul_le_mul_of_nonneg_left hLen hKξ_nonneg
+  have : (∑ i in S, Kξ * Whitney.shadowLen (Q i)) ≤ Kξ * C * Whitney.length I := by
+    simpa [hsum_eq, mul_comm, mul_left_comm, mul_assoc] using hbound
+  exact le_trans hE_sum this
 
 
 /-- Boundary wedge (P+) predicate from the Cert interface. -/
@@ -396,7 +429,7 @@ lemma ae_nonneg_from_whitney_pairing_and_plateau_AI
     ∃ c0 : ℝ, 0 < c0 ∧ ∀ {b x}, 0 < b → b ≤ 1 → |x| ≤ 1 →
       (∫ t, RH.RS.poissonKernel b (x - t) * ψ t ∂(volume)) ≥ c0)
   (hAI : ∀ᵐ x : ℝ,
-      Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
+      Filter.Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
         (nhdsWithin 0 (Ioi 0)) (nhds (RH.RS.boundaryRe F x))) :
   RH.Cert.PPlus F := by
   classical
@@ -616,7 +649,7 @@ lemma whitney_plateau_coercivity_from_pairing
           = - (1/2) * (∫ x in Q, RS.sqnormR2 (gradU x) ∂σ)
             - (1/2) * (∫ x in Q, RS.sqnormR2 (χ x • gradV x) ∂σ) := by
       simp [integral_add, integral_mul_left, sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
-            mul_comm, mul_left_comm, mul_assoc, inv_two]
+            mul_comm, mul_left_comm, mul_assoc]
     -- Monotonicity of set integrals under a.e. ≤ / ≥
     have := setIntegral_mono_ae (μ := σ) (s := Q) (t := Q)
       (f := fun x => (gradU x) ⋅ (χ x • gradV x))
@@ -628,7 +661,7 @@ lemma whitney_plateau_coercivity_from_pairing
   have hchi : ∫ x in Q, RS.sqnormR2 (χ x • gradV x) ∂σ = ∫ x in Q, RS.sqnormR2 (gradV x) ∂σ := by
     have hpt' : ∀ x ∈ Q, RS.sqnormR2 (χ x • gradV x) = RS.sqnormR2 (gradV x) := by
       intro x hx; simpa [hχ_support x hx, RS.sqnormR2, pow_two, mul_comm, mul_left_comm, mul_assoc]
-    have := set_integral_congr_ae (μ := σ) (s := Q)
+    have := MeasureTheory.setIntegral_congr_ae (μ := σ) (s := Q)
       (Filter.Eventually.of_forall (by intro x hx; simpa [hpt' x hx]))
     simpa using this
   -- Combine with the energy assumption for ∇V
@@ -765,7 +798,6 @@ Hypotheses:
 
 Conclusion:
 `∫_Q ∇U·(χ∇V) ≥ (1/2 − κ) · E(Q)`.
->>>>>>> 06c4e5e (fix(track-build): remove proofwidgets, clean AppleDouble, fix TentShadow import; CRGreenOuter pairing+boundary helpers)
 -/
 lemma whitney_plateau_coercivity_from_closeness
   (U : ℝ × ℝ → ℝ) (gradU : (ℝ × ℝ) → ℝ × ℝ)
@@ -807,17 +839,17 @@ lemma whitney_plateau_coercivity_from_closeness
       have := this
       simpa [two_mul, sub_eq, add_comm, add_left_comm, add_assoc, mul_comm, mul_left_comm, mul_assoc]
     have := (eq_of_mul_eq_mul_left (by norm_num : (0:ℝ) < 2) (by simpa [two_mul] using this))
-    simpa [inv_two] using congrArg (fun r => r / 2) this
+    simpa using congrArg (fun r => r / 2) this
   -- Integrate and drop the nonnegative ‖χ∇V‖² term
   have :
       (∫ x in Q, (gradU x) ⋅ (χ x • gradV x) ∂σ)
         = (1/2) * (∫ x in Q, RS.sqnormR2 (gradU x) ∂σ)
           + (1/2) * (∫ x in Q, RS.sqnormR2 (χ x • gradV x) ∂σ)
           - (1/2) * (∫ x in Q, RS.sqnormR2 (gradU x - χ x • gradV x) ∂σ) := by
-    have := set_integral_congr_ae (μ := σ) (s := Q)
+    have := MeasureTheory.setIntegral_congr_ae (μ := σ) (s := Q)
       (Filter.Eventually.of_forall (by intro x hx; simpa [hPolar x]))
     simp [integral_add, integral_sub, integral_mul_left, add_comm, add_left_comm, add_assoc,
-          sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc, inv_two] at this
+          sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] at this
     exact this
   -- Drop the nonnegative middle term and use closeness
   have hNonneg : 0 ≤ (∫ x in Q, RS.sqnormR2 (χ x • gradV x) ∂σ) := by
@@ -1197,7 +1229,7 @@ lemma per_shadow_coercivity_divided
 
 variable {ι : Type*}
 
-/‑ From a decomposition `A i = B i + R i`, a lower bound on the sum of `A`, a
+/- From a decomposition `A i = B i + R i`, a lower bound on the sum of `A`, a
 boundary negativity bound on the sum of `B`, and a smallness bound on the sum of
 remainders `R`, together with a shadow–energy comparability and energy capture,
 derive a contradiction (False) under a quantitative numeric separation. -/
@@ -1382,7 +1414,7 @@ They are intentionally permissive and can be tightened later.
 namespace RS
 namespace Window
 
-/‑ Selection of a base interval and boundary window from the failure of `(P+)`.
+/- Selection of a base interval and boundary window from the failure of `(P+)`.
 This is a permissive adapter returning a short interval in `[−1,1]` and a height
 `b ∈ (0,1]`. It does not encode negativity; downstream code should refine. -/
 lemma density_interval_of_not_PPlus
@@ -1393,7 +1425,7 @@ lemma density_interval_of_not_PPlus
   classical
   refine ⟨Set.Icc (-1 : ℝ) 1, (1 : ℝ), by norm_num, by norm_num, (1/2 : ℝ), by norm_num, by norm_num⟩
 
-/‑ Per‑ring test package existence: returns trivial data satisfying the
+/- Per‑ring test package existence: returns trivial data satisfying the
 volumetric and decomposition bounds (with zero constants/tests). This is
 adequate for wiring; analytic versions can replace it later. -/
 lemma per_ring_test_package
@@ -1423,14 +1455,14 @@ lemma per_ring_test_package
   · -- interior remainder bound with zeros
     simp [RS.boxEnergy, sqnormR2]
 
-/‑ Plateau coercivity adapter (per ring).
+/- Plateau coercivity adapter (per ring).
 Removed permissive stub returning `c⋆ = 0`. Supply analytic per-ring coercivity downstream. -/
 
 end Window
 
 namespace Whitney
 
-/‑ Disjoint rings capture (interface): permissive adapter exposing disjointness
+/- Disjoint rings capture (interface): permissive adapter exposing disjointness
 and a pass-through packing bound. Analytic versions can refine geometry. -/
 structure DisjointRings (ι : Type*) where
   Q : ι → Set (ℝ × ℝ)
