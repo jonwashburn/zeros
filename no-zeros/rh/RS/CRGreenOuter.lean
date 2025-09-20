@@ -573,7 +573,12 @@ theorem pairing_L2_CauchySchwarz_restrict
         ≤ Real.sqrt (∫ x in Q, sqnormR2 (gradU x) ∂σ)
           * Real.sqrt (∫ x in Q, sqnormR2 (gradChiVpsi x) ∂σ) := by
     simpa [hsumU, hsumG] using hstepQ_sum
-  simpa [boxEnergy, testEnergy] using hstepQ
+  have hfinal :
+      |∫ x in Q, (gradU x) ⋅ (gradChiVpsi x) ∂σ|
+        ≤ Real.sqrt (boxEnergyCRGreen gradU σ Q)
+          * Real.sqrt (testEnergy gradChiVpsi σ Q) := by
+    simpa [boxEnergyCRGreen, testEnergy] using hstepQ
+  exact hfinal
 
 
 /-
