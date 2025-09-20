@@ -33,6 +33,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Integral.Bochner
 import Mathlib.MeasureTheory.Function.LpSpace
+import rh.RS.WhitneyGeometryDefs
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic
 import rh.RS.SchurGlobalization
@@ -124,10 +125,13 @@ infixl:72 " ⋅ " => dotR2
 @[simp] def sqnormR2 (v : ℝ × ℝ) : ℝ := v.1 ^ 2 + v.2 ^ 2
 
 
-/-- The box energy on `Q` for the vector field `∇U` and measure `σ`. -/
-@[simp] def boxEnergy
+/-- The box energy on `Q` for the vector field `∇U` and measure `σ` (CRGreen version). -/
+@[simp] def boxEnergyCRGreen
   (gradU : (ℝ × ℝ) → ℝ × ℝ) (σ : Measure (ℝ × ℝ)) (Q : Set (ℝ × ℝ)) : ℝ :=
   ∫ x in Q, sqnormR2 (gradU x) ∂σ
+
+-- Alias for compatibility
+local notation "boxEnergy" => boxEnergyCRGreen
 
 
 /-- Unconditional Whitney pairing export (façade). -/

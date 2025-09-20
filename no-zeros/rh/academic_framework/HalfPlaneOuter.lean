@@ -235,6 +235,45 @@ open RH.AcademicFramework.CompletedXi
 
 @[simp] def F_pinch (det2 O : ℂ → ℂ) : ℂ → ℂ := fun z => (2 : ℂ) * RH.RS.J_pinch det2 O z
 
+-- Helper 1: RS.boundary → local `boundary` M=2 real-part bound for the pinch field
+private lemma boundary_Re_F_pinch_le_two_local
+  {O : ℂ → ℂ}
+  (hBME : RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s / riemannXi_ext s))
+  (t : ℝ) :
+  |(F_pinch RH.RS.det2 O (boundary t)).re| ≤ (2 : ℝ) := by
+  classical
+  -- Work on RS.boundary and then `simpa` back to local `boundary`
+  have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
+    by_cases hO : O (RH.RS.boundary t) = 0
+    · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+      · have hzero : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
+      · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO]) (by exact hXi)
+    · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+      · have hzero : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
+      · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
+  simpa using hRS
+
+-- Helper 2: integrability on boundary for the pinch field with M = 2 bound
+private lemma integrable_boundary_kernel_M2
+  {O : ℂ → ℂ}
+  (hBME : RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s / riemannXi_ext s))
+  (z : ℂ) (hz : (1/2 : ℝ) < z.re) :
+  Integrable (fun t : ℝ =>
+    (F_pinch RH.RS.det2 O (boundary t)).re * poissonKernel z t) := by
+  have hBnd2 : ∀ t : ℝ,
+      |(F_pinch RH.RS.det2 O (boundary t)).re| ≤ (2 : ℝ) :=
+    fun t => boundary_Re_F_pinch_le_two_local (O := O) hBME t
+  exact integrable_boundary_kernel_of_bounded
+    (F := F_pinch RH.RS.det2 O) z (2 : ℝ) hz hBnd2
+
 theorem HasHalfPlanePoissonTransport_Jpinch
     {det2 O : ℂ → ℂ}
     (hRep :
@@ -603,21 +642,21 @@ theorem pinch_representation_on_offXi_M2
       (t : ℝ) :
       |(F_pinch RH.RS.det2 O (boundary t)).re| ≤ (2 : ℝ) := by
     classical
-    have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
+  have hRS : |(F_pinch RH.RS.det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
       by_cases hO : O (RH.RS.boundary t) = 0
       · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
-        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
-            have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
-              simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-            simpa [this]
-          simpa [this]
+      · have hzero : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
         · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by simpa [hO]) (by exact hXi)
       · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
-        · have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
-            have : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
-              simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
-            simpa [this]
-          simpa [this]
+      · have hzero : (F_pinch RH.RS.det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch RH.RS.det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
         · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME t (by exact hO) (by exact hXi)
     simpa using hRS
   -- Integrability via M=2 bound derived internally

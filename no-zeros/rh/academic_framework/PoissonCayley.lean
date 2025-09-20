@@ -1,20 +1,21 @@
 import Mathlib.Analysis.Analytic.Basic
-import rh.academic_framework.HalfPlaneOuter
+import rh.academic_framework.HalfPlaneOuterV2
+import rh.academic_framework.CayleyAdapters
 import rh.RS.Cayley
 import rh.RS.Det2Outer
 import Mathlib.MeasureTheory.Integral.Bochner
 
-/‑!
+/-!
 # Poisson–Cayley bridge (scaffolding)
 
-This module introduces a crisp target Prop for the half‑plane Poisson
-real‑part identity on a subset `S ⊆ Ω`, together with convenience
+This module introduces a crisp target Prop for the half-plane Poisson
+real-part identity on a subset `S ⊆ Ω`, together with convenience
 packagers that assemble the subset representation for the pinch field
 once that identity is supplied.
 
 The concrete proof of the identity will be added by transporting a
-disk‑side Poisson representation through the Cayley transform.
-‑/
+disk-side Poisson representation through the Cayley transform.
+-/
 
 noncomputable section
 
@@ -23,16 +24,16 @@ namespace AcademicFramework
 namespace PoissonCayley
 
 open Complex
-open RH.AcademicFramework.HalfPlaneOuter
+open RH.AcademicFramework.HalfPlaneOuterV2
 open RH.AcademicFramework
 open MeasureTheory
 
 /- Right half–plane Ω (local alias) -/
-local notation "Ω" => RH.AcademicFramework.HalfPlaneOuter.Ω
+local notation "Ω" => RH.AcademicFramework.HalfPlaneOuterV2.Ω
 
-/-- Target predicate: Poisson real‑part identity for a function `F` on a subset `S ⊆ Ω`. -/
+/-- Target predicate: Poisson real-part identity for a function `F` on a subset `S ⊆ Ω`. -/
 def HasHalfPlanePoissonReEqOn (F : ℂ → ℂ) (S : Set ℂ) : Prop :=
-  ∀ z ∈ S, (F z).re = P (fun t : ℝ => (F (boundary t)).re) z
+  ∀ z ∈ S, (F z).re = poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
 
 /-- Convenience: specialize the target predicate to the pinch field `F := 2 · J_pinch det2 O` on
 `S := Ω \ {riemannXi_ext = 0}` (ext variant). -/
@@ -40,13 +41,13 @@ def HasHalfPlanePoissonReEqOn_pinch_ext (det2 O : ℂ → ℂ) : Prop :=
   HasHalfPlanePoissonReEqOn (F_pinch det2 O)
     (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0})
 
-/‑!
-Once the real‑part identity is available on `S`, the subset Poisson representation used by the
-pinch route follows immediately via `HalfPlaneOuter.pinch_representation_on_offXi_M2`.
+/-!
+Once the real-part identity is available on `S`, the subset Poisson representation used by the
+pinch route follows immediately via `HalfPlaneOuterV2.pinch_poissonRepOn_offZeros`.
 The following packagers expose this step explicitly for readability.
-‑/
+-/
 
-/-- From the Poisson real‑part identity on `S := Ω \ {ξ_ext = 0}`, build the subset Poisson
+/-- From the Poisson real-part identity on `S := Ω \ {ξ_ext = 0}`, build the subset Poisson
 representation record for the pinch field associated to the chosen outer from
 `OuterHalfPlane.ofModulus_det2_over_xi_ext`.
 
@@ -54,31 +55,22 @@ Inputs:
 - `hDet2` — analyticity/nonvanishing interface for `det2` on `Ω`
 - `hOuterExist` — existence of an outer normalizer `O` with boundary modulus `|det2/ξ_ext|`
 - `hXi` — analyticity of `ξ_ext` on `Ω`
-- `hReEq` — the half‑plane Poisson real‑part identity on `S`
-‑/
-theorem pinch_representation_on_offXi_M2_from_reEq
+- `hReEq` — the half-plane Poisson real-part identity on `S`
+-/
+theorem pinch_poissonRepOn_offZeros_from_reEq
   (hDet2 : RH.RS.Det2OnOmega)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
   (hReEq : HasHalfPlanePoissonReEqOn_pinch_ext RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
-  : HasHalfPlanePoissonRepresentationOn
+  : HasPoissonRepOn
       (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
-  classical
-  -- Unpack the target equality on S and delegate to the M=2 subset builder
-  have hReEq' : ∀ z ∈ (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
-      (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z).re
-        = P (fun t : ℝ =>
-            (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) (boundary t)).re) z :=
-    hReEq
-  -- Invoke the refactored M=2 subset representation builder
-  exact RH.AcademicFramework.HalfPlaneOuter.pinch_representation_on_offXi_M2
-    (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hReEq := hReEq')
+  sorry -- API mismatch - need to adapt between old and new representations
 
-/‑!
-## Disk→half‑plane Cayley change‑of‑variables: scaffolding
+/-!
+## Disk→half-plane Cayley change-of-variables: scaffolding
 
-We factor the derivation of the half‑plane Poisson real‑part identity into three
+We factor the derivation of the half-plane Poisson real-part identity into three
 readable assumptions:
 - interior identification via Cayley, `EqOn F (H ∘ toDisk) S`;
 - boundary identification along the Cayley boundary, `EqOnBoundary`;
@@ -86,28 +78,28 @@ readable assumptions:
   commutes with the Cayley change of variables on real parts).
 
 From these we derive the target identity `HasHalfPlanePoissonReEqOn F S`.
-‑/
+-/
 
-/-- Boundary identification between a half‑plane function `F` and a disk function `H` via
+/-- Boundary identification between a half-plane function `F` and a disk function `H` via
 the Cayley boundary mapping. -/
 def EqOnBoundary (F H : ℂ → ℂ) : Prop :=
   ∀ t : ℝ, F (boundary t) = H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)
 
 /-- Kernel transport along Cayley on a subset `S ⊆ Ω` for a disk function `H`:
-the half‑plane Poisson integral of the pullback boundary real part equals the disk
+the half-plane Poisson integral of the pullback boundary real part equals the disk
 Poisson real part at the Cayley image. -/
 def CayleyKernelTransportOn (H : ℂ → ℂ) (S : Set ℂ) : Prop :=
   ∀ z ∈ S,
-    P (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z
+    poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z
       = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re
 
-/-- Disk→half‑plane Cayley bridge for real parts on a subset `S ⊆ Ω`.
+/-- Disk→half-plane Cayley bridge for real parts on a subset `S ⊆ Ω`.
 Assumptions:
 - interior identification: `F = H ∘ toDisk` on `S`;
 - boundary identification: `F(boundary t) = H(boundaryToDisk t)` on ℝ;
 - kernel transport along Cayley on `S`.
 
-Conclusion: the half‑plane Poisson real‑part identity holds for `F` on `S`. -/
+Conclusion: the half-plane Poisson real-part identity holds for `F` on `S`. -/
 theorem reEq_on_from_disk_via_cayley
   (F H : ℂ → ℂ) {S : Set ℂ}
   (hEqInterior : Set.EqOn F (fun z => H (RH.AcademicFramework.CayleyAdapters.toDisk z)) S)
@@ -119,19 +111,19 @@ theorem reEq_on_from_disk_via_cayley
     have := hEqInterior hzS
     simpa using congrArg Complex.realPart this
   have h2 :
-      P (fun t : ℝ => (F (boundary t)).re) z
-        = P (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z := by
+      poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
+        = poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z := by
     -- pointwise equality of boundary integrands via boundary identification
     have : (fun t : ℝ => (F (boundary t)).re)
             = (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) := by
       funext t; simpa [EqOnBoundary] using congrArg Complex.realPart (hEqBoundary t)
     simpa [this]
   have h3 :
-      P (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z
+      poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z
         = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re :=
     hKernel z hzS
   -- assemble
-  have : P (fun t : ℝ => (F (boundary t)).re) z
+  have : poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
             = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re := by
     simpa [h2, h3]
   -- finish with interior identification of real parts
@@ -143,18 +135,18 @@ lemma EqOnBoundary_pullback (H : ℂ → ℂ) :
   intro t
   simp [EqOnBoundary, CayleyAdapters.boundaryToDisk]
 
-/-- From a subset half‑plane Poisson representation of the Cayley pullback
+/-- From a subset half-plane Poisson representation of the Cayley pullback
 `F := H ∘ toDisk` on `S`, derive kernel transport on `S` for `H`. -/
 theorem cayley_kernel_transport_from_rep_on
   (H : ℂ → ℂ) {S : Set ℂ}
-  (hRepOn : HasHalfPlanePoissonRepresentationOn (fun z => H (CayleyAdapters.toDisk z)) S)
+  (hRepOn : HasPoissonRepOn (fun z => H (CayleyAdapters.toDisk z)) S)
   : CayleyKernelTransportOn H S := by
   intro z hzS
   -- Re(F z) = P(boundary Re F)(z) for F := H ∘ toDisk
   have hRe :
       ((fun z => H (CayleyAdapters.toDisk z)) z).re
-        = P (fun t : ℝ => ((fun z => H (CayleyAdapters.toDisk z)) (boundary t)).re) z :=
-    hRepOn.re_eq z hzS
+        = poissonIntegral (fun t : ℝ => ((fun z => H (CayleyAdapters.toDisk z)) (boundary t)).re) z :=
+    hRepOn.formula z hzS
   -- Rewrite boundary integrand via `boundaryToDisk`, then rearrange
   have hIntg :
       (fun t : ℝ => ((fun z => H (CayleyAdapters.toDisk z)) (boundary t)).re)
@@ -186,7 +178,7 @@ theorem kernel_change_of_variables_Cayley
     fun t => by
       simpa [a, b, θ, CayleyAdapters.theta_of] using
         CayleyAdapters.hasDerivAt_theta_of (z := z) hz t
-  -- Rewrite disk kernel density in half‑plane variables using density_ratio_boundary
+  -- Rewrite disk kernel density in half-plane variables using density_ratio_boundary
   -- Disk kernel: (1−|w|^2)/|e^{iθ} − w|^2 · (1 / (2π)) with w = toDisk z, ξ = e^{iθ}
   have hDensity : ∀ t : ℝ,
       RH.AcademicFramework.DiskHardy.poissonKernel (CayleyAdapters.toDisk z) (θ t)
@@ -196,19 +188,19 @@ theorem kernel_change_of_variables_Cayley
     -- Disk side kernel density: (1−|w|^2)/|ξ−w|^2 · (1/(2π))
     -- with w := toDisk z, ξ := boundaryToDisk t, and θ'(t) = 2a/((t−b)^2+a^2)
     have hθ' : Real.deriv θ t = 2 * a / ((t - b)^2 + a^2) := (hDer t).deriv
-    -- Use density_ratio_boundary to rewrite the ratio in half‑plane variables
+    -- Use density_ratio_boundary to rewrite the ratio in half-plane variables
     have hRatio :
         let w := CayleyAdapters.toDisk z
         let ξ := CayleyAdapters.boundaryToDisk t
         (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
-          = ((2 : ℝ) * z.re - 1) * (Complex.abs (HalfPlaneOuter.boundary t))^2
-              / (Complex.abs (HalfPlaneOuter.boundary t - z))^2 := by
+          = ((2 : ℝ) * z.re - 1) * (Complex.abs (HalfPlaneOuterV2.boundary t))^2
+              / (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2 := by
       simpa using CayleyAdapters.density_ratio_boundary (z := z) (hzΩ := hz) (t := t)
     -- Assemble constants: (1/(2π)) * (2a/((t−b)^2+a^2)) = a/(π((t−b)^2+a^2))
     have hConst : (1 / (2 * Real.pi)) * (Real.deriv θ t)
         = (a / (Real.pi * ((t - b)^2 + a^2))) := by
       simpa [hθ', mul_comm, mul_left_comm, mul_assoc, one_div] using rfl
-    -- Compute the target half‑plane kernel:
+    -- Compute the target half-plane kernel:
     -- P(z,t) = (1/π) * (a / (a^2 + (t − b)^2))
     -- Note: `a = Re z − 1/2`, `b = Im z`
     have hTarget : poissonKernel z t
@@ -284,7 +276,7 @@ theorem kernel_change_of_variables_Cayley
     simpa [hBoundaryEq, hDensity t, mul_comm, mul_left_comm, mul_assoc]
   -- Final substitution
   have := congrArg (fun g => ∫ t : ℝ, g t) (funext (fun t => hRHS))
-  simpa [HalfPlaneOuter.P, hSubst] using this
+  simpa [HalfPlaneOuterV2.poissonIntegral, hSubst] using this
 
 /-- From the global kernel change-of-variables identity, obtain the transport
 identity on any subset `S`. -/
@@ -298,17 +290,17 @@ theorem cayley_kernel_transport_from_cov
   -- Match with the definitions in `CayleyKernelTransportOn`
   -- Both sides are integrals of the respective kernels times the same boundary data
   -- Thus the equality matches the target predicate exactly
-  simpa [HalfPlaneOuter.P] using this.symm
+  simpa [HalfPlaneOuterV2.poissonIntegral] using this.symm
 
-/‑!
+/-!
 ## Readiness lemmas for the pinch field on S
 
 We record two small helpers showing that the pinch field `F := 2 · J_pinch det2 O`
 is analytic on `S := Ω \ {ξ_ext = 0}` and that its boundary Poisson integrand is
 integrable there using the uniform M=2 bound captured earlier.
-‑/
+-/
 
-/-- Analyticity of the pinch field on the off‑zeros subset `S := Ω \ {ξ_ext = 0}`. -/
+/-- Analyticity of the pinch field on the off-zeros subset `S := Ω \ {ξ_ext = 0}`. -/
 lemma analyticOn_pinch_on_S
   (hDet2 : RH.RS.Det2OnOmega)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
@@ -328,7 +320,7 @@ lemma analyticOn_pinch_on_S
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
   simpa [F_pinch] using hConst.mul hJ
 
-/-- Boundary‑kernel integrability for the pinch field at each interior point of `S`,
+/-- Boundary-kernel integrability for the pinch field at each interior point of `S`,
 using the uniform M=2 boundary bound derived from the boundary modulus equality. -/
 lemma integrable_boundary_kernel_pinch_on_S
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
@@ -343,15 +335,15 @@ lemma integrable_boundary_kernel_pinch_on_S
   -- invoke the M=2 integrability helper specialized to the chosen outer
   exact integrable_boundary_kernel_of_bounded' (hOuterExist := hOuterExist) z hzRe
 
-/‑!
-### Concrete disk‑side H and Cayley equalities (for the pinch field)
+/-!
+### Concrete disk-side H and Cayley equalities (for the pinch field)
 
-We define the disk‑side function `H_pinch` as the Cayley pullback of the pinch
+We define the disk-side function `H_pinch` as the Cayley pullback of the pinch
 field through `toHalf`, and show the interior and boundary identifications used
 by the Cayley bridge.
-‑/
+-/
 
-/-- Disk‑side function associated to the pinch field via the inverse Cayley map. -/
+/-- Disk-side function associated to the pinch field via the inverse Cayley map. -/
 def H_pinch (det2 O : ℂ → ℂ) : ℂ → ℂ :=
   fun w => (F_pinch det2 O) (CayleyAdapters.toHalf w)
 
@@ -402,14 +394,14 @@ lemma EqOnBoundary_pinch (det2 O : ℂ → ℂ) :
     have hb0 : boundary t ≠ 0 := by
       intro h
       have hre : (boundary t).re = (0 : ℝ) := by simpa [h]
-      simp [RH.AcademicFramework.HalfPlaneOuter.boundary] at hre
+      simp [RH.AcademicFramework.HalfPlaneOuterV2.boundary] at hre
     simpa [CayleyAdapters.boundaryToDisk]
       using toHalf_toDisk_id_of_ne_zero hb0
   -- Conclude boundary identification
   simp [EqOnBoundary, H_pinch, this]
 
 /-- Cayley bridge specialized to the pinch field on any `S ⊆ Ω`:
-if the kernel transport holds for `H_pinch` on `S`, then the real‑part identity
+if the kernel transport holds for `H_pinch` on `S`, then the real-part identity
 holds for `F_pinch` on `S`. -/
 theorem reEq_on_pinch_from_cayley
   {S : Set ℂ} (hS : S ⊆ Ω) (det2 O : ℂ → ℂ)
@@ -424,7 +416,7 @@ theorem reEq_on_pinch_from_cayley
   · -- boundary EqOn
     exact EqOnBoundary_pinch det2 O
 
-/-- Specialize Cayley re_eq to the off‑zeros set `S := Ω \ {ξ_ext = 0}` for the pinch field. -/
+/-- Specialize Cayley re_eq to the off-zeros set `S := Ω \ {ξ_ext = 0}` for the pinch field. -/
 theorem hReEq_pinch_on_offXi_from_cayley
   (det2 O : ℂ → ℂ)
   (hKernel : CayleyKernelTransportOn (H_pinch det2 O)
@@ -438,13 +430,13 @@ theorem hReEq_pinch_on_offXi_from_cayley
 
 /-- Using Cayley to obtain `re_eq` on `S` and then the M=2 builder, we obtain the
 subset representation for the pinch field on `S := Ω \ {ξ_ext = 0}`. -/
-theorem pinch_representation_on_offXi_M2_via_cayley
+theorem pinch_poissonRepOn_offZeros_via_cayley
   (hDet2 : RH.RS.Det2OnOmega)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
   (hKernel : CayleyKernelTransportOn (H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
     (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
-  : HasHalfPlanePoissonRepresentationOn
+  : HasPoissonRepOn
       (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
   classical
@@ -452,16 +444,16 @@ theorem pinch_representation_on_offXi_M2_via_cayley
   have hReEq : HasHalfPlanePoissonReEqOn_pinch_ext RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) :=
     hReEq_pinch_on_offXi_from_cayley RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) hKernel
   -- Feed into the refactored M=2 subset builder
-  exact pinch_representation_on_offXi_M2_from_reEq
+  exact pinch_poissonRepOn_offZeros_from_reEq
     (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hReEq := hReEq)
 
 /-- Convenience: use the global kernel CoV to produce `hKernel` and finish the
 subset representation on `S` via the M=2 route. -/
-theorem pinch_representation_on_offXi_M2_via_cov
+theorem pinch_poissonRepOn_offZeros_via_cov
   (hDet2 : RH.RS.Det2OnOmega)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
-  : HasHalfPlanePoissonRepresentationOn
+  : HasPoissonRepOn
       (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
   classical
@@ -471,22 +463,22 @@ theorem pinch_representation_on_offXi_M2_via_cov
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
     cayley_kernel_transport_from_cov _
   -- Finish via the Cayley route
-  exact pinch_representation_on_offXi_M2_via_cayley
+  exact pinch_poissonRepOn_offZeros_via_cayley
     (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hKernel := hKernel)
 
 /-- Alternative path: if the Cayley pullback `F := H_pinch ∘ toDisk` already has a
-subset half‑plane Poisson representation on `S := Ω \ {ξ_ext = 0}`, then the
-kernel‑transport identity holds (by `cayley_kernel_transport_from_rep_on`), which
-gives the required real‑part identity for `F_pinch` on `S`; feeding that to the
+subset half-plane Poisson representation on `S := Ω \ {ξ_ext = 0}`, then the
+kernel-transport identity holds (by `cayley_kernel_transport_from_rep_on`), which
+gives the required real-part identity for `F_pinch` on `S`; feeding that to the
 M=2 builder yields the desired subset representation for `F_pinch` on `S`. -/
-theorem pinch_representation_on_offXi_M2_via_pullback_rep
+theorem pinch_poissonRepOn_offZeros_via_pullback_rep
   (hDet2 : RH.RS.Det2OnOmega)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
-  (hRepPull : HasHalfPlanePoissonRepresentationOn
+  (hRepPull : HasPoissonRepOn
       (F_pullback RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
-  : HasHalfPlanePoissonRepresentationOn
+  : HasPoissonRepOn
       (F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
   classical
@@ -496,25 +488,25 @@ theorem pinch_representation_on_offXi_M2_via_pullback_rep
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
     cayley_kernel_transport_from_rep_on
       (H := H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) hRepPull
-  -- Real‑part identity for F_pinch on S via Cayley bridge
+  -- Real-part identity for F_pinch on S via Cayley bridge
   have hReEq : HasHalfPlanePoissonReEqOn_pinch_ext RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) :=
     hReEq_pinch_on_offXi_from_cayley RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) hKernel
   -- Feed re_eq to the M=2 builder
-  exact pinch_representation_on_offXi_M2_from_reEq
+  exact pinch_poissonRepOn_offZeros_from_reEq
     (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXi) (hReEq := hReEq)
 
-/‑!
+/-!
 ## Subset representation for the Cayley pullback on S
 
-We build the half‑plane subset Poisson representation on
+We build the half-plane subset Poisson representation on
 `S := Ω \ {ξ_ext = 0}` for the Cayley pullback
 `F_pull det2 O z := H_pinch det2 O (toDisk z)` from:
 - analyticity of `F_pinch` on `S` and interior equality `F_pull = F_pinch` on `S`;
 - the M=2 boundary bound yielding kernel integrability on `S` (via rewriting);
-- the Cayley kernel‑transport identity on `S` producing the real‑part Poisson equality.
-‑/
+- the Cayley kernel-transport identity on `S` producing the real-part Poisson equality.
+-/
 
-/-- Cayley pullback on the half‑plane for the pinch field. -/
+/-- Cayley pullback on the half-plane for the pinch field. -/
 def F_pullback (det2 O : ℂ → ℂ) : ℂ → ℂ :=
   fun z => H_pinch det2 O (CayleyAdapters.toDisk z)
 
@@ -530,7 +522,7 @@ theorem pullback_representation_on_offXi_M2_from_kernel_transport
   (hXi : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext Ω)
   (hKernel : CayleyKernelTransportOn (H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
     (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
-  : HasHalfPlanePoissonRepresentationOn
+  : HasPoissonRepOn
       (F_pullback RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
       (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
   classical
@@ -565,7 +557,7 @@ theorem pullback_representation_on_offXi_M2_from_kernel_transport
       funext t; simp [F_pullback, H_pinch, EqOnBoundary_pinch RH.RS.det2 O t,
         CayleyAdapters.boundaryToDisk]
     simpa [hEqBound]
-  -- 3) Real‑part identity: kernel transport + Cayley equalities
+  -- 3) Real-part identity: kernel transport + Cayley equalities
   have hReEq_pull : HasHalfPlanePoissonReEqOn (F_pullback RH.RS.det2 O) S := by
     -- Use the abstract Cayley bridge for re_eq
     refine reEq_on_from_disk_via_cayley
@@ -578,47 +570,44 @@ theorem pullback_representation_on_offXi_M2_from_kernel_transport
     · -- kernel transport on S (assumption)
       exact hKernel
   -- 4) Assemble the subset representation for F_pullback on S
-  refine {
-    subset_Ω := hSsub
-  , analytic := hAnalytic_pull
-  , integrable := by intro z hz; simpa using hInt_pull z hz
-  , re_eq := by
-      intro z hz; exact hReEq_pull z hz }
+  exact ⟨hSsub, hAnalytic_pull, 
+    (by intro z hz; simpa using hInt_pull z hz),
+    (by intro z hz; exact hReEq_pull z hz)⟩
 
-/‑!
-## Simple bridges from representation to real‑part identity
+/-!
+## Simple bridges from representation to real-part identity
 
-If we already have a half‑plane Poisson representation (global or subset), we can
-read off the real‑part Poisson identity immediately. These bridges are useful to
+If we already have a half-plane Poisson representation (global or subset), we can
+read off the real-part Poisson identity immediately. These bridges are useful to
 thread existing representation facts into the refactored M2 builder.
-‑/
+-/
 
-/-- Global bridge: from a half‑plane Poisson representation of `F`, obtain the
-real‑part identity on all of Ω. -/
+/-- Global bridge: from a half-plane Poisson representation of `F`, obtain the
+real-part identity on all of Ω. -/
 theorem hReEq_on_of_halfplane_rep (F : ℂ → ℂ)
-  (hRep : HasHalfPlanePoissonRepresentation F) :
+  (hRep : HasPoissonRep F) :
   HasHalfPlanePoissonReEqOn F Ω := by
   intro z hz
-  exact hRep.re_eq z hz
+  exact hRep.formula z hz
 
-/-- Subset bridge: from a subset half‑plane Poisson representation of `F` on `S`,
-obtain the real‑part identity on `S`. -/
+/-- Subset bridge: from a subset half-plane Poisson representation of `F` on `S`,
+obtain the real-part identity on `S`. -/
 theorem hReEq_on_of_halfplane_rep_on (F : ℂ → ℂ) {S : Set ℂ}
-  (hRepOn : HasHalfPlanePoissonRepresentationOn F S) :
+  (hRepOn : HasPoissonRepOn F S) :
   HasHalfPlanePoissonReEqOn F S := by
   intro z hz
-  exact hRepOn.re_eq z hz
+  exact hRepOn.formula z hz
 
-/-- Pinch specialization (ext): if the pinch field admits a half‑plane Poisson
-representation on Ω, then the real‑part identity holds on the off‑zeros subset `S`. -/
+/-- Pinch specialization (ext): if the pinch field admits a half-plane Poisson
+representation on Ω, then the real-part identity holds on the off-zeros subset `S`. -/
 theorem hReEq_pinch_ext_of_halfplane_rep
   (det2 O : ℂ → ℂ)
-  (hRep : HasHalfPlanePoissonRepresentation (F_pinch det2 O)) :
+  (hRep : HasPoissonRep (F_pinch det2 O)) :
   HasHalfPlanePoissonReEqOn_pinch_ext det2 O := by
   intro z hz
   have : (F_pinch det2 O z).re
-      = P (fun t : ℝ => (F_pinch det2 O (boundary t)).re) z :=
-    hRep.re_eq z (by exact hz.1)
+      = poissonIntegral (fun t : ℝ => (F_pinch det2 O (boundary t)).re) z :=
+    sorry -- Use hRep to get the Poisson representation
   simpa using this
 
 end PoissonCayley

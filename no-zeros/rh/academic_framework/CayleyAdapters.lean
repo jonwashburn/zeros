@@ -1,6 +1,8 @@
 import rh.academic_framework.DiskHardy
 -- (no additional mathlib imports needed here)
-import rh.academic_framework.HalfPlaneOuter
+import rh.academic_framework.HalfPlaneOuterV2
+
+noncomputable section
 
 namespace RH
 namespace AcademicFramework
@@ -16,14 +18,14 @@ open scoped Real
 @[simp] def toHalf (w : ℂ) : ℂ := 1 / (1 - w)
 
 /-- Boundary parametrization transport under Cayley: on Re s=1/2, the image lies on ∂𝔻. -/
-@[simp] def boundaryToDisk (t : ℝ) : ℂ := toDisk (HalfPlaneOuter.boundary t)
+@[simp] def boundaryToDisk (t : ℝ) : ℂ := toDisk (HalfPlaneOuterV2.boundary t)
 
 /-! ## Geometry facts for the Cayley transform -/
 
 lemma map_Ω_to_unitDisk {z : ℂ}
-  (hz : z ∈ HalfPlaneOuter.Ω) : toDisk z ∈ DiskHardy.unitDisk := by
+  (hz : z ∈ HalfPlaneOuterV2.Ω) : toDisk z ∈ DiskHardy.unitDisk := by
   -- Re z > 1/2 ⇒ |z-1| < |z| ⇒ |(z-1)/z| < 1
-  have hzRe : (1/2 : ℝ) < z.re := by simpa [HalfPlaneOuter.Ω, Set.mem_setOf_eq] using hz
+  have hzRe : (1/2 : ℝ) < z.re := by simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hz
   have hzNe : z ≠ 0 := by
     intro h; have hre := congrArg Complex.re h; simpa using (lt_irrefl_of_le_of_lt (by simpa [h] : (0:ℝ) = z.re) hzRe)
   have hsq : (Complex.abs (z - 1))^2 = (Complex.abs z)^2 - 2 * z.re + 1 := by
@@ -43,19 +45,19 @@ lemma map_Ω_to_unitDisk {z : ℂ}
 
 lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1 := by
   -- |(s-1)/s| = 1 when Re s = 1/2 with s = 1/2 + i t
-  have hrepr : HalfPlaneOuter.boundary t = Complex.mk (1/2) t := by
-    simpa [HalfPlaneOuter.boundary_mk_eq]
-  have hne : HalfPlaneOuter.boundary t ≠ 0 := by
+  have hrepr : HalfPlaneOuterV2.boundary t = Complex.mk (1/2) t := by
+    simpa [HalfPlaneOuterV2.boundary_mk_eq]
+  have hne : HalfPlaneOuterV2.boundary t ≠ 0 := by
     intro h; have hre := congrArg Complex.re h; simpa [hrepr] using hre
-  have h1 : Complex.abs (HalfPlaneOuter.boundary t - 1)
+  have h1 : Complex.abs (HalfPlaneOuterV2.boundary t - 1)
             = Real.sqrt (((- (1/2 : ℝ))^2) + t^2) := by
-    have : HalfPlaneOuter.boundary t - 1 = Complex.mk (- (1/2 : ℝ)) t := by
+    have : HalfPlaneOuterV2.boundary t - 1 = Complex.mk (- (1/2 : ℝ)) t := by
       simp [hrepr, sub_eq_add_neg]
     simpa [this, Complex.abs_def]
-  have h2 : Complex.abs (HalfPlaneOuter.boundary t)
+  have h2 : Complex.abs (HalfPlaneOuterV2.boundary t)
             = Real.sqrt (((1/2 : ℝ)^2) + t^2) := by
     simpa [hrepr, Complex.abs_def]
-  have : Complex.abs (boundaryToDisk t) = Complex.abs (HalfPlaneOuter.boundary t - 1) / Complex.abs (HalfPlaneOuter.boundary t) := by
+  have : Complex.abs (boundaryToDisk t) = Complex.abs (HalfPlaneOuterV2.boundary t - 1) / Complex.abs (HalfPlaneOuterV2.boundary t) := by
     simp [boundaryToDisk, toDisk, Complex.abs_div, hne]
   have : Complex.abs (boundaryToDisk t)
       = Real.sqrt ((1/2 : ℝ)^2 + t^2) / Real.sqrt ((1/2 : ℝ)^2 + t^2) := by
@@ -85,7 +87,7 @@ lemma boundaryToDisk_closed_form (t : ℝ) :
   boundaryToDisk t =
     ((t : ℂ)^2 - (1/4 : ℂ) + Complex.I * (t : ℂ)) / ((t : ℂ)^2 + (1/4 : ℂ)) := by
   -- boundaryToDisk t = toDisk (1/2 + i t) = ((-1/2 + i t) / (1/2 + i t))
-  simp [boundaryToDisk, toDisk, HalfPlaneOuter.boundary,
+  simp [boundaryToDisk, toDisk, HalfPlaneOuterV2.boundary,
         sub_eq_add_neg, add_comm, add_left_comm, add_assoc,
         mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv]
   -- rewrite (a+bi) algebraically into the rational form
@@ -116,10 +118,10 @@ lemma one_minus_absSq_toDisk (z : ℂ) (hz : z ≠ 0) :
   simpa [h, this, hdiff]
 
 /-- The boundary point `s = 1/2 + i t` is never zero. -/
-lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuter.boundary t ≠ 0 := by
+lemma boundary_ne_zero (t : ℝ) : HalfPlaneOuterV2.boundary t ≠ 0 := by
   intro h
-  have : (HalfPlaneOuter.boundary t).re = (0 : ℝ) := by simpa [h]
-  simp [HalfPlaneOuter.boundary] at this
+  have : (HalfPlaneOuterV2.boundary t).re = (0 : ℝ) := by simpa [h]
+  simp [HalfPlaneOuterV2.boundary] at this
 
 /-- Difference of Cayley images in terms of original points. Requires both nonzero. -/
 lemma toDisk_sub (u v : ℂ) (hu : u ≠ 0) (hv : v ≠ 0) :
@@ -132,40 +134,40 @@ lemma toDisk_sub (u v : ℂ) (hu : u ≠ 0) (hv : v ≠ 0) :
 /-- Absolute value of the boundary/disk difference in terms of original points. -/
 lemma abs_boundaryToDisk_sub_toDisk (t : ℝ) (z : ℂ) (hz : z ≠ 0) :
   Complex.abs (boundaryToDisk t - toDisk z)
-    = Complex.abs (HalfPlaneOuter.boundary t - z)
-        / (Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z) := by
-  have hs0 : HalfPlaneOuter.boundary t ≠ 0 := boundary_ne_zero t
+    = Complex.abs (HalfPlaneOuterV2.boundary t - z)
+        / (Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z) := by
+  have hs0 : HalfPlaneOuterV2.boundary t ≠ 0 := boundary_ne_zero t
   have hdiff : boundaryToDisk t - toDisk z
-      = (HalfPlaneOuter.boundary t - z) / (HalfPlaneOuter.boundary t * z) := by
+      = (HalfPlaneOuterV2.boundary t - z) / (HalfPlaneOuterV2.boundary t * z) := by
     -- use the general difference formula specialized to u=s, v=z
-    simpa [boundaryToDisk] using toDisk_sub (u := HalfPlaneOuter.boundary t) (v := z) hs0 hz
+    simpa [boundaryToDisk] using toDisk_sub (u := HalfPlaneOuterV2.boundary t) (v := z) hs0 hz
   -- take absolute values
   simpa [hdiff, Complex.abs_div, Complex.abs_mul]
 
 /-- Core density identity: rewrite `(1 - |w|^2)/|ξ − w|^2` in half‑plane variables. -/
-lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuter.Ω) (t : ℝ) :
+lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuterV2.Ω) (t : ℝ) :
   let w := toDisk z
   let ξ := boundaryToDisk t
   (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
-    = ((2 : ℝ) * z.re - 1) * (Complex.abs (HalfPlaneOuter.boundary t))^2
-        / (Complex.abs (HalfPlaneOuter.boundary t - z))^2 := by
+    = ((2 : ℝ) * z.re - 1) * (Complex.abs (HalfPlaneOuterV2.boundary t))^2
+        / (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2 := by
   classical
   intro w ξ
   have hz0 : z ≠ 0 := by
     -- Re z > 1/2 ⇒ z ≠ 0
     intro h; have : (0 : ℝ) < (1/2 : ℝ) := by norm_num
-    have hRe : (1/2 : ℝ) < z.re := by simpa [HalfPlaneOuter.Ω, Set.mem_setOf_eq] using hzΩ
+    have hRe : (1/2 : ℝ) < z.re := by simpa [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using hzΩ
     exact (lt_irrefl _ (lt_trans this hRe))
-  have hs0 : HalfPlaneOuter.boundary t ≠ 0 := boundary_ne_zero t
+  have hs0 : HalfPlaneOuterV2.boundary t ≠ 0 := boundary_ne_zero t
   -- Evaluate denominator via difference identity
   have hDen : (Complex.abs (ξ - w))^2
-      = (Complex.abs (HalfPlaneOuter.boundary t - z))^2
-          / ((Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2) := by
+      = (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
+          / ((Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2) := by
     have := abs_boundaryToDisk_sub_toDisk t z hz0
     -- square both sides
     have : (Complex.abs (boundaryToDisk t - toDisk z))^2
-        = (Complex.abs (HalfPlaneOuter.boundary t - z))^2
-            / ((Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z)^2) := by
+        = (Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
+            / ((Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z)^2) := by
       simpa [pow_two, mul_pow] using congrArg (fun r => r^2) this
     -- simplify (ab)^2 = a^2 b^2
     simpa [ξ, w, pow_two, mul_pow] using this
@@ -174,14 +176,14 @@ lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuter.Ω) (t : ℝ
       = ((2 : ℝ) * z.re - 1) / (Complex.abs z)^2 := by
     simpa [w] using one_minus_absSq_toDisk z hz0
   -- assemble the ratio
-  have hPos : (Complex.abs (HalfPlaneOuter.boundary t) * Complex.abs z)^2
-      = (Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2 := by
+  have hPos : (Complex.abs (HalfPlaneOuterV2.boundary t) * Complex.abs z)^2
+      = (Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2 := by
     ring
   -- compute: (A/|z|^2) / (B/(|s|^2|z|^2)) = A*|s|^2/B
   have : (1 - (Complex.abs w)^2) / (Complex.abs (ξ - w))^2
       = (((2 : ℝ) * z.re - 1) / (Complex.abs z)^2)
-          / ((Complex.abs (HalfPlaneOuter.boundary t - z))^2
-              / ((Complex.abs (HalfPlaneOuter.boundary t))^2 * (Complex.abs z)^2)) := by
+          / ((Complex.abs (HalfPlaneOuterV2.boundary t - z))^2
+              / ((Complex.abs (HalfPlaneOuterV2.boundary t))^2 * (Complex.abs z)^2)) := by
     simpa [hNum, hDen]
   -- finish with field algebra
   field_simp [this]
@@ -190,8 +192,8 @@ lemma density_ratio_boundary (z : ℂ) (hzΩ : z ∈ HalfPlaneOuter.Ω) (t : ℝ
 def a (z : ℂ) : ℝ := z.re - (1/2 : ℝ)
 def b (z : ℂ) : ℝ := z.im
 
-lemma a_pos_of_mem_Ω {z : ℂ} (hz : z ∈ HalfPlaneOuter.Ω) : 0 < a z := by
-  simpa [a, HalfPlaneOuter.Ω, Set.mem_setOf_eq] using (hz : (1/2 : ℝ) < z.re)
+lemma a_pos_of_mem_Ω {z : ℂ} (hz : z ∈ HalfPlaneOuterV2.Ω) : 0 < a z := by
+  simpa [a, HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] using (hz : (1/2 : ℝ) < z.re)
 
 -- (Angle parametrization lemmas omitted here; not needed for algebraic identities above.)
 
@@ -203,13 +205,13 @@ record. This removes internal admits; callers supply the analytic facts. -/
 def HalfPlanePoisson_from_Disk
   (F : ℂ → ℂ)
   (Hdisk : ℂ → ℂ)
-  (hRel : Set.EqOn F (fun z => Hdisk (toDisk z)) HalfPlaneOuter.Ω)
-  (hAnalytic : AnalyticOn ℂ F HalfPlaneOuter.Ω)
-  (hIntegrable : ∀ z ∈ HalfPlaneOuter.Ω,
-    Integrable (fun t : ℝ => (F (HalfPlaneOuter.boundary t)).re * HalfPlaneOuter.poissonKernel z t))
-  (hReEq : ∀ z ∈ HalfPlaneOuter.Ω,
-    (F z).re = HalfPlaneOuter.P (fun t : ℝ => (F (HalfPlaneOuter.boundary t)).re) z)
-  : HalfPlaneOuter.HasHalfPlanePoissonRepresentation F := by
+  (hRel : Set.EqOn F (fun z => Hdisk (toDisk z)) HalfPlaneOuterV2.Ω)
+  (hAnalytic : AnalyticOn ℂ F HalfPlaneOuterV2.Ω)
+  (hIntegrable : ∀ z ∈ HalfPlaneOuterV2.Ω,
+    Integrable (fun t : ℝ => (F (HalfPlaneOuterV2.boundary t)).re * HalfPlaneOuterV2.poissonKernel z t))
+  (hReEq : ∀ z ∈ HalfPlaneOuterV2.Ω,
+    (F z).re = HalfPlaneOuterV2.poissonIntegral (fun t : ℝ => (F (HalfPlaneOuterV2.boundary t)).re) z)
+  : HalfPlaneOuterV2.HasPoissonRep F := by
   -- Package the provided half-plane facts directly; no internal admits.
   exact {
     analytic := hAnalytic
@@ -231,18 +233,18 @@ open MeasureTheory
 lemma HalfPlanePoisson_real_from_Disk
   (F Hdisk : ℂ → ℂ)
   (hDisk : DiskHardy.HasDiskPoissonRepresentation Hdisk)
-  (hRel : Set.EqOn F (fun z => Hdisk (toDisk z)) HalfPlaneOuter.Ω)
-  (hMap : ∀ z ∈ HalfPlaneOuter.Ω, toDisk z ∈ DiskHardy.unitDisk)
-  (hAnalytic : AnalyticOn ℂ F HalfPlaneOuter.Ω)
-  (hIntegrable : ∀ z ∈ HalfPlaneOuter.Ω,
-    Integrable (fun t : ℝ => (F (HalfPlaneOuter.boundary t)).re * HalfPlaneOuter.poissonKernel z t))
-  (hChange : ∀ z ∈ HalfPlaneOuter.Ω,
+  (hRel : Set.EqOn F (fun z => Hdisk (toDisk z)) HalfPlaneOuterV2.Ω)
+  (hMap : ∀ z ∈ HalfPlaneOuterV2.Ω, toDisk z ∈ DiskHardy.unitDisk)
+  (hAnalytic : AnalyticOn ℂ F HalfPlaneOuterV2.Ω)
+  (hIntegrable : ∀ z ∈ HalfPlaneOuterV2.Ω,
+    Integrable (fun t : ℝ => (F (HalfPlaneOuterV2.boundary t)).re * HalfPlaneOuterV2.poissonKernel z t))
+  (hChange : ∀ z ∈ HalfPlaneOuterV2.Ω,
     (∫ θ : ℝ, (Hdisk (DiskHardy.boundary θ)).re * DiskHardy.poissonKernel (toDisk z) θ)
-      = (∫ t : ℝ, (F (HalfPlaneOuter.boundary t)).re * HalfPlaneOuter.poissonKernel z t))
-  : HalfPlaneOuter.HasHalfPlanePoissonRepresentation F := by
+      = (∫ t : ℝ, (F (HalfPlaneOuterV2.boundary t)).re * HalfPlaneOuterV2.poissonKernel z t))
+  : HalfPlaneOuterV2.HasPoissonRep F := by
   -- Derive the half‑plane real‑part identity from the disk representation and `hChange`.
-  have hReEq : ∀ z ∈ HalfPlaneOuter.Ω,
-      (F z).re = HalfPlaneOuter.P (fun t : ℝ => (F (HalfPlaneOuter.boundary t)).re) z := by
+  have hReEq : ∀ z ∈ HalfPlaneOuterV2.Ω,
+      (F z).re = HalfPlaneOuterV2.poissonIntegral (fun t : ℝ => (F (HalfPlaneOuterV2.boundary t)).re) z := by
     intro z hz
     -- From disk representation at w := toDisk z
     have hw : toDisk z ∈ DiskHardy.unitDisk := hMap z hz
@@ -256,7 +258,7 @@ lemma HalfPlanePoisson_real_from_Disk
     -- Change variables on the integral side via the supplied identity `hChange`
     have hCoV := hChange z hz
     -- Conclude equality for Re F
-    simpa [HalfPlaneOuter.P, hRelz] using hCoV.symm.trans (by simpa [hRelz] using congrArg id hDiskEq)
+    simpa [HalfPlaneOuterV2.poissonIntegral, hRelz] using hCoV.symm.trans (by simpa [hRelz] using congrArg id hDiskEq)
   -- Package the half‑plane representation
   exact HalfPlanePoisson_from_Disk F Hdisk hRel hAnalytic hIntegrable hReEq
 

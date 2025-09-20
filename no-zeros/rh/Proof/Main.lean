@@ -524,12 +524,12 @@ LocalData/removable-extension chooser. These provide a direct contradiction
 structure using: Schur on Ω \ Z(Ξ), right-edge normalization (Θ → -1), and
 local pole behavior at zeros (Θ → 1), plus symmetry to conclude RH.
 -/
-namespace RH.Proof.Pinch
+namespace RH.Proof.poissonIntegralinch
 -- (skeleton pinch lemmas removed in favor of the assign-based route below)
-end RH.Proof.Pinch
+end RH.Proof.poissonIntegralinch
 
 -- Assign-based pinch route (no sorries): use RS removable globalization directly.
-namespace RH.Proof.Pinch
+namespace RH.Proof.poissonIntegralinch
 
 open RH.RS Complex Set
 
@@ -585,7 +585,7 @@ theorem RH_from_pinch_assign
     no_right_zeros_from_pinch_assign Ξ Θ hSchur assign
   exact RH.Proof.RH_core (Ξ := Ξ) noRightZeros sym
 
-end RH.Proof.Pinch
+end RH.Proof.poissonIntegralinch
 
 namespace RH.Proof.Final
 open RH.AcademicFramework.CompletedXi
@@ -611,7 +611,7 @@ theorem RiemannHypothesis_from_pinch_ext_assign
     fun s => RH.AcademicFramework.CompletedXi.xi_ext_functional_equation s
   have symXi : ∀ ρ, riemannXi_ext ρ = 0 → riemannXi_ext (1 - ρ) = 0 :=
     RH.AcademicFramework.CompletedXi.zero_symmetry_from_fe riemannXi_ext fe
-  exact RH.Proof.Pinch.RH_from_pinch_assign riemannXi_ext Θ symXi hSchur assign
+  exact RH.Proof.poissonIntegralinch.RH_from_pinch_assign riemannXi_ext Θ symXi hSchur assign
 
 /-- Export to mathlib from the assign-based pinch route. -/
 theorem RiemannHypothesis_mathlib_from_pinch_ext_assign
@@ -652,7 +652,7 @@ theorem RH_from_assign
 
 /-- Final theorem using a concrete pinch certificate: build the Ξ-assign from
 the certificate and conclude RH. -/
-theorem RH_from_pinch_certificate (C : RH.RS.PinchCertificateExt) : RiemannHypothesis := by
+theorem RH_from_pinch_certificate (C : RH.RS.poissonIntegralinchCertificateExt) : RiemannHypothesis := by
   -- Θ from certificate and its Schur bound off Z(Ξ_ext)
   have hSchur : RH.RS.IsSchurOn (RH.RS.Θ_cert C)
       (RH.RS.Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
@@ -679,14 +679,14 @@ These provide the top-level interface for the Riemann Hypothesis proof.
 
 /-- Final Riemann Hypothesis theorem consuming a pinch certificate.
 This will be instantiated with a concrete certificate witness. -/
-theorem RiemannHypothesis_final (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
+theorem RiemannHypothesis_final (C : RH.RS.poissonIntegralinchCertificateExt) : RiemannHypothesis :=
   RH_from_pinch_certificate C
 
 -- (legacy convenience alias removed to avoid name shadowing)
 
 /-- Top-level RH theorem (certificate-driven alias).
 Given a pinch certificate `C`, conclude `RiemannHypothesis`. -/
-theorem RH (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
+theorem RH (C : RH.RS.poissonIntegralinchCertificateExt) : RiemannHypothesis :=
   RiemannHypothesis_final C
 
 /-- Clean pinch-ingredients route: given
@@ -778,7 +778,7 @@ theorem RiemannHypothesis_from_poisson_and_pinned'
     have : Θ z0 = 1 := by simpa [hgz] using hg1
     exact hΘz0 this
   -- Build certificate and conclude
-  let C : RH.RS.PinchCertificateExt :=
+  let C : RH.RS.poissonIntegralinchCertificateExt :=
     RH.RS.buildPinchCertificate hOuter hRe_offXi hRemXi
   exact RH_from_pinch_certificate C
 
@@ -859,21 +859,21 @@ theorem RiemannHypothesis_from_certificate_rep_on_via_cov
   -- Choose the outer and set notation
   let O : ℂ → ℂ := RH.RS.OuterHalfPlane.choose_outer hOuterExist
   -- Subset representation via CoV
-  have hRepOn : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentationOn
-      (RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 O)
+  have hRepOn : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRepOn
+      (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 O)
       (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
-    RH.AcademicFramework.PoissonCayley.pinch_representation_on_offXi_M2_via_cov
+    RH.AcademicFramework.poissonIntegraloissonCayley.pinch_representation_on_offXi_M2_via_cov
       (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXiAnalytic)
   -- Produce (P+) for F := 2·J_pinch det2 O from the certificate Kξ + Carleson route
   let F : ℂ → ℂ := fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 O z)
-  have hPPlus : RH.Cert.PPlus F := by
+  have hPPlus : RH.Cert.poissonIntegralPlus F := by
     -- Use existence-level `(∃Kξ, Carleson) → (P+)` and Kξ from the certificate
-    have hP : RH.Cert.PPlusFromCarleson_exists F := RH.RS.PPlusFromCarleson_exists_proved (F := F)
-    exact RH.RS.PPlus_of_certificate α c F hKxi hP
+    have hP : RH.Cert.poissonIntegralPlusFromCarleson_exists F := RH.RS.poissonIntegralPlusFromCarleson_exists_proved (F := F)
+    exact RH.RS.poissonIntegralPlus_of_certificate α c F hKxi hP
   -- Interior positivity on S via subset transport
   have hRe_offXi : ∀ z ∈ (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
       0 ≤ (F z).re :=
-    RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonTransport_on_Jpinch
+    RH.AcademicFramework.HalfPlaneOuterV2.pinch_transport
       (det2 := RH.RS.det2) (O := O) hRepOn hPPlus
   -- Package outer existence and conclude via the pinch-ingredients route
   have hOuter : ∃ O' : ℂ → ℂ, RH.RS.OuterHalfPlane O' ∧
@@ -923,7 +923,7 @@ theorem RH_from_certificate_poisson_and_pinned
     (hTrans : RH.RS.HasHalfPlanePoissonTransport
       (fun z => (2 : ℂ) * (_root_.RH.RS.J_pinch _root_.RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)))
     (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
-    (hP : RH.Cert.PPlusFromCarleson_exists
+    (hP : RH.Cert.poissonIntegralPlusFromCarleson_exists
       (fun z => (2 : ℂ) * (_root_.RH.RS.J_pinch _root_.RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)))
     (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
         ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
@@ -943,8 +943,8 @@ theorem RH_from_certificate_poisson_and_pinned
     · exact (RH.RS.OuterHalfPlane.choose_outer_spec hOuterExist).2
   -- Build (P+) for F := 2·J_pinch det2 O
   let F : ℂ → ℂ := fun z => (2 : ℂ) * (_root_.RH.RS.J_pinch _root_.RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)
-  have hPPlus : RH.Cert.PPlus F :=
-    RH.RS.PPlus_of_certificate α c F hKxi hP
+  have hPPlus : RH.Cert.poissonIntegralPlus F :=
+    RH.RS.poissonIntegralPlus_of_certificate α c F hKxi hP
   -- Poisson transport → interior positivity on Ω
   have hPoisson : ∀ z ∈ RH.RS.Ω, 0 ≤ (F z).re :=
     RH.RS.hPoisson_from_PPlus _ _ hTrans hPPlus
@@ -1044,7 +1044,7 @@ theorem RiemannHypothesis_from_poisson_and_pinned
     have : Θ z0 = 1 := by simpa [hgz] using hg1
     exact hΘz0 this
   -- Build certificate and conclude
-  let C : RH.RS.PinchCertificateExt :=
+  let C : RH.RS.poissonIntegralinchCertificateExt :=
     RH.RS.buildPinchCertificate hOuter hRe_offXi hRemXi
   exact RH_from_pinch_certificate C
 
@@ -1070,7 +1070,7 @@ theorem RiemannHypothesis_from_certificate_route
   : RiemannHypothesis := by
   -- Produce (P+) existence-level implication for F := 2·J_pinch det2 O
   let F : ℂ → ℂ := fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)
-  have hP : RH.Cert.PPlusFromCarleson_exists F := RH.RS.PPlusFromCarleson_exists_proved (F := F)
+  have hP : RH.Cert.poissonIntegralPlusFromCarleson_exists F := RH.RS.poissonIntegralPlusFromCarleson_exists_proved (F := F)
   -- Delegate to the main wrapper
   exact RH_from_certificate_poisson_and_pinned
     (α := α) (c := c) (hOuterExist := hOuterExist) (hTrans := hTrans)
@@ -1082,7 +1082,7 @@ the representation and delegate to the main certificate route. -/
 theorem RiemannHypothesis_from_certificate_rep_route
   (α c : ℝ)
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
-  (hRep : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentation
+  (hRep : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRep
     (fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)))
   (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → RH.AcademicFramework.CompletedXi.riemannXi_ext ρ = 0 →
@@ -1115,14 +1115,14 @@ theorem RiemannHypothesis_from_certificate_rep_on
   (hXiAnalytic : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext RH.RS.Ω)
   (M : ℝ)
   (hBound : ∀ t : ℝ,
-      |(RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)
-        (RH.AcademicFramework.HalfPlaneOuter.boundary t)).re| ≤ M)
+      |(RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)
+        (RH.AcademicFramework.HalfPlaneOuterV2.boundary t)).re| ≤ M)
   (hReEq : ∀ z ∈ (RH.RS.Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
-      (RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z).re
-        = RH.AcademicFramework.HalfPlaneOuter.P
+      (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z).re
+        = RH.AcademicFramework.HalfPlaneOuterV2.poissonIntegral
             (fun t : ℝ =>
-              (RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)
-                (RH.AcademicFramework.HalfPlaneOuter.boundary t)).re) z)
+              (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)
+                (RH.AcademicFramework.HalfPlaneOuterV2.boundary t)).re) z)
   (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → RH.AcademicFramework.CompletedXi.riemannXi_ext ρ = 0 →
       ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
@@ -1138,22 +1138,22 @@ theorem RiemannHypothesis_from_certificate_rep_on
   -- Choose the outer and define the off-zeros set
   let O : ℂ → ℂ := RH.RS.OuterHalfPlane.choose_outer hOuterExist
   -- Poisson representation on S := Ω \ {ξ_ext=0} via the M=2 builder
-  have hRepOn : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentationOn
-      (RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 O)
+  have hRepOn : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRepOn
+      (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 O)
       (RH.RS.Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) :=
-    RH.AcademicFramework.HalfPlaneOuter.pinch_representation_on_offXi_M2
+    RH.AcademicFramework.HalfPlaneOuterV2.pinch_representation_on_offXi_M2
       (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXiAnalytic)
       (hReEq := by intro z hz; simpa using (hReEq z hz))
   -- Produce (P+) for F := 2·J_pinch det2 O from the certificate Kξ + Carleson route
   let F : ℂ → ℂ := fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 O z)
-  have hPPlus : RH.Cert.PPlus F := by
+  have hPPlus : RH.Cert.poissonIntegralPlus F := by
     -- Use existence-level `(∃Kξ, Carleson) → (P+)` and Kξ from the certificate
-    have hP : RH.Cert.PPlusFromCarleson_exists F := RH.RS.PPlusFromCarleson_exists_proved (F := F)
-    exact RH.RS.PPlus_of_certificate α c F hKxi hP
+    have hP : RH.Cert.poissonIntegralPlusFromCarleson_exists F := RH.RS.poissonIntegralPlusFromCarleson_exists_proved (F := F)
+    exact RH.RS.poissonIntegralPlus_of_certificate α c F hKxi hP
   -- Interior positivity on S via subset transport
   have hRe_offXi : ∀ z ∈ (RH.RS.Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
       0 ≤ (F z).re :=
-    RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonTransport_on_Jpinch
+    RH.AcademicFramework.HalfPlaneOuterV2.pinch_transport
       (det2 := RH.RS.det2) (O := O) hRepOn hPPlus
   -- Package outer existence and conclude via the pinch-ingredients route
   have hOuter : ∃ O' : ℂ → ℂ, RH.RS.OuterHalfPlane O' ∧
@@ -1199,8 +1199,8 @@ theorem RiemannHypothesis_from_certificate_rep_on_via_cayley
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hDet2 : RH.RS.Det2OnOmega)
   (hXiAnalytic : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext RH.RS.Ω)
-  (hKernel : RH.AcademicFramework.PoissonCayley.CayleyKernelTransportOn
-    (RH.AcademicFramework.PoissonCayley.H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
+  (hKernel : RH.AcademicFramework.poissonIntegraloissonCayley.CayleyKernelTransportOn
+    (RH.AcademicFramework.poissonIntegraloissonCayley.H_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist))
     (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
   (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → RH.AcademicFramework.CompletedXi.riemannXi_ext ρ = 0 →
@@ -1217,23 +1217,23 @@ theorem RiemannHypothesis_from_certificate_rep_on_via_cayley
   -- Choose the outer and set notation
   let O : ℂ → ℂ := RH.RS.OuterHalfPlane.choose_outer hOuterExist
   -- Representation on S from Cayley kernel transport (no explicit re_eq needed)
-  have hRepOn : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentationOn
-      (RH.AcademicFramework.HalfPlaneOuter.F_pinch RH.RS.det2 O)
+  have hRepOn : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRepOn
+      (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 O)
       (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
     -- Apply the PoissonCayley builder that composes reEq_from_cayley with the M=2 route
-    exact RH.AcademicFramework.PoissonCayley.pinch_representation_on_offXi_M2_via_cayley
+    exact RH.AcademicFramework.poissonIntegraloissonCayley.pinch_representation_on_offXi_M2_via_cayley
       (hDet2 := hDet2) (hOuterExist := hOuterExist)
       (hXi := hXiAnalytic) (hKernel := hKernel)
   -- Produce (P+) for F := 2·J_pinch det2 O from the certificate Kξ + Carleson route
   let F : ℂ → ℂ := fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 O z)
-  have hPPlus : RH.Cert.PPlus F := by
+  have hPPlus : RH.Cert.poissonIntegralPlus F := by
     -- Use existence-level `(∃Kξ, Carleson) → (P+)` and Kξ from the certificate
-    have hP : RH.Cert.PPlusFromCarleson_exists F := RH.RS.PPlusFromCarleson_exists_proved (F := F)
-    exact RH.RS.PPlus_of_certificate α c F hKxi hP
+    have hP : RH.Cert.poissonIntegralPlusFromCarleson_exists F := RH.RS.poissonIntegralPlusFromCarleson_exists_proved (F := F)
+    exact RH.RS.poissonIntegralPlus_of_certificate α c F hKxi hP
   -- Interior positivity on S via subset transport
   have hRe_offXi : ∀ z ∈ (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
       0 ≤ (F z).re :=
-    RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonTransport_on_Jpinch
+    RH.AcademicFramework.HalfPlaneOuterV2.pinch_transport
       (det2 := RH.RS.det2) (O := O) hRepOn hPPlus
   -- Package outer existence and conclude via the pinch-ingredients route
   have hOuter : ∃ O' : ℂ → ℂ, RH.RS.OuterHalfPlane O' ∧

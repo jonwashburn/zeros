@@ -3,10 +3,10 @@ import rh.RS.SchurGlobalization
 import rh.RS.H1BMOWindows
 import rh.RS.CRGreenOuter
 import rh.RS.Cayley
-import rh.academic_framework.HalfPlaneOuter
+import rh.academic_framework.HalfPlaneOuterV2
 import rh.RS.PoissonPlateau
 -- TentShadow gated; this file should not depend on it directly
-import rh.rh.RS.WhitneyGeometryDefs
+import rh.RS.WhitneyGeometryDefs
 import rh.academic_framework.CompletedXi
 import rh.Cert.KxiWhitney
 import rh.Cert.KxiPPlus
@@ -1514,7 +1514,7 @@ theorem schur_off_zeros_of_PPlus
 
 /-- Align RS/Cert `(P+)` with AF `(P+)` (both mean a.e. boundary nonnegativity). -/
 @[simp] lemma PPlus_rs_to_af (F : ℂ → ℂ) :
-  RH.Cert.PPlus F ↔ RH.AcademicFramework.HalfPlaneOuter.PPlus F := by
+  RH.Cert.PPlus F ↔ RH.AcademicFramework.HalfPlaneOuterV2.BoundaryPositive F := by
   constructor
   · intro h
     -- Align boundary parametrizations: mk (1/2,t) = (1/2) + I t
@@ -1523,8 +1523,8 @@ theorem schur_off_zeros_of_PPlus
       · simp
       · simp
     simpa [RH.Cert.PPlus,
-           RH.AcademicFramework.HalfPlaneOuter.PPlus,
-           RH.AcademicFramework.HalfPlaneOuter.boundary_mk_eq, hb]
+           RH.AcademicFramework.HalfPlaneOuterV2.BoundaryPositive,
+           RH.AcademicFramework.HalfPlaneOuterV2.boundary_mk_eq, hb]
       using h
   · intro h
     have hb (t : ℝ) : (Complex.mk (1/2) t) = ((1/2 : ℂ) + Complex.I * (t : ℂ)) := by
@@ -1532,21 +1532,21 @@ theorem schur_off_zeros_of_PPlus
       · simp
       · simp
     simpa [RH.Cert.PPlus,
-           RH.AcademicFramework.HalfPlaneOuter.PPlus,
-           RH.AcademicFramework.HalfPlaneOuter.boundary_mk_eq, hb]
+           RH.AcademicFramework.HalfPlaneOuterV2.BoundaryPositive,
+           RH.AcademicFramework.HalfPlaneOuterV2.boundary_mk_eq, hb]
       using h
 
 /-- Transport wrapper: if `(P+)` holds for `F` on the boundary and we have a
 half‑plane Poisson representation, then interior positivity follows. -/
 theorem interior_re_nonneg_of_PPlus_and_rep
     (F : ℂ → ℂ)
-    (hRep : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentation F)
+    (hRep : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRep F)
     (hP : RH.Cert.PPlus F) :
     ∀ z : ℂ, z.re > (1/2 : ℝ) → 0 ≤ (F z).re := by
   intro z hz
-  have hPAF : RH.AcademicFramework.HalfPlaneOuter.PPlus F :=
+  have hPAF : RH.AcademicFramework.HalfPlaneOuterV2.BoundaryPositive F :=
     (PPlus_rs_to_af F).mp hP
-  exact RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonTransport_re
+  exact RH.AcademicFramework.HalfPlaneOuterV2.poissonTransport
     (F := F) hRep hPAF z hz
 
 /-- Wiring adapter: use `CRGreen_link` together with a concrete Carleson budget,

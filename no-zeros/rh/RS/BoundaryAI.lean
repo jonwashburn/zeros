@@ -1,5 +1,5 @@
 -- TentShadow gated to reduce build surface; BoundaryWedge provides needed glue
-import rh.academic_framework.HalfPlaneOuter
+import rh.academic_framework.HalfPlaneOuterV2
 import rh.RS.BoundaryWedge
 
 /-!
@@ -14,15 +14,15 @@ noncomputable section
 namespace RH
 namespace RS
 
-open RH.AcademicFramework.HalfPlaneOuter
+open RH.AcademicFramework.HalfPlaneOuterV2
 
 /-- RS alias: boundary Poisson AI for an arbitrary `F`. -/
-abbrev BoundaryPoissonAI (F : ℂ → ℂ) : Prop :=
-  RH.AcademicFramework.HalfPlaneOuter.BoundaryPoissonAI F
+abbrev BoundaryAI (F : ℂ → ℂ) : Prop :=
+  RH.AcademicFramework.HalfPlaneOuterV2.BoundaryAI F
 
 /-- RS alias: implication from Poisson representation to boundary AI. -/
-abbrev boundaryPoissonAI_from_rep (F : ℂ → ℂ) : Prop :=
-  RH.AcademicFramework.HalfPlaneOuter.boundaryPoissonAI_from_rep F
+abbrev boundaryAI_from_poissonRep (F : ℂ → ℂ) : Prop :=
+  RH.AcademicFramework.HalfPlaneOuterV2.boundaryAI_from_poissonRep F
 
 /-- Pinch field (explicit, RS-level spelling).
 Note: AF also provides `F_pinch`; we keep the explicit form locally. -/
@@ -30,20 +30,20 @@ Note: AF also provides `F_pinch`; we keep the explicit form locally. -/
   fun z => (2 : ℂ) * J_pinch det2 O z
 
 /-- RS alias: boundary Poisson AI specialized to the pinch field. -/
-abbrev BoundaryPoissonAI_pinch (det2 O : ℂ → ℂ) : Prop :=
-  BoundaryPoissonAI (F_pinch det2 O)
+abbrev BoundaryAI_pinch (det2 O : ℂ → ℂ) : Prop :=
+  BoundaryAI (F_pinch det2 O)
 
 /-- RS alias: AF pinch AI adapter (representation ⇒ boundary AI). -/
-abbrev boundaryPoissonAI_from_rep_pinch (det2 O : ℂ → ℂ) : Prop :=
-  RH.AcademicFramework.HalfPlaneOuter.boundaryPoissonAI_from_rep_Jpinch det2 O
+abbrev boundaryAI_from_poissonRep_pinch (det2 O : ℂ → ℂ) : Prop :=
+  RH.AcademicFramework.HalfPlaneOuterV2.boundaryAI_from_poissonRep_Jpinch det2 O
 
 /-- Produce the concrete AI hypothesis for the pinch field from a
 half–plane Poisson representation and the AF adapter. -/
 theorem AI_for_pinch_of_rep
   {det2 O : ℂ → ℂ}
-  (hRep : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentation (F_pinch det2 O))
-  (hImp : boundaryPoissonAI_from_rep_pinch det2 O) :
-  BoundaryPoissonAI_pinch det2 O :=
+  (hRep : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRep (F_pinch det2 O))
+  (hImp : boundaryAI_from_poissonRep_pinch det2 O) :
+  BoundaryAI_pinch det2 O :=
 by
   -- The AF adapter is an implication `HasRep → BoundaryAI`; apply it.
   exact hImp hRep
@@ -53,7 +53,7 @@ predicate: boundary a.e. nonnegativity `(P+)` implies interior nonnegativity
 on `Ω` for the real part of `F`. -/
 theorem transport_of_rep
   (F : ℂ → ℂ)
-  (hRep : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentation F) :
+  (hRep : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRep F) :
   HasHalfPlanePoissonTransport F := by
   intro hPPlus z hzΩ
   -- Convert membership in Ω to the real-part inequality
@@ -66,7 +66,7 @@ theorem transport_of_rep
 `HasHalfPlanePoissonTransport F`. -/
 theorem transport_for_pinch_of_rep
   {det2 O : ℂ → ℂ}
-  (hRep : RH.AcademicFramework.HalfPlaneOuter.HasHalfPlanePoissonRepresentation (F_pinch det2 O)) :
+  (hRep : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRep (F_pinch det2 O)) :
   HasHalfPlanePoissonTransport (fun z => (2 : ℂ) * J_pinch det2 O z) := by
   -- Delegate to the generic wrapper
   exact transport_of_rep (F := F_pinch det2 O) hRep
