@@ -186,7 +186,28 @@ lemma F_pinch_boundary_bound
     |(F_pinch det2 O (boundary t)).re| ≤ 2 := by
   -- Apply RS.boundary_Re_F_pinch_le_two when O and ξ are nonzero
   -- When either is zero, F_pinch = 0 so the bound holds trivially
-  sorry
+  classical
+  -- Translate local BoundaryModulusEq (with local boundary) to the RS version
+  have hBME_RS : RH.RS.BoundaryModulusEq O (fun s => det2 s / riemannXi_ext s) := by
+    intro τ; simpa [RH.RS.boundary, boundary] using hBME τ
+  -- Work on RS.boundary and then rewrite back to the local boundary
+  have hRS : |(F_pinch det2 O (RH.RS.boundary t)).re| ≤ (2 : ℝ) := by
+    by_cases hO : O (RH.RS.boundary t) = 0
+    · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+      · have hzero : (F_pinch det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
+      · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME_RS t (by simpa [hO]) (by exact hXi)
+    · by_cases hXi : riemannXi_ext (RH.RS.boundary t) = 0
+      · have hzero : (F_pinch det2 O (RH.RS.boundary t)) = 0 := by
+          simp [F_pinch, RH.RS.J_pinch, hO, hXi, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        have hre0 : (F_pinch det2 O (RH.RS.boundary t)).re = 0 := by
+          simpa using congrArg Complex.re hzero
+        simpa [hre0] using (by norm_num : (0 : ℝ) ≤ (2 : ℝ))
+      · exact RH.RS.boundary_Re_F_pinch_le_two (O := O) hBME_RS t (by exact hO) (by exact hXi)
+  simpa [RH.RS.boundary, boundary] using hRS
 
 /-! ## Section 5: Integrability Helpers -/
 
@@ -219,18 +240,44 @@ lemma poissonKernel_integrable {z : ℂ} (hz : z ∈ Ω) :
   have h_dom : Integrable (fun t => C / (1 + (t - z.im)^2)) := by
     -- integrable_inv_one_add_sq gives integrability of 1/(1+t²)
     -- Translation and scaling preserve integrability
-    sorry -- Use integrable_inv_one_add_sq.comp_sub_right and const_mul
+    have : Integrable (fun t : ℝ => 1 / (1 + (t - z.im) ^ 2)) := by
+      simpa [sub_eq_add_neg, pow_two] using
+        (integrable_inv_one_add_sq.comp_sub_right z.im)
+    simpa [div_eq_mul_inv] using this.const_mul C
   -- Apply comparison
   refine h_dom.mono ?_ ?_
-  · sorry -- Measurability of poissonKernel
-  · filter_upwards with t
-    sorry -- Show |poissonKernel z t| ≤ C/(1+(t-z.im)²) using hbound
+  · -- Measurability of poissonKernel
+    -- Build from basic measurable operations
+    have hb : Measurable (fun t : ℝ => t - z.im) := by
+      simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
+    have hden : Measurable (fun t : ℝ => (z.re - 1/2) ^ 2 + (t - z.im) ^ 2) :=
+      measurable_const.add (hb.pow 2)
+    have hfrac : Measurable
+        (fun t : ℝ => (z.re - 1/2) / ((z.re - 1/2) ^ 2 + (t - z.im) ^ 2)) := by
+      have : Measurable (fun t : ℝ => ((z.re - 1/2) ^ 2 + (t - z.im) ^ 2)⁻¹) :=
+        hden.inv
+      simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+        using this.const_mul (z.re - 1/2)
+    have hmeas : Measurable
+        (fun t : ℝ => (1 / Real.pi) *
+          ((z.re - 1/2) / ((z.re - 1/2) ^ 2 + (t - z.im) ^ 2))) :=
+      hfrac.const_mul (1 / Real.pi)
+    simpa [poissonKernel] using hmeas.aestronglyMeasurable
+  · -- Pointwise bound using hbound and nonnegativity of the kernel
+    refine Filter.Eventually.of_forall (fun t => ?_)
+    have hk_nonneg : 0 ≤ poissonKernel z t := poissonKernel_nonneg hz t
+    have hk_abs : |poissonKernel z t| = poissonKernel z t := by
+      simpa using abs_of_nonneg hk_nonneg
+    simpa [hk_abs] using hbound t
 
-/-- Integrability with bounded boundary data -/
+/-- Integrability with bounded boundary data 
+    Note: The measurability assumption `hMeas` is needed since F may not be continuous.
+    For analytic functions, this follows from continuity. -/
 lemma integrable_boundedBoundary
     (F : ℂ → ℂ) (z : ℂ) (M : ℝ)
     (hz : z ∈ Ω)
-    (hBound : ∀ t : ℝ, |(F (boundary t)).re| ≤ M) :
+    (hBound : ∀ t : ℝ, |(F (boundary t)).re| ≤ M)
+    (hMeas : Measurable (fun t => (F (boundary t)).re)) :
     Integrable (fun t => (F (boundary t)).re * poissonKernel z t) := by
   -- The kernel is integrable
   have hker := poissonKernel_integrable hz
@@ -250,11 +297,36 @@ lemma integrable_boundedBoundary
   · -- Measurability
     apply Measurable.aestronglyMeasurable
     apply Measurable.mul
-    · sorry -- Measurability of F(boundary t).re
-    · sorry -- Measurability of poissonKernel
+    · -- Measurability of F(boundary t).re - directly from hypothesis
+      exact hMeas
+    · -- Measurability of poissonKernel z t
+      -- Build from measurable primitives and use div_eq_mul_inv
+      have hb : Measurable (fun t : ℝ => t - z.im) := by
+        simpa [sub_eq_add_neg] using (measurable_id.sub measurable_const)
+      have hden : Measurable (fun t : ℝ => (z.re - (1/2 : ℝ)) ^ 2 + (t - z.im) ^ 2) := by
+        exact measurable_const.add (hb.pow 2)
+      have hfrac : Measurable
+          (fun t : ℝ => (z.re - (1/2 : ℝ)) /
+            ((z.re - (1/2 : ℝ)) ^ 2 + (t - z.im) ^ 2)) := by
+        have : Measurable (fun t : ℝ =>
+            ((z.re - (1/2 : ℝ)) ^ 2 + (t - z.im) ^ 2)⁻¹) := hden.inv
+        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
+          using this.const_mul (z.re - (1/2 : ℝ))
+      simpa [poissonKernel]
+        using (hfrac.const_mul (1 / Real.pi)).aestronglyMeasurable
   · -- Bound
     filter_upwards with t
-    sorry -- Show |(F(boundary t)).re * poissonKernel z t| ≤ M * poissonKernel z t
+    have hk_nonneg : 0 ≤ poissonKernel z t := poissonKernel_nonneg hz t
+    have hk_abs : |poissonKernel z t| = poissonKernel z t := by
+      simpa using abs_of_nonneg hk_nonneg
+    calc
+      |(F (boundary t)).re * poissonKernel z t|
+          = |(F (boundary t)).re| * |poissonKernel z t| := by
+            simpa [abs_mul]
+      _ ≤ M * |poissonKernel z t| := by
+            exact mul_le_mul_of_nonneg_right (hBound t) (abs_nonneg _)
+      _ = M * poissonKernel z t := by
+            simpa [hk_abs]
 
 /-! ## Section 6: Main Existence Results -/
 
@@ -279,8 +351,23 @@ theorem pinch_poissonRepOn_offZeros
     intro z hz
     have hzΩ : z ∈ Ω := Set.mem_of_mem_diff hz
     apply integrable_boundedBoundary _ _ 2 hzΩ
-    intro t
-    exact F_pinch_boundary_bound hBME t
+    · intro t
+      exact F_pinch_boundary_bound hBME t
+    · -- Measurability of t ↦ (F_pinch det2 O (boundary t)).re
+      apply Measurable.comp
+      · exact measurable_re  -- Real part is measurable
+      · -- Measurability of t ↦ F_pinch det2 O (boundary t)
+        -- The composition t ↦ boundary t ↦ F_pinch det2 O (boundary t)
+        -- boundary is measurable as an affine map
+        have hBoundaryMeas : Measurable (boundary : ℝ → ℂ) := by
+          unfold boundary
+          apply Measurable.add
+          · exact measurable_const
+          · apply Measurable.const_mul
+            exact Complex.continuous_ofReal.measurable
+        -- For F_pinch to be measurable, we'd need continuity or measurability
+        -- This typically requires that the functions involved are continuous
+        sorry  -- Requires F_pinch det2 O to be continuous or measurable
   · -- formula
     exact hFormula
 
