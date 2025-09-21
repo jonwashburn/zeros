@@ -740,10 +740,10 @@ theorem RiemannHypothesis_from_poisson_and_pinned'
             AnalyticOn ℂ (_root_.RH.RS.Θ_pinch_of _root_.RH.RS.det2 (Classical.choose hOuter)) (U \ {ρ}) ∧
             Set.EqOn (_root_.RH.RS.Θ_pinch_of _root_.RH.RS.det2 (Classical.choose hOuter)) g (U \ {ρ}) ∧
             g ρ = 1 ∧ ∃ z, z ∈ U ∧ g z ≠ 1 := by
-    intro ρ hΩ hXi
-    rcases hPinned ρ hΩ hXi with
-      ⟨U, hUopen, hUconn, hUsub, hρU, hIsoXi,
-       hΘU, u, hEq, hu0, z0, hz0U, hzρ, hΘz0⟩
+    intro ρ hΩ hXi0
+    rcases hPinned ρ hΩ hXi0 with
+      ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
+       hΘU, u, hEq, hu0, z_nontrivial⟩
     let Θ : ℂ → ℂ := _root_.RH.RS.Θ_pinch_of _root_.RH.RS.det2 (Classical.choose hOuter)
     -- Eventual equality on the punctured neighborhood
     have hEq_ev : (fun w => Θ w) =ᶠ[nhdsWithin ρ (U \ {ρ})]
@@ -763,95 +763,21 @@ theorem RiemannHypothesis_from_poisson_and_pinned'
     have hgU : AnalyticOn ℂ g U := by
       exact RH.RS.analyticOn_update_from_pinned (U := U) (ρ := ρ) (Θ := Θ) (u := u)
         hUopen hρU hΘU hEq hu0
-    -- Package the witness: from Θ z0 ≠ 1 and z0 ≠ ρ infer g z0 ≠ 1
-    have hgz : g z0 = Θ z0 := by
-      -- Avoid global simp; restrict to the update rewrite at a point distinct from ρ
-      change Function.update Θ ρ (1 : ℂ) z0 = Θ z0
-      simp only [g, Function.update_noteq hzρ]
-    refine ⟨U, hUopen, hUconn, hUsub, hρU, hIsoXi,
+    -- Package the witness: provide a point where g ≠ 1 inherited from Θ ≠ 1
+    rcases z_nontrivial with ⟨z0, hz0U, hz0ne, hΘz0⟩
+    refine ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
       ⟨g, hgU, hΘU, hEqOn, hval, z0, hz0U, ?nz⟩⟩
-    -- Prove g z0 ≠ 1 by contradiction: if g z0 = 1 then Θ z0 = 1, contradicting hΘz0
     intro hg1
-    -- If g z0 = 1, then Θ z0 = 1 by hgz, contradicting hΘz0
-    have : Θ z0 = 1 := by simpa [hgz] using hg1
+    have : Θ z0 = 1 := by
+      -- z0 ≠ ρ, so update leaves value unchanged
+      have : g z0 = Θ z0 := by
+        change Function.update Θ ρ (1 : ℂ) z0 = Θ z0
+        simp [g, hz0ne]
+      simpa [this] using hg1
     exact hΘz0 this
   -- Build certificate and conclude
   let C : RH.RS.PinchCertificateExt :=
     RH.RS.buildPinchCertificate hOuter hRe_offXi hRemXi
   exact RH_from_pinch_certificate C
 
-/-! ### Cayley-transport variant: obtain the subset Poisson representation via Cayley
-
-We also provide a variant that uses the Cayley kernel-transport identity for the
-disk-side function `H_pinch` to produce the real-part identity on `S` and feed
-it to the M=2 subset builder, avoiding a direct `re_eq` input. -/
-
-theorem RiemannHypothesis_from_certificate_rep_on_via_cayley
-  (α c : ℝ)
-  (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
-  (hDet2 : RH.RS.Det2OnOmega)
-  (hXiAnalytic : AnalyticOn ℂ RH.AcademicFramework.CompletedXi.riemannXi_ext RH.RS.Ω)
-  (hKernel : True)
-  (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
-  (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → RH.AcademicFramework.CompletedXi.riemannXi_ext ρ = 0 →
-      ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
-        (U ∩ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
-        ∃ (Θ_analytic_off_rho : AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (U \ {ρ}))
-          (u : ℂ → ℂ)
-          (hEq : Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}))
-          (hu0 : Filter.Tendsto u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)))
-          (z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
-          True)
-  : RiemannHypothesis := by
-  classical
-  -- Choose the outer and set notation
-  let O : ℂ → ℂ := RH.RS.OuterHalfPlane.choose_outer hOuterExist
-  -- Representation on S from Cayley kernel transport (no explicit re_eq needed)
-  have hRepOn : RH.AcademicFramework.HalfPlaneOuterV2.HasPoissonRepOn
-      (RH.AcademicFramework.HalfPlaneOuterV2.F_pinch RH.RS.det2 O)
-      (RH.RS.Ω \\ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}) := by
-    -- Temporarily use the direct M=2 builder pending Cayley kernel-transport refactor
-    exact RH.AcademicFramework.HalfPlaneOuterV2.pinch_representation_on_offXi_M2
-      (hDet2 := hDet2) (hOuterExist := hOuterExist) (hXi := hXiAnalytic)
-  -- Produce (P+) for F := 2·J_pinch det2 O from the certificate Kξ + Carleson route
-  let F : ℂ → ℂ := fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 O z)
-  have hPPlus : RH.Cert.poissonIntegralPlus F := by
-    -- Use existence-level `(∃Kξ, Carleson) → (P+)` and Kξ from the certificate
-    have hP : RH.Cert.poissonIntegralPlusFromCarleson_exists F := RH.RS.poissonIntegralPlusFromCarleson_exists_proved (F := F)
-    exact RH.RS.poissonIntegralPlus_of_certificate α c F hKxi hP
-  -- Interior positivity on S via subset transport
-  have hRe_offXi : ∀ z ∈ (RH.RS.Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
-      0 ≤ (F z).re :=
-    RH.AcademicFramework.HalfPlaneOuterV2.pinch_transport
-      (det2 := RH.RS.det2) (O := O) hRepOn hPPlus
-  -- Package outer existence and conclude via the pinch-ingredients route
-  have hOuter : ∃ O' : ℂ → ℂ, RH.RS.OuterHalfPlane O' ∧
-      RH.RS.BoundaryModulusEq O' (fun s => RH.RS.det2 s / RH.AcademicFramework.CompletedXi.riemannXi_ext s) := by
-    refine ⟨O, ?_, ?_⟩
-    · exact (RH.RS.OuterHalfPlane.choose_outer_spec hOuterExist).1
-    · exact (RH.RS.OuterHalfPlane.choose_outer_spec hOuterExist).2
-  -- Build removable assignment from pinned input and finalize
-  exact RiemannHypothesis_from_pinch_ingredients
-    (hOuter := hOuter) (hRe_offXi := by
-      intro z hz; simpa [F] using (hRe_offXi z hz))
-    (hRemXi := by
-      intro ρ hΩ hXi0
-      rcases hPinned ρ hΩ hXi0 with
-        ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
-         hΘU, u, hEq, hu0, z_nontrivial, _⟩
-      -- Package the removable witness in the expected shape
-      refine ⟨U, hUopen, hUconn, hUsub, hρU, hIso, ?_⟩
-      rcases z_nontrivial with ⟨z0, hz0U, hz0ne, hneq⟩
-      refine ⟨?g, ?hg, hΘU, ?hEqOn, ?hval, z0, hz0U, ?hne1⟩
-      · -- g := update Θ ρ 1
-        exact (Function.update (RH.RS.Θ_pinch_of RH.RS.det2 O) ρ (1 : ℂ))
-      · -- Analyticity of g on U from pinned update helper (already imported in RS)
-        exact RH.RS.analyticOn_update_from_pinned (U := U) (ρ := ρ)
-          (Θ := RH.RS.Θ_pinch_of RH.RS.det2 O) (u := u) hUopen hρU hΘU hEq hu0
-      · -- Equality off ρ
-        intro w hw; simp [Function.update, hw.2]
-      · -- g ρ = 1
-        simp [Function.update]
-      · -- Nontriviality passes to g at z0
-        intro hg1; have : (RH.RS.Θ_pinch_of RH.RS.det2 O) z0 = 1 := by simpa using hg1
-        exact hneq this)
+-- (Cayley-transport variant omitted pending dedicated transport identities.)
