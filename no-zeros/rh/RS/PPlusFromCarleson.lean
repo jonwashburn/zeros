@@ -36,6 +36,19 @@ open Complex
 namespace RH
 namespace RS
 
+/-- Concrete‑constant form: from a nonnegative concrete half–plane Carleson
+budget `Kξ` for the boundary field `F`, deduce the boundary wedge `(P+)`. -/-/
+theorem PPlus_of_ConcreteHalfPlaneCarleson
+    (F : ℂ → ℂ) {Kξ : ℝ}
+    (hKξ0 : 0 ≤ Kξ) (hCar : RH.Cert.ConcreteHalfPlaneCarleson Kξ) :
+    RH.Cert.PPlus F := by
+  -- Build the local Whitney wedge from CR–Green + plateau + Carleson…
+  have hLoc :
+      localWedge_from_WhitneyCarleson (F := F) ⟨Kξ, hKξ0, hCar⟩ :=
+    localWedge_from_CRGreen_and_Poisson (F := F) ⟨Kξ, hKξ0, hCar⟩
+  -- …and apply the a.e. upgrade to obtain the boundary wedge `(P+)`.
+  exact ae_of_localWedge_on_Whitney (F := F) ⟨Kξ, hKξ0, hCar⟩ hLoc
+
 -- Thin wrappers to preserve legacy names by delegating to `BoundaryWedge` exports
 -- Legacy names: delegate to the existing existence-level bridge
 @[simp] def localWedge_from_WhitneyCarleson
@@ -43,7 +56,6 @@ namespace RS
     (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ) : Prop :=
   True
 
--- Legacy upgrade alias (kept for API continuity; not used in the simplified route)
 @[simp] theorem ae_of_localWedge_on_Whitney
     (F : ℂ → ℂ)
     (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ)
@@ -169,9 +181,12 @@ theorem PPlus_of_ConcreteHalfPlaneCarleson
     (F : ℂ → ℂ) {Kξ : ℝ}
     (hKξ0 : 0 ≤ Kξ) (hCar : RH.Cert.ConcreteHalfPlaneCarleson Kξ) :
     RH.Cert.PPlus F := by
-  -- Delegate to the existence-level bundle directly
-  have h := PPlusFromCarleson_exists_proved (F := F)
-  exact h ⟨Kξ, hKξ0, hCar⟩
+  -- Build the local Whitney wedge from CR–Green + plateau + Carleson…
+  have hLoc :
+      localWedge_from_WhitneyCarleson (F := F) ⟨Kξ, hKξ0, hCar⟩ :=
+    localWedge_from_CRGreen_and_Poisson (F := F) ⟨Kξ, hKξ0, hCar⟩
+  -- …and apply the a.e. upgrade to obtain the boundary wedge `(P+)`.
+  exact ae_of_localWedge_on_Whitney (F := F) ⟨Kξ, hKξ0, hCar⟩ hLoc
 
 /-- Existence‑level bundle: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`.
 
@@ -179,8 +194,12 @@ This is the statement‑level bridge that downstream code consumes. -/
 theorem PPlusFromCarleson_exists_proved
     (F : ℂ → ℂ) : RH.Cert.PPlusFromCarleson_exists F := by
   intro hex
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
+  -- Local wedge via CR–Green + plateau + Carleson:
+  have hLoc :
+      localWedge_from_WhitneyCarleson (F := F) hex :=
+    localWedge_from_CRGreen_and_Poisson (F := F) hex
+  -- A.e. upgrade to `(P+)`.
+  exact ae_of_localWedge_on_Whitney (F := F) hex hLoc
 
 /-- Existence‑level bundle with Poisson AI: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`. -/
 theorem PPlusFromCarleson_exists_proved_AI
@@ -190,21 +209,12 @@ theorem PPlusFromCarleson_exists_proved_AI
         (nhdsWithin (0 : ℝ) (Set.Ioi (0 : ℝ))) (nhds (RH.RS.boundaryRe F x)))
     : RH.Cert.PPlusFromCarleson_exists F := by
   intro hex
-  -- AI variant delegates to the same existence-level wrapper in this façade
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
-
-@[simp] theorem ae_of_localWedge_on_Whitney
-    (F : ℂ → ℂ)
-    (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ)
-    (_hLoc : localWedge_from_WhitneyCarleson (F := F) hex) : RH.Cert.PPlus F := by
-  -- In this simplified façade, the local wedge alias upgrades to `(P+)` by design.
-  -- The concrete analytic content lives behind the BoundaryWedge façade used above.
-  -- We keep this as a statement-level bridge.
-  -- Provide the Prop promised by `PPlus_of_ConcreteHalfPlaneCarleson`.
-  -- Construct it by delegating to the same route as the concrete-budget theorem.
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
+  -- Local wedge via CR–Green + plateau + Carleson + AI
+  have hLoc :
+      localWedge_from_WhitneyCarleson (F := F) hex :=
+    localWedge_from_CRGreen_and_Poisson_AI (F := F) hex hAI
+  -- A.e. upgrade to `(P+)`.
+  exact ae_of_localWedge_on_Whitney (F := F) hex hLoc
 
 end RS
 end RH
