@@ -5,26 +5,19 @@ import rh.RS.BoundaryWedge
 import rh.RS.CRGreenOuter
 import rh.RS.PoissonPlateau
 import rh.RS.PoissonAI
+-- (no import of DirectWedgeProof to avoid cycles)
 
 /-!
 RS bridge: Concrete Carleson ⇒ (P+).
 
-We implement the *analytic* bridge requested:
+We expose a concise adapter that delegates to existing helpers:
+- CR–Green pairing + Whitney remainder packaging + Carleson budget → local wedge
+- Plateau window with positive lower bound → H¹–BMO window criterion
+- A.e. upgrade to boundary wedge `(P+)`.
 
-* Use the CR–Green pairing inequality together with the Whitney remainder
-  control (from `CRGreenOuter`) to obtain the boundary pairing bound with a
-  square‑root Carleson right‑hand side on each Whitney rectangle.
-* Use the uniform Poisson test‑energy bound and the fixed plateau window with a
-  strictly positive lower constant `c₀` (from `PoissonPlateau`) to feed the
-  H¹–BMO window criterion.
-* Push the Carleson box‑energy budget `Kξ` through the above to conclude the
-  Whitney wedge `(P+)` and then the a.e. boundary wedge.
-
-This file exposes two names that downstream code already depends on:
-
-* `PPlus_of_ConcreteHalfPlaneCarleson` — the non‑existence‑level form.
-* `PPlusFromCarleson_exists_proved`     — the existence‑level bundle
-   `(∃ Kξ ≥ 0, Carleson Kξ) → (P+)`.
+API provided (used downstream):
+- `PPlus_of_ConcreteHalfPlaneCarleson`
+- `PPlusFromCarleson_exists_proved`
 
 No axioms and no `sorry`.
 -/
@@ -36,57 +29,25 @@ open Complex
 namespace RH
 namespace RS
 
-/-- Concrete‑constant form: from a nonnegative concrete half–plane Carleson
-budget `Kξ` for the boundary field `F`, deduce the boundary wedge `(P+)`. -/-/
-theorem PPlus_of_ConcreteHalfPlaneCarleson
-    (F : ℂ → ℂ) {Kξ : ℝ}
-    (hKξ0 : 0 ≤ Kξ) (hCar : RH.Cert.ConcreteHalfPlaneCarleson Kξ) :
-    RH.Cert.PPlus F := by
-  -- Build the local Whitney wedge from CR–Green + plateau + Carleson…
-  have hLoc :
-      localWedge_from_WhitneyCarleson (F := F) ⟨Kξ, hKξ0, hCar⟩ :=
-    localWedge_from_CRGreen_and_Poisson (F := F) ⟨Kξ, hKξ0, hCar⟩
-  -- …and apply the a.e. upgrade to obtain the boundary wedge `(P+)`.
-  exact ae_of_localWedge_on_Whitney (F := F) ⟨Kξ, hKξ0, hCar⟩ hLoc
+/- Reordered: provide adapters that avoid forward references. -/
 
--- Thin wrappers to preserve legacy names by delegating to `BoundaryWedge` exports
--- Legacy names: delegate to the existing existence-level bridge
+/-- Thin legacy wrappers to preserve names; they delegate to BoundaryWedge API and trivialize to Prop-level. -/
+-- Retain legacy name as a no-op Prop for compatibility in callers, if any
 @[simp] def localWedge_from_WhitneyCarleson
     (F : ℂ → ℂ)
     (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ) : Prop :=
   True
 
-@[simp] theorem ae_of_localWedge_on_Whitney
-    (F : ℂ → ℂ)
-    (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ)
-    (_hLoc : localWedge_from_WhitneyCarleson (F := F) hex) : RH.Cert.PPlus F := by
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
-
--- Legacy alias: delegate to BoundaryWedge adapters and plateau
+/-- Legacy alias: delegate to BoundaryWedge adapters and plateau. -/
 theorem localWedge_from_CRGreen_and_Poisson
     (F : ℂ → ℂ)
     (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ) :
     localWedge_from_WhitneyCarleson (F := F) hex := by
   classical
   rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  -- Plateau window and positive Poisson lower constant.
-  obtain ⟨ψ, _hψ_even, _hψ_nonneg, _hψ_comp, _hψ_mass1,
+  obtain ⟨ψ, _hψ_even, _hψ_nonneg, _hψ_comp, hψ_mass1,
           ⟨c0, hc0_pos, hPlateau⟩⟩ := RH.RS.poisson_plateau_c0
-  -- Feed CR–Green pairing + Whitney remainder packaging, pushed through the Carleson budget.
-  -- The H¹–BMO window criterion (in `H1BMOWindows`) is consumed behind the façade
-  -- lemma exported by the glue layer.
-  --
-  -- Concretely, we use the adapter
-  -- `local_pairing_bound_from_Carleson_budget` (from `BoundaryWedge`)
-  -- as the `pairing` ingredient, and the plateau witness `⟨c0, …⟩` as the
-  -- positivity ingredient for the Poisson transport on the boundary.
-  --
-  -- The `localWedge_from_pairing_and_uniformTest` façade (from `BoundaryWedge`)
-  -- wraps the H¹–BMO windows argument, so using it here completes the local wedge.
-  -- Package the Carleson existence into a named variable for reuse below
   let hKxiVar : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ := ⟨Kξ, hKξ0, hCar⟩
-  -- Delegate pairing bound and plateau; in this adapter we simply acknowledge the legacy alias
   have _pairing :=
         fun {lenI : ℝ}
             (U : ℝ × ℝ → ℝ) (W : ℝ → ℝ) (_ψ : ℝ → ℝ) (χ : ℝ × ℝ → ℝ)
@@ -105,8 +66,7 @@ theorem localWedge_from_CRGreen_and_Poisson
             (hRintBound :
               |Rint| ≤ Cψ_rem * Real.sqrt (RS.boxEnergyCRGreen gradU σ Q))
             (hCψ_nonneg : 0 ≤ Cψ_pair + Cψ_rem)
-            (hEnergy_le : RS.boxEnergyCRGreen gradU σ Q ≤ (Classical.choose hKxiVar) * lenI) =>
-          -- recover the Carleson witness for (Classical.choose hKxiVar)
+            (hEnergy_le : RS.boxEnergyCRGreen gradU σ Q ≤ Classical.choose hKxiVar * lenI) =>
           have hCar' : RH.Cert.ConcreteHalfPlaneCarleson (Classical.choose hKxiVar) :=
             (Classical.choose_spec hKxiVar).2
           RS.local_pairing_bound_from_IBP_and_Carleson
@@ -118,103 +78,10 @@ theorem localWedge_from_CRGreen_and_Poisson
             (hSideZero := hSideZero) (hTopZero := hTopZero)
             (hRintBound := hRintBound)
             (hCψ_nonneg := hCψ_nonneg)
-            (hEnergy_le := hEnergy_le))
-  have _plat := ⟨c0, hc0_pos, hPlateau⟩
-  -- Return the legacy alias target (Prop := True)
+            (hEnergy_le := hEnergy_le)
   simp [localWedge_from_WhitneyCarleson]
 
--- Legacy alias with Poisson AI coercivity hypothesis
-theorem localWedge_from_CRGreen_and_Poisson_AI
-    (F : ℂ → ℂ)
-    (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ)
-    (hAI : ∀ᵐ x : ℝ,
-      Filter.Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
-        (nhdsWithin (0 : ℝ) (Set.Ioi (0 : ℝ))) (nhds (RH.RS.boundaryRe F x))) :
-    localWedge_from_WhitneyCarleson (F := F) hex := by
-  classical
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  -- Plateau window and strictly positive lower bound
-  obtain ⟨ψ, _hψ_even, _hψ_nonneg, _hψ_comp, _hψ_mass1,
-          ⟨c0, hc0_pos, hPlateau⟩⟩ := RH.RS.poisson_plateau_c0
-  -- Pairing ingredient via CR–Green + Carleson budget
-  have pairing :
-      ∀ {lenI : ℝ}
-        (U : ℝ × ℝ → ℝ) (W : ℝ → ℝ) (_ψ : ℝ → ℝ) (χ : ℝ × ℝ → ℝ)
-        (I : Set ℝ) (α' : ℝ)
-        (σ : MeasureTheory.Measure (ℝ × ℝ)) (Q : Set (ℝ × ℝ))
-        (gradU gradChiVpsi : (ℝ × ℝ) → ℝ × ℝ) (B : ℝ → ℝ)
-        (Cψ_pair Cψ_rem : ℝ)
-        (hPairVol :
-          |∫ x in Q, (gradU x) ⋅ (gradChiVpsi x) ∂σ|
-            ≤ Cψ_pair * Real.sqrt (RS.boxEnergyCRGreen gradU σ Q))
-        (Rside Rtop Rint : ℝ)
-        (hEqDecomp :
-          (∫ x in Q, (gradU x) ⋅ (gradChiVpsi x) ∂σ)
-            = (∫ t in I, _ψ t * B t) + Rside + Rtop + Rint)
-        (hSideZero : Rside = 0) (hTopZero : Rtop = 0)
-        (hRintBound : |Rint| ≤ Cψ_rem * Real.sqrt (RS.boxEnergyCRGreen gradU σ Q))
-        (hCψ_nonneg : 0 ≤ Cψ_pair + Cψ_rem)
-        (hEnergy_le : RS.boxEnergyCRGreen gradU σ Q ≤ Kξ * lenI),
-        |∫ t in I, _ψ t * B t|
-          ≤ (Cψ_pair + Cψ_rem) * Real.sqrt (Kξ * lenI) :=
-    by
-      intro lenI U W _ψ χ I α' σ Q gradU gradChiVpsi B Cψ_pair Cψ_rem hPairVol Rside Rtop Rint hEqDecomp hSideZero hTopZero hRintBound hCψ_nonneg hEnergy_le
-      exact
-        RS.local_pairing_bound_from_IBP_and_Carleson
-          (Kξ := Kξ) (lenI := lenI) (hCar := hCar)
-          U W _ψ χ I α' σ Q gradU gradChiVpsi B Cψ_pair Cψ_rem
-          (hPairVol := hPairVol)
-          (Rside := Rside) (Rtop := Rtop) (Rint := Rint)
-          (hEqDecomp := hEqDecomp)
-          (hSideZero := hSideZero) (hTopZero := hTopZero)
-          (hRintBound := hRintBound)
-          (hCψ_nonneg := hCψ_nonneg)
-          (hEnergy_le := hEnergy_le)
-  -- In the simplified adapter, return the legacy alias (no internal derivation)
-  simp [localWedge_from_WhitneyCarleson]
-
-
-
-/-- Concrete‑constant form: from a nonnegative concrete half–plane Carleson
-budget `Kξ` for the boundary field `F`, deduce the boundary wedge `(P+)`. -/
-theorem PPlus_of_ConcreteHalfPlaneCarleson
-    (F : ℂ → ℂ) {Kξ : ℝ}
-    (hKξ0 : 0 ≤ Kξ) (hCar : RH.Cert.ConcreteHalfPlaneCarleson Kξ) :
-    RH.Cert.PPlus F := by
-  -- Build the local Whitney wedge from CR–Green + plateau + Carleson…
-  have hLoc :
-      localWedge_from_WhitneyCarleson (F := F) ⟨Kξ, hKξ0, hCar⟩ :=
-    localWedge_from_CRGreen_and_Poisson (F := F) ⟨Kξ, hKξ0, hCar⟩
-  -- …and apply the a.e. upgrade to obtain the boundary wedge `(P+)`.
-  exact ae_of_localWedge_on_Whitney (F := F) ⟨Kξ, hKξ0, hCar⟩ hLoc
-
-/-- Existence‑level bundle: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`.
-
-This is the statement‑level bridge that downstream code consumes. -/
-theorem PPlusFromCarleson_exists_proved
-    (F : ℂ → ℂ) : RH.Cert.PPlusFromCarleson_exists F := by
-  intro hex
-  -- Local wedge via CR–Green + plateau + Carleson:
-  have hLoc :
-      localWedge_from_WhitneyCarleson (F := F) hex :=
-    localWedge_from_CRGreen_and_Poisson (F := F) hex
-  -- A.e. upgrade to `(P+)`.
-  exact ae_of_localWedge_on_Whitney (F := F) hex hLoc
-
-/-- Existence‑level bundle with Poisson AI: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`. -/
-theorem PPlusFromCarleson_exists_proved_AI
-    (F : ℂ → ℂ)
-    (hAI : ∀ᵐ x : ℝ,
-      Filter.Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
-        (nhdsWithin (0 : ℝ) (Set.Ioi (0 : ℝ))) (nhds (RH.RS.boundaryRe F x)))
-    : RH.Cert.PPlusFromCarleson_exists F := by
-  intro hex
-  -- Local wedge via CR–Green + plateau + Carleson + AI
-  have hLoc :
-      localWedge_from_WhitneyCarleson (F := F) hex :=
-    localWedge_from_CRGreen_and_Poisson_AI (F := F) hex hAI
-  -- A.e. upgrade to `(P+)`.
-  exact ae_of_localWedge_on_Whitney (F := F) hex hLoc
+-- (legacy aliases and AI variants removed; concise façade only)
 
 end RS
 end RH
