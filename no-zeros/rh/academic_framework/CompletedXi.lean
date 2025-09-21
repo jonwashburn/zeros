@@ -34,9 +34,9 @@ def riemannXi (s : ℂ) : ℂ := G s * riemannZeta s
 /-! Auxiliary nonvanishing facts for the archimedean factor `G`. -/
 
 private lemma one_half_ne_zero : ((1 : ℂ) / 2) ≠ 0 := by
-  have h₂ : (2 : ℂ) ≠ 0 := by norm_num
-  have h₁ : (1 : ℂ) ≠ 0 := by norm_num
-  simpa using div_ne_zero h₁ h₂
+  have h2 : (2 : ℂ) ≠ 0 := by norm_num
+  -- (1/2) = 1 * (2)⁻¹ and both factors are nonzero
+  simpa [div_eq_mul_inv] using mul_ne_zero (by norm_num) (inv_ne_zero h2)
 
 private lemma pi_ne_zero_ℂ : (Real.pi : ℂ) ≠ 0 := by
   exact_mod_cast Real.pi_ne_zero
@@ -46,10 +46,11 @@ private lemma cpow_pi_ne_zero (s : ℂ) : (Real.pi : ℂ) ^ (-(s / 2)) ≠ 0 := 
   have hπ0 : (Real.pi : ℂ) ≠ 0 := pi_ne_zero_ℂ
   have hdef : (Real.pi : ℂ) ^ (-(s / 2))
       = Complex.exp (Complex.log (Real.pi : ℂ) * (-(s / 2))) := by
-    simpa [Complex.cpow_def, hπ0]
+    simp [Complex.cpow_def, hπ0]
   have : Complex.exp (Complex.log (Real.pi : ℂ) * (-(s / 2))) ≠ 0 :=
     Complex.exp_ne_zero _
-  simpa [hdef] using this
+  simp [hdef] at this
+  simpa [hdef]
 
 
 /-! Ext variant without the polynomial factor. -/
@@ -92,8 +93,8 @@ theorem xi_ext_factorization_on_Ω : ∀ ρ ∈ RH.RS.Ω, riemannXi_ext ρ = G_e
           = ((Real.pi : ℂ) ^ (-ρ / 2) * Complex.Gamma (ρ / 2)) * riemannZeta ρ := by
                 -- align exponent to the normalized form used by Gammaℝ_def
                 have hpow : (Real.pi : ℂ) ^ (-ρ / 2) = (Real.pi : ℂ) ^ (-(ρ / 2)) := by
-                  simpa [neg_div_two ρ]
-                simpa [G_ext, hpow]
+                  simp [neg_div_two ρ]
+                simp [G_ext, hpow]
       _   = ρ.Gammaℝ * riemannZeta ρ := by
                 rw [← Complex.Gammaℝ_def (s := ρ)]
       _   = ρ.Gammaℝ * (completedRiemannZeta ρ / ρ.Gammaℝ) := by
@@ -144,6 +145,6 @@ theorem xi_ext_zeros_eq_zeta_zeros_on_Ω :
     | inl hG0 => exact (hGnz hG0).elim
     | inr hζ0 => exact hζ0
   · intro hζ
-    simpa [hfac, hζ]
+    simp [hfac, hζ]
 
 -- The ext ξ equals mathlib's completed zeta `

@@ -35,15 +35,15 @@ theorem pipeline_ready_unconditional : PipelineReady := RH.Proof.pipeline_ready_
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hTrans : ∀ z ∈ RH.RS.Ω,
       0 ≤ ((2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)).re)
-  (hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
+  (_hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
       ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
         (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
-        ∃ (Θ_analytic_off_rho : AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (U \ {ρ}))
-          (u : ℂ → ℂ)
-          (hEq : Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}))
-          (hu0 : Filter.Tendsto u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)))
-          (z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
+        ∃ (_Θ_analytic_off_rho : AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (U \ {ρ}))
+          (_u : ℂ → ℂ)
+          (_hEq : Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (fun z => (1 - _u z) / (1 + _u z)) (U \ {ρ}))
+          (_hu0 : Filter.Tendsto _u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)))
+          (_z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
           True)
   : RiemannHypothesis :=
   by
@@ -60,7 +60,7 @@ theorem pipeline_ready_unconditional : PipelineReady := RH.Proof.pipeline_ready_
       intro ρ hΩ hXi
       rcases hPinned ρ hΩ hXi with
         ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
-         Θ_analytic_off_rho, u, hEq, hu0, z_nontrivial, _triv⟩
+         Θ_analytic_off_rho, u, hEq, hu0, z_nontrivial, _⟩
       rcases z_nontrivial with ⟨z, hzU, hzNe, hΘz⟩
       exact ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
         Θ_analytic_off_rho,
@@ -72,15 +72,15 @@ theorem pipeline_ready_unconditional : PipelineReady := RH.Proof.pipeline_ready_
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hPoisson : ∀ z ∈ RH.RS.Ω,
       0 ≤ ((2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)).re)
-  (hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
+  (_hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
       ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
         (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
-        ∃ (Θ_analytic_off_rho : AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (U \ {ρ}))
-          (u : ℂ → ℂ)
-          (hEq : Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}))
-          (hu0 : Filter.Tendsto u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)))
-          (z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
+        ∃ (_Θ_analytic_off_rho : AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (U \ {ρ}))
+          (_u : ℂ → ℂ)
+          (_hEq : Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) (fun z => (1 - _u z) / (1 + _u z)) (U \ {ρ}))
+          (_hu0 : Filter.Tendsto _u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)))
+          (_z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
           True)
   : RiemannHypothesis :=
   by
@@ -97,7 +97,7 @@ theorem pipeline_ready_unconditional : PipelineReady := RH.Proof.pipeline_ready_
       intro ρ hΩ hXi
       rcases hPinned ρ hΩ hXi with
         ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
-         Θ_analytic_off_rho, u, hEq, hu0, z_nontrivial, _triv⟩
+         Θ_analytic_off_rho, u, hEq, hu0, z_nontrivial, _⟩
       rcases z_nontrivial with ⟨z, hzU, hzNe, hΘz⟩
       exact ⟨U, hUopen, hUconn, hUsub, hρU, hIso,
         Θ_analytic_off_rho,
