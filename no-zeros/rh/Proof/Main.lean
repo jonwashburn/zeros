@@ -4,7 +4,6 @@ import rh.RS.BoundaryWedge
 import rh.Cert.KxiWhitney
 import Mathlib.Topology.Defs.Filter
 import rh.academic_framework.EulerProductMathlib
-import rh.academic_framework.PoissonCayley
 import rh.academic_framework.CompletedXi
 import rh.academic_framework.CompletedXiSymmetry
 import rh.academic_framework.Theta
