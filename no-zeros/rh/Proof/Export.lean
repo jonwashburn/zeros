@@ -1,4 +1,5 @@
 import rh.Proof.Main
+import rh.RS.PinchIngredients
 
 /-!
 Final wiring exports: clean, stable entry points that expose Mathlib's
@@ -72,6 +73,15 @@ theorem RiemannHypothesis_mathlib_from_CR_outer_ext
   : RiemannHypothesis :=
   RH.Proof.Final.RiemannHypothesis_mathlib_from_CR_outer_ext choose hGnz
 
-end RH.Proof.Export
+namespace RH
+namespace Proof
+namespace Final
+
+-- Re-export the certificate-to-RH final wrapper for convenience
+export RH.RS (certificate_from_pinch_ingredients)
+
+end Final
+end Proof
+end RH
 
 
