@@ -80,4 +80,4 @@
   {"message":
    "././././rh/RS/CRGreenOuter.lean:922:4: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"}],
- "depHash": "18076672480721812679"}
+ "depHash": "11756027293457786210"}
