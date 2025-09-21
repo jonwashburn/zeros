@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: rh.Proof.Main
-// Imports: Init rh.academic_framework.Certificate rh.RS.SchurGlobalization rh.RS.BoundaryWedge rh.Cert.KxiWhitney Mathlib.Topology.Defs.Filter rh.academic_framework.EulerProductMathlib rh.academic_framework.CompletedXi rh.academic_framework.CompletedXiSymmetry rh.academic_framework.Theta rh.RS.OffZerosBridge rh.RS.Cayley rh.RS.PinchCertificate rh.RS.XiExtBridge rh.RS.SchurGlobalization rh.RS.CRGreenOuter Mathlib.NumberTheory.LSeries.RiemannZeta Mathlib.Tactic Mathlib.Analysis.SpecialFunctions.Gamma.Deligne Mathlib.Topology.Basic rh.RS.PinchIngredients
+// Imports: Init rh.academic_framework.Certificate rh.RS.SchurGlobalization rh.RS.BoundaryWedge rh.Cert.KxiWhitney Mathlib.Topology.Defs.Filter rh.academic_framework.EulerProductMathlib rh.academic_framework.CompletedXi rh.academic_framework.CompletedXiSymmetry rh.academic_framework.Theta rh.RS.OffZerosBridge rh.RS.Cayley rh.RS.PinchCertificate rh.RS.XiExtBridge rh.RS.SchurGlobalization rh.RS.CRGreenOuter Mathlib.NumberTheory.LSeries.RiemannZeta Mathlib.Tactic Mathlib.Analysis.SpecialFunctions.Gamma.Deligne Mathlib.Topology.Basic rh.RS.PinchIngredients rh.RS.PinnedRemovable
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -34,6 +34,7 @@ lean_object* initialize_Mathlib_Tactic(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Analysis_SpecialFunctions_Gamma_Deligne(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Topology_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_RS_PinchIngredients(uint8_t builtin, lean_object*);
+lean_object* initialize_rh_RS_PinnedRemovable(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_rh_Proof_Main(uint8_t builtin, lean_object* w) {
 lean_object * res;
@@ -100,6 +101,9 @@ res = initialize_Mathlib_Topology_Basic(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_rh_RS_PinchIngredients(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_rh_RS_PinnedRemovable(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 return lean_io_result_mk_ok(lean_box(0));

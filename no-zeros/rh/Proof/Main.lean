@@ -19,6 +19,7 @@ import Mathlib.Tactic
 import Mathlib.Analysis.SpecialFunctions.Gamma.Deligne
 import Mathlib.Topology.Basic
 import rh.RS.PinchIngredients
+import rh.RS.PinnedRemovable
 
 set_option maxRecDepth 4096
 set_option diagnostics true
@@ -781,3 +782,32 @@ theorem RiemannHypothesis_from_poisson_and_pinned'
   exact RH_from_pinch_certificate C
 
 -- (Cayley-transport variant omitted pending dedicated transport identities.)
+
+/-- Thin wrapper exposing the pinned assignment in the exact shape used by
+`RiemannHypothesis_from_poisson_and_pinned'`, built from u‑trick pinned data. -/
+theorem hPinned_assign_for_Main
+  (hOuter : ∃ O : ℂ → ℂ, RH.RS.OuterHalfPlane O ∧
+      RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s / riemannXi_ext s))
+  (hPinnedData :
+    ∀ ρ ∈ RH.RS.Ω, riemannXi_ext ρ = 0 →
+      ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
+        (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
+        AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuter)) (U \ {ρ}) ∧
+        ∃ u : ℂ → ℂ,
+          Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuter))
+                   (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}) ∧
+          Filter.Tendsto u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)) ∧
+          ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuter)) z ≠ 1)
+  : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
+      ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
+        (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
+        ∃ g : ℂ → ℂ, AnalyticOn ℂ g U ∧
+          AnalyticOn ℂ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuter)) (U \ {ρ}) ∧
+          Set.EqOn (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuter)) g (U \ {ρ}) ∧
+          g ρ = 1 ∧ ∃ z, z ∈ U ∧ g z ≠ 1 := by
+  -- Delegate to the RS PinnedRemovable builder
+  intro ρ hΩ hXi
+  classical
+  have := RH.RS.removable_assign_for_Theta_pinch_ext (hOuter := hOuter)
+    (hPinnedData := hPinnedData)
+  exact this ρ hΩ hXi

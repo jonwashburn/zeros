@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: rh.RS.PinchCertificate
-// Imports: Init Mathlib.Analysis.Analytic.Basic Mathlib.Topology.Basic rh.academic_framework.CompletedXi rh.RS.Det2Outer rh.RS.Cayley
+// Imports: Init Mathlib.Analysis.Analytic.Basic Mathlib.Topology.Basic rh.academic_framework.CompletedXi rh.RS.Det2Outer rh.RS.Cayley rh.RS.PinnedRemovable
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -431,6 +431,7 @@ lean_object* initialize_Mathlib_Topology_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_academic__framework_CompletedXi(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_RS_Det2Outer(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_RS_Cayley(uint8_t builtin, lean_object*);
+lean_object* initialize_rh_RS_PinnedRemovable(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_rh_RS_PinchCertificate(uint8_t builtin, lean_object* w) {
 lean_object * res;
@@ -452,6 +453,9 @@ res = initialize_rh_RS_Det2Outer(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_rh_RS_Cayley(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_rh_RS_PinnedRemovable(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 l_RH_RS_term_u03a9____x40_rh_RS_PinchCertificate___hyg_8____closed__1 = _init_l_RH_RS_term_u03a9____x40_rh_RS_PinchCertificate___hyg_8____closed__1();

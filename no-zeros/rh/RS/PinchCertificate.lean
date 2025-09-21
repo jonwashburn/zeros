@@ -3,6 +3,7 @@ import Mathlib.Topology.Basic
 import rh.academic_framework.CompletedXi
 import rh.RS.Det2Outer
 import rh.RS.Cayley
+import rh.RS.PinnedRemovable
 
 /-!
 # Pinch certificate builder for the ext ξ route
@@ -65,6 +66,55 @@ def buildPinchCertificate
     (by
       intro ρ hΩ hXi
       simpa [Θ_pinch_of] using (hRemXi ρ hΩ hXi))
+
+/-- Build a `PinchCertificateExt` from outer existence, interior positivity on
+the off-zeros set, and pinned u-trick data giving removable extensions for the
+pinch `Θ`. -/
+def buildPinchCertificate_from_pinned
+  (hDet2 : Det2OnOmega)
+  (hOuter : ∃ O : ℂ → ℂ, OuterHalfPlane O ∧
+      BoundaryModulusEq O (fun s => det2 s / riemannXi_ext s))
+  (hRe_offXi : ∀ z ∈ (Ω \ {z | riemannXi_ext z = 0}),
+      0 ≤ ((2 : ℂ) * (J_pinch det2 (Classical.choose hOuter) z)).re)
+  (hPinnedData : ∀ ρ ∈ Ω, riemannXi_ext ρ = 0 →
+      ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ Ω ∧ ρ ∈ U ∧
+        (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
+        AnalyticOn ℂ (Θ_pinch_of det2 (Classical.choose hOuter)) (U \ {ρ}) ∧
+        ∃ u : ℂ → ℂ,
+          Set.EqOn (Θ_pinch_of det2 (Classical.choose hOuter))
+                   (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}) ∧
+          Filter.Tendsto u (nhdsWithin ρ (U \ {ρ})) (nhds (0 : ℂ)) ∧
+          ∃ z, z ∈ U ∧ z ≠ ρ ∧ (Θ_pinch_of det2 (Classical.choose hOuter)) z ≠ 1)
+  : PinchCertificateExt := by
+  classical
+  -- Use the generic builder once we have the removable assignment
+  -- Convert pinned data into the removable assignment expected by `of_interfaces`
+  refine PinchCertificateExt.of_interfaces (hDet2 := hDet2)
+    (hOuter := hOuter) (hRe := hRe_offXi) (hRem := ?hRem)
+  · -- Removable assignment from pinned data using the builder in PinnedRemovable
+    intro ρ hΩ hXi
+    -- hPinnedData already includes isolation equality; thread through the RS builder
+    -- by directly constructing g via update using the pinned data.
+    rcases hPinnedData ρ hΩ hXi with
+      ⟨U, hUopen, hUconn, hUsub, hρU, hIsoXi, hΘU, u, hEq, hu0,
+        z0, hz0U, hz0ne, hΘz0ne⟩
+    -- Align Θ with the expected `OuterHalfPlane.choose_outer` choice
+    let Θ := Θ_pinch_of det2 (OuterHalfPlane.choose_outer hOuter)
+    have hΘU' : AnalyticOn ℂ Θ (U \ {ρ}) := by
+      simpa [Θ, OuterHalfPlane.choose_outer] using hΘU
+    have hEq' : Set.EqOn Θ (fun z => (1 - u z) / (1 + u z)) (U \ {ρ}) := by
+      simpa [Θ, OuterHalfPlane.choose_outer] using hEq
+    -- Build the removable extension directly via the u‑trick helper
+    have pin := RH.RS.removable_pinned_from_u_trick Θ u U ρ hUopen hρU hΘU' hEq' hu0 z0 hz0U hz0ne hΘz0ne
+    rcases pin with ⟨_Uopen, _ρmem, g, hgU, hEqOff, hgρ, ⟨w, hwU, hwne, hgwne⟩⟩
+    refine ⟨U, hUopen, hUconn, hUsub, hρU, hIsoXi, ?_⟩
+    -- Pack the conjunctions with explicit nesting to match the target type
+    refine ⟨g, ?_, ?_, ?_⟩
+    · exact hgU
+    · exact by simpa [Θ] using hΘU'
+    · refine ⟨(by simpa [Θ] using hEqOff), ?_⟩
+      refine ⟨hgρ, ?_⟩
+      exact ⟨w, ⟨hwU, hgwne⟩⟩
 
 end RS
 end RH

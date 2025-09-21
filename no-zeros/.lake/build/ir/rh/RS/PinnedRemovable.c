@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: rh.RS.PinnedRemovable
-// Imports: Init Mathlib.Analysis.Complex.Basic Mathlib.Analysis.Complex.RemovableSingularity Mathlib.Topology.Basic rh.RS.OffZerosBridge
+// Imports: Init Mathlib.Analysis.Complex.Basic Mathlib.Analysis.Complex.RemovableSingularity Mathlib.Topology.Basic rh.RS.OffZerosBridge rh.RS.Cayley rh.RS.Det2Outer
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -18,6 +18,8 @@ lean_object* initialize_Mathlib_Analysis_Complex_Basic(uint8_t builtin, lean_obj
 lean_object* initialize_Mathlib_Analysis_Complex_RemovableSingularity(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Topology_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_RS_OffZerosBridge(uint8_t builtin, lean_object*);
+lean_object* initialize_rh_RS_Cayley(uint8_t builtin, lean_object*);
+lean_object* initialize_rh_RS_Det2Outer(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_rh_RS_PinnedRemovable(uint8_t builtin, lean_object* w) {
 lean_object * res;
@@ -36,6 +38,12 @@ res = initialize_Mathlib_Topology_Basic(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_rh_RS_OffZerosBridge(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_rh_RS_Cayley(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_rh_RS_Det2Outer(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 return lean_io_result_mk_ok(lean_box(0));
