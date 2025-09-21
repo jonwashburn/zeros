@@ -1,0 +1,20 @@
+{"log":
+ [{"message":
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/PPlusFromCarleson.lean -R ./././. -o ././.lake/build/lib/rh/RS/PPlusFromCarleson.olean -i ././.lake/build/lib/rh/RS/PPlusFromCarleson.ilean -c ././.lake/build/ir/rh/RS/PPlusFromCarleson.c --json",
+   "level": "trace"},
+  {"message":
+   "././././rh/RS/PPlusFromCarleson.lean:37:5: unused variable `F`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "././././rh/RS/PPlusFromCarleson.lean:38:5: unused variable `hex`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "././././rh/RS/PPlusFromCarleson.lean:48:45: unused variable `hψ_mass1`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "././././rh/RS/PPlusFromCarleson.lean:49:15: unused variable `hc0_pos`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"},
+  {"message":
+   "././././rh/RS/PPlusFromCarleson.lean:49:24: unused variable `hPlateau`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+   "level": "warning"}],
+ "depHash": "15499154530194316214"}

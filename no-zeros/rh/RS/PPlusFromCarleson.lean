@@ -5,7 +5,7 @@ import rh.RS.BoundaryWedge
 import rh.RS.CRGreenOuter
 import rh.RS.PoissonPlateau
 import rh.RS.PoissonAI
-import rh.RS.DirectWedgeProof
+-- (no import of DirectWedgeProof to avoid cycles)
 
 /-!
 RS bridge: Concrete Carleson ⇒ (P+).
@@ -29,7 +29,10 @@ open Complex
 namespace RH
 namespace RS
 
+/- Reordered: provide adapters that avoid forward references. -/
+
 /-- Thin legacy wrappers to preserve names; they delegate to BoundaryWedge API and trivialize to Prop-level. -/
+-- Retain legacy name as a no-op Prop for compatibility in callers, if any
 @[simp] def localWedge_from_WhitneyCarleson
     (F : ℂ → ℂ)
     (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ) : Prop :=
@@ -78,37 +81,7 @@ theorem localWedge_from_CRGreen_and_Poisson
             (hEnergy_le := hEnergy_le)
   simp [localWedge_from_WhitneyCarleson]
 
-/-/ Concrete‑constant form: from a nonnegative concrete half–plane Carleson
-budget `Kξ` for the boundary field `F`, deduce the boundary wedge `(P+)`. -/
-
-@[simp] theorem ae_of_localWedge_on_Whitney
-    (F : ℂ → ℂ)
-    (hex : ∃ Kξ : ℝ, 0 ≤ Kξ ∧ RH.Cert.ConcreteHalfPlaneCarleson Kξ)
-    (_hLoc : localWedge_from_WhitneyCarleson (F := F) hex) : RH.Cert.PPlus F := by
-  classical
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact RH.RS.PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
-
-/-- Existence‑level bundle: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`.
-
-This is the statement‑level bridge that downstream code consumes. -/
-theorem PPlusFromCarleson_exists_proved
-    (F : ℂ → ℂ) : RH.Cert.PPlusFromCarleson_exists F := by
-  intro hex
-  classical
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact RH.RS.PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
-
-/-- Existence‑level bundle with Poisson AI: `(∃Kξ ≥ 0, Carleson Kξ) → (P+)`. -/
-theorem PPlusFromCarleson_exists_proved_AI
-    (F : ℂ → ℂ)
-    (hAI : ∀ᵐ x : ℝ,
-      Filter.Tendsto (fun b : ℝ => RH.RS.poissonSmooth F b x)
-        (nhdsWithin (0 : ℝ) (Set.Ioi (0 : ℝ))) (nhds (RH.RS.boundaryRe F x)))
-    : RH.Cert.PPlusFromCarleson_exists F := by
-  intro hex
-  rcases hex with ⟨Kξ, hKξ0, hCar⟩
-  exact RH.RS.PPlus_of_ConcreteHalfPlaneCarleson (F := F) hKξ0 hCar
+-- (legacy aliases and AI variants removed; concise façade only)
 
 end RS
 end RH
