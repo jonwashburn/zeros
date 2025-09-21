@@ -20,19 +20,18 @@ abbrev PipelineReady := RH.Proof.PipelineReady
 theorem pipeline_ready_unconditional : PipelineReady := RH.Proof.pipeline_ready_unconditional
 
 -- Final certificate-driven alias to Mathlib's RiemannHypothesis
-theorem RiemannHypothesis_final (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
+@[simp] theorem RiemannHypothesis_final (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
   RH.Proof.RiemannHypothesis_final C
 
-theorem RH (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
+@[simp] theorem RH (C : RH.RS.PinchCertificateExt) : RiemannHypothesis :=
   RH.Proof.RH C
 
 -- Certificate route variants re-exported for convenience
-theorem RiemannHypothesis_from_certificate_route
-  (α c : ℝ)
+@[simp] theorem RiemannHypothesis_from_certificate_route
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
-  (hTrans : RH.RS.HasHalfPlanePoissonTransport
-    (fun z => (2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)))
-  (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
+  (hTrans : ∀ z ∈ RH.RS.Ω,
+      0 ≤ ((2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist) z)).re)
+  (hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
       ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
         (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
@@ -43,15 +42,15 @@ theorem RiemannHypothesis_from_certificate_route
           (z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
           True)
   : RiemannHypothesis :=
-  RH.Proof.RiemannHypothesis_from_certificate_route α c hOuterExist hTrans hKxi hPinned
+  RH.Proof.RiemannHypothesis_from_certificate_route
+    (α := (3 : ℝ) / 5) (c := (1 : ℝ)) hOuterExist hTrans hKxi hPinned
 
 -- Subset-representation route
-theorem RiemannHypothesis_from_certificate_rep_on_via_cov
-  (α c : ℝ)
+@[simp] theorem RiemannHypothesis_from_certificate_rep_on_via_cov
   (hOuterExist : RH.RS.OuterHalfPlane.ofModulus_det2_over_xi_ext)
   (hDet2 : RH.RS.Det2OnOmega)
   (hXiAnalytic : AnalyticOn ℂ riemannXi_ext RH.RS.Ω)
-  (hKxi : RH.Cert.KxiWhitney.KxiBound α c)
+  (hKxi : RH.Cert.KxiWhitney.KxiBound (α := (3 : ℝ) / 5) (c := (1 : ℝ)))
   (hPinned : ∀ ρ, ρ ∈ RH.RS.Ω → riemannXi_ext ρ = 0 →
       ∃ (U : Set ℂ), IsOpen U ∧ IsPreconnected U ∧ U ⊆ RH.RS.Ω ∧ ρ ∈ U ∧
         (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) ∧
@@ -62,10 +61,11 @@ theorem RiemannHypothesis_from_certificate_rep_on_via_cov
           (z_nontrivial : ∃ z, z ∈ U ∧ z ≠ ρ ∧ (RH.RS.Θ_pinch_of RH.RS.det2 (RH.RS.OuterHalfPlane.choose_outer hOuterExist)) z ≠ 1),
           True)
   : RiemannHypothesis :=
-  RH.Proof.RiemannHypothesis_from_certificate_rep_on_via_cov α c hOuterExist hDet2 hXiAnalytic hKxi hPinned
+  RH.Proof.RiemannHypothesis_from_certificate_rep_on_via_cov
+    (α := (3 : ℝ) / 5) (c := (1 : ℝ)) hOuterExist hDet2 hXiAnalytic hKxi hPinned
 
 -- Minimal API export to Mathlib wrapper from CR-outer route
-theorem RiemannHypothesis_mathlib_from_CR_outer_ext
+@[simp] theorem RiemannHypothesis_mathlib_from_CR_outer_ext
   (choose : ∀ ρ, ρ ∈ RH.RS.Ω → riemannZeta ρ = 0 →
       RH.RS.OffZeros.LocalData (riemannZeta := riemannZeta)
         (Θ := RH.RS.Θ_of RH.RS.CRGreenOuterData) (ρ := ρ))

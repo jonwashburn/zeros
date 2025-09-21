@@ -78,24 +78,25 @@ theorem reEq_on_from_disk_via_cayley
   intro z hzS
   have h1 : (F z).re = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re := by
     simpa using congrArg Complex.re (hEqInterior hzS)
-  have h2 :
+  -- pointwise equality of boundary real-part functions
+  have hIntgEq :
+      (fun t : ℝ => (F (boundary t)).re)
+        = (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) := by
+    funext t
+    simpa using congrArg Complex.re (hEqBoundary t)
+  -- transport the kernel identity along the equality of boundary integrands
+  have hPI :
       poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
-        = poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z := by
-    -- pointwise equality of boundary integrands via boundary identification
-    have : (fun t : ℝ => (F (boundary t)).re)
-            = (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) := by
-      funext t; simpa using congrArg Complex.re (hEqBoundary t)
-    simpa [this]
-  have h3 :
-      poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z
-        = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re :=
-    hKernel z hzS
-  -- assemble
-  have : poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
-            = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re := by
-    simpa [h2, h3]
+        = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re := by
+    -- combine integrand equality with kernel transport via a calc chain
+    calc
+      poissonIntegral (fun t : ℝ => (F (boundary t)).re) z
+          = poissonIntegral (fun t : ℝ => (H (RH.AcademicFramework.CayleyAdapters.boundaryToDisk t)).re) z := by
+            exact congrArg (fun u => poissonIntegral u z) hIntgEq
+      _ = (H (RH.AcademicFramework.CayleyAdapters.toDisk z)).re :=
+            hKernel z hzS
   -- finish with interior identification of real parts
-  simpa [h1, this]
+  simpa [h1] using hPI.symm
 
 /-- Boundary identity for the Cayley pullback: `F(boundary t) = H(boundaryToDisk t)`. -/
 lemma EqOnBoundary_pullback (H : ℂ → ℂ) :
@@ -151,7 +152,7 @@ theorem hReEq_pinch_ext_of_halfplane_rep
   intro z hz
   have : (F_pinch det2 O z).re
       = poissonIntegral (fun t : ℝ => (F_pinch det2 O (boundary t)).re) z :=
-    hRep.formula z hz
+    hRep.formula z hz.1
   simpa using this
 
 end PoissonCayley
