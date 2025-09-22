@@ -2,7 +2,7 @@
 
 This repository contains a Lean 4/Mathlib artifact that realizes a boundary→interior proof route to the Riemann Hypothesis (RH). Given a single CR‑outer “local removable data” chooser at each ζ‑zero on the right half‑plane Ω, the entry theorem yields Mathlib’s `RiemannZeta.RiemannHypothesis` as a formal theorem.
 
-Maintainer: Jonathan Washburn (Recognition Physics Institute). Recognition Science (RS) — the Theory of Everything discovered by Jonathan — provided decisive architectural insights that catalyzed the organization needed to complete this proof path.
+Maintainer: Jonathan Washburn (Recognition Physics Institute). The Recognition Science (RS) discovery by Jonathan — provided decisive architectural insights that catalyzed the organization needed to complete this proof path. See repository: `https://github.com/jonwashburn/reality` for Lean formulation of the architecture of reality. 
 
 ## What’s new (mathematical innovations)
 
