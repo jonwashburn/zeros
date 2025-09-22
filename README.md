@@ -1,3 +1,19 @@
+<!-- Badges -->
+<p align="left">
+  <a href="https://github.com/jonwashburn/zeros/actions/workflows/axioms.yml">
+    <img alt="CI" src="https://github.com/jonwashburn/zeros/actions/workflows/axioms.yml/badge.svg" />
+  </a>
+  <a href="#axioms-check">
+    <img alt="No custom axioms" src="https://img.shields.io/badge/axioms-no_custom-blue" />
+  </a>
+  <a href="#reproduce-locally">
+    <img alt="No sorries" src="https://img.shields.io/badge/sorries-none-brightgreen" />
+  </a>
+  <a href="#lean-artifact-how-the-proof-is-wired">
+    <img alt="RH entry wired" src="https://img.shields.io/badge/RH-entry_wired_in_Mathlib-8A2BE2" />
+  </a>
+</p>
+
 # zeros — Boundary-to-Interior Route to RH (Lean 4 artifact)
 
 This repository contains a Lean 4/Mathlib artifact that realizes a boundary→interior proof route to the Riemann Hypothesis (RH). Given a single CR‑outer “local removable data” chooser at each ζ‑zero on the right half‑plane Ω, the entry theorem yields Mathlib’s `RiemannZeta.RiemannHypothesis` as a formal theorem.
