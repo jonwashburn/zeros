@@ -55,9 +55,12 @@ See `Riemann-Washburn.tex` for the classical exposition and the audited constant
 ## Reproduce locally
 
 ```bash
+# from repo root (convenient)
+make build
+
+# or directly in the Lean package folder
 cd no-zeros
-lake update
-lake build
+lake update && lake build
 ```
 
 Conservative build (low memory): set `LEAN_EXTRA_ARGS="-j2 -M 4096"`.
