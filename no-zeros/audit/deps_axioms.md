@@ -1,0 +1,171 @@
+- .lake/packages/mathlib/Mathlib/Tactic/LinearCombination'.lean:243: 
+- .lake/packages/mathlib/Mathlib/Tactic/LinearCombination'.lean:245: axiom hqc : qc = 2*qc
+- .lake/packages/mathlib/Mathlib/Tactic/LinearCombination.lean:206: 
+- .lake/packages/mathlib/Mathlib/Tactic/LinearCombination.lean:208: axiom hqc : qc = 2*qc
+- .lake/packages/mathlib/Mathlib/CategoryTheory/MorphismProperty/Factorization.lean:217: axiom `HasFunctorialFactorization W₁ W₂` holds. -/
+- .lake/packages/mathlib/Mathlib/Data/Matroid/IndepAxioms.lean:15: axiom that can be dropped in cases where there is some finiteness assumption.
+- .lake/packages/mathlib/Mathlib/Algebra/Order/Module/OrderedSMul.lean:75: axiom of `OrderedSMul`. -/
+- .lake/packages/mathlib/test/fun_prop_dev.lean:24: 
+- .lake/packages/mathlib/test/ring.lean:9: axiom Real : Type
+- .lake/packages/mathlib/test/norm_num.lean:16: axiom Real : Type
+- .lake/packages/mathlib/test/norm_num.lean:19: 
+- .lake/packages/mathlib/test/norm_num.lean:23: 
+- .lake/packages/mathlib/test/FBinop.lean:40: 
+- .lake/packages/mathlib/test/tfae.lean:15: 
+- .lake/packages/mathlib/test/tfae.lean:17: axiom Q : Prop
+- .lake/packages/mathlib/test/tfae.lean:18: axiom pq : P → Q
+- .lake/packages/mathlib/test/tfae.lean:19: axiom qp : Q → P
+- .lake/packages/mathlib/test/tfae.lean:39: 
+- .lake/packages/mathlib/test/tfae.lean:41: axiom Q : Prop
+- .lake/packages/mathlib/test/tfae.lean:42: axiom R : Prop
+- .lake/packages/mathlib/test/tfae.lean:43: axiom pq : P → Q
+- .lake/packages/mathlib/test/tfae.lean:44: axiom qr : Q → R
+- .lake/packages/mathlib/test/tfae.lean:45: axiom rp : R → P
+- .lake/packages/mathlib/test/tfae.lean:67: 
+- .lake/packages/mathlib/test/tfae.lean:69: axiom P₂ : Prop
+- .lake/packages/mathlib/test/tfae.lean:70: axiom P₃ : Prop
+- .lake/packages/mathlib/test/tfae.lean:71: axiom P₄ : Prop
+- .lake/packages/mathlib/test/tfae.lean:72: axiom P₅ : Prop
+- .lake/packages/mathlib/test/tfae.lean:73: axiom P₆ : Prop
+- .lake/packages/mathlib/test/tfae.lean:74: axiom P₇ : Prop
+- .lake/packages/mathlib/test/tfae.lean:75: axiom h₁ : P₁ ↔ P₂
+- .lake/packages/mathlib/test/tfae.lean:76: axiom h₂ : P₁ → P₆
+- .lake/packages/mathlib/test/tfae.lean:77: axiom h₃ : P₆ → P₇
+- .lake/packages/mathlib/test/tfae.lean:78: axiom h₄ : P₇ → P₄
+- .lake/packages/mathlib/test/tfae.lean:79: axiom h₅ : P₄ → P₅
+- .lake/packages/mathlib/test/tfae.lean:80: axiom h₆ : P₅ → P₃
+- .lake/packages/mathlib/test/tfae.lean:81: axiom h₇ : P₃ → P₂
+- .lake/packages/mathlib/test/tfae.lean:109: 
+- .lake/packages/mathlib/test/tfae.lean:111: axiom Q : Prop
+- .lake/packages/mathlib/test/tfae.lean:112: axiom pq : P → Q
+- .lake/packages/mathlib/test/tfae.lean:113: axiom qp : Q → P
+- .lake/packages/mathlib/test/linear_combination'.lean:11: axiom Real : Type
+- .lake/packages/mathlib/test/linear_combination'.lean:94: 
+- .lake/packages/mathlib/test/linear_combination'.lean:96: axiom hqc : qc = 2 * qc
+- .lake/packages/mathlib/test/linear_combination'.lean:100: 
+- .lake/packages/mathlib/test/Inhabit.lean:47: 
+- .lake/packages/mathlib/test/Inhabit.lean:49: axiom a : α
+- .lake/packages/mathlib/test/Recall.lean:89: 
+- .lake/packages/mathlib/test/polyrith.lean:519: 
+- .lake/packages/mathlib/test/polyrith.lean:524: 
+- .lake/packages/mathlib/test/polyrith.lean:526: axiom hqc : qc = 2*qc
+- .lake/packages/mathlib/test/polyrith.lean:530: 
+- .lake/packages/mathlib/test/rewrites.lean:69: 
+- .lake/packages/mathlib/test/rewrites.lean:100: 
+- .lake/packages/mathlib/test/rewrites.lean:102: axiom f : α → α
+- .lake/packages/mathlib/test/rewrites.lean:103: axiom z : α
+- .lake/packages/mathlib/test/rewrites.lean:104: axiom f_eq (n) : f n = z
+- .lake/packages/mathlib/test/spread.lean:23: 
+- .lake/packages/mathlib/test/convert.lean:84: 
+- .lake/packages/mathlib/test/convert.lean:86: 
+- .lake/packages/mathlib/test/convert.lean:88: 
+- .lake/packages/mathlib/test/NthRewrite.lean:50: 
+- .lake/packages/mathlib/test/NthRewrite.lean:55: 
+- .lake/packages/mathlib/test/NthRewrite.lean:57: axiom bar' : [[5],[5]] = [[6],[6]]
+- .lake/packages/mathlib/test/linear_combination.lean:11: axiom Real : Type
+- .lake/packages/mathlib/test/linear_combination.lean:94: 
+- .lake/packages/mathlib/test/linear_combination.lean:96: axiom hqc : qc = 2 * qc
+- .lake/packages/mathlib/test/linear_combination.lean:100: 
+- .lake/packages/mathlib/test/cc.lean:90: 
+- .lake/packages/mathlib/test/cc.lean:92: axiom g₁ : Nat → Nat
+- .lake/packages/mathlib/test/cc.lean:109: 
+- .lake/packages/mathlib/test/cc.lean:111: axiom g₂ : Nat → Nat
+- .lake/packages/mathlib/test/cc.lean:170: 
+- .lake/packages/mathlib/test/cc.lean:222: 
+- .lake/packages/mathlib/test/cc.lean:242: 
+- .lake/packages/mathlib/test/cc.lean:244: axiom B : A → Type
+- .lake/packages/mathlib/test/cc.lean:245: axiom C : (a : A) → B a → Type
+- .lake/packages/mathlib/test/cc.lean:246: axiom D : (a : A) → (ba : B a) → C a ba → Type
+- .lake/packages/mathlib/test/cc.lean:247: axiom E : (a : A) → (ba : B a) → (cba : C a ba) → D a ba cba → Type
+- .lake/packages/mathlib/test/cc.lean:248: axiom F : (a : A) → (ba : B a) → (cba : C a ba) → (dcba : D a ba cba) → E a ba cba dcba → Type
+- .lake/packages/mathlib/test/cc.lean:249: axiom C_ss : ∀ a ba, Subsingleton (C a ba)
+- .lake/packages/mathlib/test/cc.lean:250: axiom a1 : A
+- .lake/packages/mathlib/test/cc.lean:251: axiom a2 : A
+- .lake/packages/mathlib/test/cc.lean:252: axiom a3 : A
+- .lake/packages/mathlib/test/cc.lean:253: axiom mk_B1 : (a : _) → B a
+- .lake/packages/mathlib/test/cc.lean:254: axiom mk_B2 : (a : _) → B a
+- .lake/packages/mathlib/test/cc.lean:255: axiom mk_C1 : {a : _} → (ba : _) → C a ba
+- .lake/packages/mathlib/test/cc.lean:256: axiom mk_C2 : {a : _} → (ba : _) → C a ba
+- .lake/packages/mathlib/test/cc.lean:257: axiom tr_B : {a : _} → B a → B a
+- .lake/packages/mathlib/test/cc.lean:258: axiom x : A → A
+- .lake/packages/mathlib/test/cc.lean:259: axiom y : A → A
+- .lake/packages/mathlib/test/cc.lean:260: axiom z : A → A
+- .lake/packages/mathlib/test/cc.lean:261: axiom f : {a : A} → {ba : B a} → (cba : C a ba) → D a ba cba
+- .lake/packages/mathlib/test/cc.lean:262: axiom f' : {a : A} → {ba : B a} → (cba : C a ba) → D a ba cba
+- .lake/packages/mathlib/test/cc.lean:263: axiom g : {a : A} → {ba : B a} → {cba : C a ba} → (dcba : D a ba cba) → E a ba cba dcba
+- .lake/packages/mathlib/test/cc.lean:264: axiom h : {a : A} → {ba : B a} → {cba : C a ba} → {dcba : D a ba cba} →
+- .lake/packages/mathlib/test/cc.lean:331: 
+- .lake/packages/mathlib/test/linarith.lean:456: 
+- .lake/packages/mathlib/test/linarith.lean:469: 
+- .lake/packages/mathlib/test/linarith.lean:475: 
+- .lake/packages/mathlib/test/linarith.lean:515: 
+- .lake/packages/mathlib/test/GCongr/inequalities.lean:20: axiom Real : Type
+- .lake/packages/mathlib/test/GCongr/inequalities.lean:190: 
+- .lake/packages/mathlib/test/solve_by_elim/basic.lean:166: 
+- .lake/packages/mathlib/test/LibrarySearch/basic.lean:166: axiom F (a b : ℕ) : f a ≤ f b ↔ a ≤ b
+- .lake/packages/proofwidgets/ProofWidgets/Demos/Euclidean.lean:307: 
+- .lake/packages/proofwidgets/ProofWidgets/Demos/Conv.lean:434: axiom test_sorry {α} : α
+- .lake/packages/proofwidgets/ProofWidgets/Demos/SelectInsertConv.lean:158: axiom test_sorry {α} : α
+- .lake/packages/batteries/test/simpa.lean:49: 
+- .lake/packages/batteries/test/simpa.lean:51: 
+- .lake/packages/batteries/test/solve_by_elim.lean:47: axiom mySorry {α} : α
+- .lake/packages/batteries/Batteries/Util/ProofWanted.lean:39: axiom helper {α : Sort _} : α
+- .lake/packages/aesop/AesopTest/Jesse.lean:10: 
+- .lake/packages/aesop/AesopTest/Jesse.lean:12: axiom Morphism (R S : Ring) : Type
+- .lake/packages/aesop/AesopTest/Jesse.lean:15: axiom ZZ : Ring
+- .lake/packages/aesop/AesopTest/Jesse.lean:18: axiom f : Morphism ZZ ZZ
+- .lake/packages/aesop/AesopTest/Jesse.lean:22: 
+- .lake/packages/aesop/AesopTest/Jesse.lean:26: axiom ZZ_domain : domain ZZ
+- .lake/packages/aesop/AesopTest/NormSimp.lean:73: axiom TF : T ↔ False
+- .lake/packages/aesop/AesopTest/NormSimp.lean:76: axiom TT : T ↔ True
+- .lake/packages/aesop/AesopTest/RecursiveUnfoldRule.lean:71: axiom test : Nat
+- .lake/packages/aesop/AesopTest/ExtScript.lean:82: 
+- .lake/packages/aesop/AesopTest/ExtScript.lean:84: axiom U : Type
+- .lake/packages/aesop/AesopTest/ExtScript.lean:85: axiom u : U
+- .lake/packages/aesop/AesopTest/ExtScript.lean:86: axiom v : U
+- .lake/packages/aesop/AesopTest/ExtScript.lean:89: axiom T_ext : ∀ x y : T, u = v → (∀ u v : U, u = v) → x = y
+- .lake/packages/aesop/AesopTest/List.lean:15: axiom ADMIT : ∀ {α : Sort _}, α
+- .lake/packages/aesop/AesopTest/ForwardRedundantHypsWithMVars.lean:15: 
+- .lake/packages/aesop/AesopTest/ForwardRedundantHypsWithMVars.lean:19: axiom len_pos {α} {ls : List α} : 0 ≤ len (ls : List α)
+- .lake/packages/aesop/AesopTest/AddRulesCommand.lean:80: 
+- .lake/packages/aesop/AesopTest/AddRulesCommand.lean:82: axiom U : Type
+- .lake/packages/aesop/AesopTest/AddRulesCommand.lean:83: axiom f : T → U
+- .lake/packages/aesop/AesopTest/AddRulesCommand.lean:84: axiom t : T
+- .lake/packages/aesop/AesopTest/DroppedMVars.lean:15: 
+- .lake/packages/aesop/AesopTest/DroppedMVars.lean:17: 
+- .lake/packages/aesop/AesopTest/DroppedMVars.lean:21: axiom RingId (R : Ring) : RingHom R R
+- .lake/packages/aesop/AesopTest/DroppedMVars.lean:24: axiom ZZ : Ring
+- .lake/packages/aesop/AesopTest/RulePattern.lean:13: 
+- .lake/packages/aesop/AesopTest/RulePattern.lean:19: axiom nat_pos (n : Nat) : 0 ≤ (↑n : Int)
+- .lake/packages/aesop/AesopTest/RulePattern.lean:31: axiom foo : ∀ {x y : Nat} (_ : 0 < x) (_ : 0 < y), 0 < min x y
+- .lake/packages/aesop/AesopTest/RulePattern.lean:37: 
+- .lake/packages/aesop/AesopTest/RulePattern.lean:43: axiom triangle (a b : Int) : |a + b| ≤ |a| + |b|
+- .lake/packages/aesop/AesopTest/RulePattern.lean:52: axiom falso' : True → False
+- .lake/packages/aesop/AesopTest/RulePattern.lean:73: axiom quuz (x y : Nat) : True
+- .lake/packages/aesop/AesopTest/RulePattern.lean:79: axiom bar (x y : Nat) : True
+- .lake/packages/aesop/AesopTest/RulePattern.lean:86: axiom baz (x y : Nat) : True
+- .lake/packages/aesop/AesopTest/RulePattern.lean:98: axiom falso₁ : T
+- .lake/packages/aesop/AesopTest/WarnApplyIff.lean:18: axiom foo : True ↔ True
+- .lake/packages/aesop/AesopTest/WarnApplyIff.lean:21: axiom bar : True ↔ True
+- .lake/packages/aesop/AesopTest/WarnApplyIff.lean:25: axiom baz : True ↔ True
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:10: 
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:12: axiom T : Prop
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:13: axiom Q : Nat → Prop
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:14: axiom R : Nat → Prop
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:15: axiom S : Nat → Prop
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:18: axiom q_r_p : ∀ x, Q x → R x → P
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:21: axiom s_q : ∀ x y, S y → Q x
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:24: axiom s_r : ∀ x y, S y → R x
+- .lake/packages/aesop/AesopTest/SafeExtractionCopyIntroducedMVars.lean:25: 
+- .lake/packages/aesop/AesopTest/AllWeaken.lean:17: axiom weaken {α} (P Q : α → Prop) (wk : ∀ x, P x → Q x) (xs : List α)
+- .lake/packages/aesop/AesopTest/SafePrefixExpansionRappLimit.lean:10: axiom loopy {α : Prop} : α ∨ α → α
+- .lake/packages/aesop/AesopTest/Forward.lean:172: 
+- .lake/packages/aesop/AesopTest/Forward.lean:174: axiom B : Type
+- .lake/packages/aesop/AesopTest/Forward.lean:175: axiom C : Type
+- .lake/packages/aesop/AesopTest/Forward.lean:178: axiom ab : A → B
+- .lake/packages/aesop/AesopTest/Forward.lean:181: axiom bc : B → C
+- .lake/packages/aesop/AesopTest/PostponeSafeRules.lean:18: 
+- .lake/packages/aesop/AesopTest/PostponeSafeRules.lean:22: axiom t : T 0
+- .lake/packages/aesop/AesopTest/PostponeSafeRules.lean:26: 
+- .lake/packages/aesop/AesopTest/PostponeSafeRules.lean:31: axiom u₁ : U 0
+- .lake/packages/aesop/AesopTest/PostponeSafeRules.lean:34: axiom u₂ : U 1

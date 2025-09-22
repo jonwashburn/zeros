@@ -1,0 +1,1265 @@
+✔ [2530/2604] Built rh.RS.Domain
+✔ [2531/2604] Built rh.academic_framework.DiagonalFredholm.Operator
+✔ [2532/2604] Built rh.Blockers.Triage
+✔ [2533/2604] Built rh.RS.DirectBridge
+✔ [2540/2604] Built rh.RS.TentShadow
+✔ [2541/2604] Built rh.RS.PoissonOuterA1
+✔ [2542/2604] Built rh.academic_framework.DiagonalFredholm.ProductLemmas
+✔ [2544/2604] Built rh.RS.PoissonAI
+✔ [2545/2604] Built rh.academic_framework.DiskHardy
+✔ [2551/2604] Built rh.academic_framework.ZetaFunctionalEquation
+⚠ [2552/2604] Built rh.academic_framework.MellinThetaZeta
+warning: ././././rh/academic_framework/MellinThetaZeta.lean:49:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/MellinThetaZeta.lean:44:13: unused variable `hs`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2553/2604] Built rh.academic_framework.DiagonalFredholm.Determinant
+✔ [2554/2604] Built rh.academic_framework.Theta
+✔ [2555/2604] Built rh.academic_framework.GammaBounds
+✔ [2556/2604] Built rh.academic_framework.EulerProduct.PrimeSeries
+✔ [2557/2604] Built rh.RS.AdmissibleWindows
+⚠ [2558/2604] Built rh.academic_framework.DiagonalFredholm.WeierstrassProduct
+warning: ././././rh/academic_framework/DiagonalFredholm/WeierstrassProduct.lean:52:10: `inv_le_inv_of_le` has been deprecated, use `inv_anti₀` instead
+⚠ [2559/2604] Built rh.RS.H1BMOWindows
+warning: ././././rh/RS/H1BMOWindows.lean:57:10: unused variable `ψ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/H1BMOWindows.lean:57:12: unused variable `u`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/H1BMOWindows.lean:79:5: unused variable `hC`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/H1BMOWindows.lean:115:29: unused variable `md`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/H1BMOWindows.lean:115:53: unused variable `ed`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2560/2604] Built rh.academic_framework.CompletedXi
+warning: ././././rh/academic_framework/CompletedXi.lean:39:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CompletedXi.lean:37:7: unused variable `h2`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/academic_framework/CompletedXi.lean:39:47: 'norm_num' tactic does nothing
+note: this linter can be disabled with `set_option linter.unusedTactic false`
+warning: ././././rh/academic_framework/CompletedXi.lean:39:47: this tactic is never executed
+note: this linter can be disabled with `set_option linter.unreachableTactic false`
+warning: ././././rh/academic_framework/CompletedXi.lean:53:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CompletedXi.lean:76:29: try 'simp at hReρ_pos' instead of 'simpa using hReρ_pos'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CompletedXi.lean:81:40: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CompletedXi.lean:82:39: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CompletedXi.lean:83:39: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2561/2604] Built rh.RS.WhitneyGeometryDefs
+⚠ [2562/2604] Built rh.academic_framework.EulerProduct.K0Bound
+warning: ././././rh/academic_framework/EulerProduct/K0Bound.lean:87:39: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/EulerProduct/K0Bound.lean:112:44: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/EulerProduct/K0Bound.lean:149:46: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/EulerProduct/K0Bound.lean:183:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2563/2604] Built rh.academic_framework.CompletedXiSymmetry
+✔ [2564/2604] Built rh.RS.Det2Outer
+✔ [2565/2604] Built rh.Cert.K0PPlus
+✔ [2566/2604] Built rh.academic_framework.DiagonalFredholm.Comprehensive
+✔ [2567/2604] Built rh.Cert.KxiWhitney
+✔ [2568/2604] Built rh.RS.OuterWitness
+✔ [2569/2604] Built rh.RS.Det2
+⚠ [2570/2604] Built rh.RS.OffZerosBridge
+warning: ././././rh/RS/OffZerosBridge.lean:397:14: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2571/2604] Built rh.academic_framework.DiagonalFredholm
+⚠ [2572/2604] Built rh.RS.XiExtBridge
+warning: ././././rh/RS/XiExtBridge.lean:145:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/XiExtBridge.lean:156:42: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/XiExtBridge.lean:157:33: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/XiExtBridge.lean:112:13: unused variable `hρΩ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/XiExtBridge.lean:112:27: unused variable `hρXi`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/XiExtBridge.lean:130:7: unused variable `hΘ_lim1`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/XiExtBridge.lean:134:7: unused variable `hDiff`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/XiExtBridge.lean:156:9: unused variable `hzIn`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2573/2604] Built rh.RS.SchurGlobalization
+warning: ././././rh/RS/SchurGlobalization.lean:75:43: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:76:39: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:77:44: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:78:40: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:75:64: 'simp' tactic does nothing
+note: this linter can be disabled with `set_option linter.unusedTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:76:60: 'simp' tactic does nothing
+note: this linter can be disabled with `set_option linter.unusedTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:77:65: 'simp' tactic does nothing
+note: this linter can be disabled with `set_option linter.unusedTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:78:61: 'simp' tactic does nothing
+note: this linter can be disabled with `set_option linter.unusedTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:75:64: this tactic is never executed
+note: this linter can be disabled with `set_option linter.unreachableTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:76:60: this tactic is never executed
+note: this linter can be disabled with `set_option linter.unreachableTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:77:65: this tactic is never executed
+note: this linter can be disabled with `set_option linter.unreachableTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:78:61: this tactic is never executed
+note: this linter can be disabled with `set_option linter.unreachableTactic false`
+warning: ././././rh/RS/SchurGlobalization.lean:155:20: unused variable `hz`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:156:21: unused variable `hz`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:193:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:183:17: unused variable `hΘ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:217:5: unused variable `hUsub`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:218:13: unused variable `hρΩ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:218:41: unused variable `hρZ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:262:30: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:306:49: unused variable `hz`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:307:5: unused variable `w`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:355:4: try 'simp at this' instead of 'simpa using this'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:417:53: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:452:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:468:34: try 'simp at this' instead of 'simpa using this'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:476:7: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:487:44: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:525:5: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:544:23: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:585:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:602:34: try 'simp at this' instead of 'simpa using this'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:556:5: unused variable `hZsub`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:557:27: unused variable `hρZ`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:560:5: unused variable `hΘU`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:615:48: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:625:44: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:645:45: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:658:50: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:684:43: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:697:50: unused variable `data`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:731:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:742:5: unused variable `hΘU`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/SchurGlobalization.lean:819:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/SchurGlobalization.lean:827:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2574/2604] Built rh.academic_framework.EulerProductMathlib
+✔ [2575/2604] Built rh.RS.Context
+⚠ [2576/2604] Built rh.RS.Cayley
+warning: ././././rh/RS/Cayley.lean:128:16: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:130:16: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:140:45: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:148:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:186:14: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:224:21: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/Cayley.lean:237:10: unused variable `hz`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/Cayley.lean:274:3: unused variable `hDet2`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2577/2604] Built rh.RS.PoissonPlateau
+warning: ././././rh/RS/PoissonPlateau.lean:87:7: unused variable `hμS`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PoissonPlateau.lean:114:3: unused variable `hInt`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PoissonPlateau.lean:165:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:170:10: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:250:14: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:282:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:299:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:336:40: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:356:26: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:448:10: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:454:12: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:516:16: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:547:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:560:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/PoissonPlateau.lean:590:42: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2578/2604] Built rh.Cert.KxiPPlus
+✖ [2579/2604] Building rh.academic_framework.PinchLocalHelpers
+trace: .> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/academic_framework/PinchLocalHelpers.lean -R ./././. -o ././.lake/build/lib/rh/academic_framework/PinchLocalHelpers.olean -i ././.lake/build/lib/rh/academic_framework/PinchLocalHelpers.ilean -c ././.lake/build/ir/rh/academic_framework/PinchLocalHelpers.c --json
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:26:11: unknown identifier 'Analytic'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:26:37: unknown identifier 'completedRiemannZeta_analytic'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:42:4: unknown identifier 'analytic_isolated_zero_nhdsWithin'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:41:9: rcases tactic failed: x✝ : ?m.1210 is not an inductive datatype
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:82:32: unknown identifier '𝓝'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:93:72: unknown identifier '𝓝'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:97:69: unsolved goals
+hDet2 : Det2OnOmega
+hOuter : OuterHalfPlane.ofModulus_det2_over_xi_ext
+U : Set ℂ
+ρ : ℂ
+hΩρ : ρ ∈ Ω
+hρU : ρ ∈ U
+hIso : U ∩ {z | riemannXi_ext z = 0} = {ρ}
+hDet2nz : det2 ρ ≠ 0
+z : ℂ
+hz : z ∈ U
+⊢ z ∈ Ω
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:105:32: unknown identifier '𝓝'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:108:4: tactic 'assumption' failed
+hDet2 : Det2OnOmega
+hOuter : OuterHalfPlane.ofModulus_det2_over_xi_ext
+U : Set ℂ
+ρ : ℂ
+hΩρ : ρ ∈ Ω
+hρU : ρ ∈ U
+hIso : U ∩ {z | riemannXi_ext z = 0} = {ρ}
+hDet2nz : det2 ρ ≠ 0
+this : Tendsto (fun z ↦ riemannXi_ext z) (nhdsWithin ρ (U \ {ρ})) (sorryAx (Filter ℂ) true)
+⊢ Tendsto (fun z ↦ (J_pinch det2 (OuterHalfPlane.choose_outer hOuter) z)⁻¹ * 2⁻¹) (nhdsWithin ρ (U \ {ρ}))
+    (sorryAx (Filter ℂ) true)
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:117:30: unknown identifier 'exists_ne_of_mem_open'
+error: ././././rh/academic_framework/PinchLocalHelpers.lean:117:9: rcases tactic failed: x✝ : ?m.6651 is not an inductive datatype
+error: Lean exited with code 1
+⚠ [2580/2604] Built rh.RS.PinnedRemovable
+warning: ././././rh/RS/PinnedRemovable.lean:129:23: unused variable `hUo`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PinnedRemovable.lean:129:28: unused variable `hρmem`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PinnedRemovable.lean:129:65: unused variable `hwne`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2582/2604] Built rh.academic_framework.Certificate
+⚠ [2583/2604] Built rh.Cert.KxiWhitney_RvM
+warning: ././././rh/Cert/KxiWhitney_RvM.lean:90:19: unused variable `α`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/Cert/KxiWhitney_RvM.lean:90:27: unused variable `I`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/Cert/KxiWhitney_RvM.lean:90:49: unused variable `Zk`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2584/2604] Built rh.Cert.FactorsWitness
+warning: ././././rh/Cert/FactorsWitness.lean:55:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/Cert/FactorsWitness.lean:84:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [2585/2604] Built rh.RS.CRGreenWhitneyB
+warning: ././././rh/RS/CRGreenWhitneyB.lean:68:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenWhitneyB.lean:97:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenWhitneyB.lean:98:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenWhitneyB.lean:91:14: unused variable `hK`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenWhitneyB.lean:94:7: unused variable `hsqrt_nonneg`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenWhitneyB.lean:96:7: unused variable `hRHS_nonneg`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2586/2604] Built rh.RS.PinchCertificate
+warning: ././././rh/RS/PinchCertificate.lean:109:66: unused variable `hwne`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2587/2604] Built rh.academic_framework.HalfPlaneOuterV2
+warning: ././././rh/academic_framework/HalfPlaneOuterV2.lean:325:17: unused variable `hnn`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/academic_framework/HalfPlaneOuterV2.lean:488:7: unused variable `hFormula`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2588/2604] Built rh.RS.PinchIngredients
+⚠ [2589/2604] Built rh.academic_framework.CayleyAdapters
+warning: ././././rh/academic_framework/CayleyAdapters.lean:29:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:38:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:65:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:66:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:139:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:142:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:143:2: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:204:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/academic_framework/CayleyAdapters.lean:230:3: unused variable `hRel`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2590/2604] Built rh.academic_framework.PoissonCayley
+⚠ [2591/2604] Built rh.RS.CRGreenOuter
+warning: ././././rh/RS/CRGreenOuter.lean:60:7: unused variable `hsum`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:164:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:167:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:168:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:182:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:161:9: unused variable `h'`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:162:9: unused variable `hsum`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:236:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:238:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:239:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:234:9: unused variable `h'`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:235:9: unused variable `hsum`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:328:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:329:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:380:35: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:384:34: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:519:9: unused variable `hc`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:534:9: unused variable `hRHSnn`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:544:7: unused variable `hAB`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:549:7: unused variable `hCD`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/CRGreenOuter.lean:672:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:673:6: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:674:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:818:31: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:894:48: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: ././././rh/RS/CRGreenOuter.lean:922:4: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [2592/2604] Built rh.RS.DirectWedgeProof
+⚠ [2593/2604] Built rh.RS.BoundaryWedge
+warning: ././././rh/RS/BoundaryWedge.lean:36:25: unused variable `hC_nonneg`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/BoundaryWedge.lean:56:3: unused variable `hCar`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/BoundaryWedge.lean:85:3: unused variable `hCar`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+✔ [2594/2604] Built rh.RS.BoundaryAI
+⚠ [2595/2604] Built rh.RS.PPlusFromCarleson
+warning: ././././rh/RS/PPlusFromCarleson.lean:37:5: unused variable `F`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PPlusFromCarleson.lean:38:5: unused variable `hex`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PPlusFromCarleson.lean:48:45: unused variable `hψ_mass1`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PPlusFromCarleson.lean:49:15: unused variable `hc0_pos`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+warning: ././././rh/RS/PPlusFromCarleson.lean:49:24: unused variable `hPlateau`
+note: this linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [2596/2604] Built rh.Proof.Main
+info: ././././rh/Proof/Main.lean:66:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 80, num: 5):
+  [reduction] outParam ↦ 80
+  [reduction] Ne ↦ 47
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 204, num: 25):
+  [kernel] HAdd.hAdd ↦ 204
+  [kernel] Add.add ↦ 202
+  [kernel] Neg.neg ↦ 122
+  [kernel] instHAdd ↦ 61
+  [kernel] HSMul.hSMul ↦ 60
+  [kernel] SMul.smul ↦ 60
+  [kernel] HSub.hSub ↦ 52
+  [kernel] DenselyNormedField.toNormedField ↦ 50
+  [kernel] OfNat.ofNat ↦ 42
+  [kernel] Sub.sub ↦ 42
+  [kernel] outParam ↦ 41
+  [kernel] AddGroupWithOne.zsmul ↦ 40
+  [kernel] AddMonoid.toAddSemigroup ↦ 40
+  [kernel] AddMonoid.toZero ↦ 40
+  [kernel] AddSemigroup.toAdd ↦ 40
+  [kernel] Ring.zsmul ↦ 40
+  [kernel] SubNegMonoid.toAddMonoid ↦ 40
+  [kernel] SubNegMonoid.zsmul ↦ 40
+  [kernel] Complex.im ↦ 32
+  [kernel] Complex.re ↦ 32
+  [kernel] AddCommMonoid.toAddMonoid ↦ 30
+  [kernel] AddGroupSeminorm.toSeminormedAddGroup ↦ 30
+  [kernel] SeminormedCommRing.toSeminormedRing ↦ 30
+  [kernel] SubNegMonoid.toNeg ↦ 30
+  [kernel] instHSub ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+warning: ././././rh/Proof/Main.lean:88:18: 'RH.AcademicFramework.CompletedXi.xi_ext_functional_equation' does not have [simp] attribute
+info: ././././rh/Proof/Main.lean:90:0: [reduction] unfolded declarations (max: 76, num: 10):
+  [reduction] OfNat.ofNat ↦ 76
+  [reduction] LT.lt ↦ 63
+  [reduction] Mul.mul ↦ 62
+  [reduction] One.one ↦ 52
+  [reduction] HAdd.hAdd ↦ 44
+  [reduction] Add.add ↦ 42
+  [reduction] LE.le ↦ 28
+  [reduction] HMul.hMul ↦ 26
+  [reduction] Inv.inv ↦ 26
+  [reduction] Zero.zero ↦ 26[reduction] unfolded instances (max: 1800, num: 109):
+  [reduction] LinearOrderedCommGroup.toOrderedCommGroup ↦ 1800
+  [reduction] OrderedCommGroup.toCommGroup ↦ 1584
+  [reduction] CommGroup.toGroup ↦ 1368
+  [reduction] CommRing.toRing ↦ 552
+  [reduction] Ring.toSemiring ↦ 394
+  [reduction] Real.commRing ↦ 386
+  [reduction] StrictOrderedRing.toRing ↦ 261
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 258
+  [reduction] Semiring.toNonUnitalSemiring ↦ 257
+  [reduction] AddCommMonoid.toAddMonoid ↦ 250
+  [reduction] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 240
+  [reduction] CommGroup.toDivisionCommMonoid ↦ 216
+  [reduction] DivInvOneMonoid.toDivInvMonoid ↦ 216
+  [reduction] DivisionCommMonoid.toDivisionMonoid ↦ 216
+  [reduction] DivisionMonoid.toDivInvMonoid ↦ 216
+  [reduction] DivisionMonoid.toDivInvOneMonoid ↦ 216
+  [reduction] Group.toDivInvMonoid ↦ 216
+  [reduction] Field.toCommRing ↦ 165
+  [reduction] Real.instStrictOrderedCommRing ↦ 164
+  [reduction] StrictOrderedCommRing.toStrictOrderedRing ↦ 164
+  [reduction] Real.strictOrderedRing ↦ 146
+  [reduction] Real.instRing ↦ 145
+  [reduction] AddGroupWithOne.toAddMonoidWithOne ↦ 137
+  [reduction] instHAdd ↦ 133
+  [reduction] Ring.toAddGroupWithOne ↦ 133
+  [reduction] AddGroup.toSubNegMonoid ↦ 128
+  [reduction] SubNegMonoid.toAddMonoid ↦ 120
+  [reduction] Real.instLinearOrderedField ↦ 114
+  [reduction] LinearOrderedCommRing.toLinearOrderedRing ↦ 111
+  [reduction] LinearOrderedField.toField ↦ 111
+  [reduction] LinearOrderedField.toLinearOrderedCommRing ↦ 111
+  [reduction] LinearOrderedRing.toStrictOrderedRing ↦ 111
+  [reduction] Real.field ↦ 111
+  [reduction] Real.linearOrderedCommRing ↦ 111
+  [reduction] AddMonoid.toAddSemigroup ↦ 109
+  [reduction] AddSemigroup.toAdd ↦ 100
+  [reduction] Semiring.toOne ↦ 96
+  [reduction] AddCommGroup.toAddGroup ↦ 94
+  [reduction] Semiring.toNatCast ↦ 83
+  [reduction] DivInvMonoid.toMonoid ↦ 82
+  [reduction] NonUnitalNonAssocSemiring.toMul ↦ 74
+  [reduction] Field.toDivisionRing ↦ 70
+  [reduction] DivisionRing.toRing ↦ 69
+  [reduction] PartialOrder.toPreorder ↦ 68
+  [reduction] CommSemiring.toSemiring ↦ 66
+  [reduction] AddMonoidWithOne.toAddMonoid ↦ 65
+  [reduction] CommRing.toCommSemiring ↦ 62
+  [reduction] Real.instDivInvMonoid ↦ 60
+  [reduction] AddZeroClass.toAdd ↦ 59
+  [reduction] Real.partialOrder ↦ 59
+  [reduction] AddMonoid.toAddZeroClass ↦ 58
+  [reduction] Real.instCommSemiring ↦ 58
+  [reduction] CommRing.toNonUnitalCommRing ↦ 49
+  [reduction] NonUnitalCommRing.toNonUnitalNonAssocCommRing ↦ 49
+  [reduction] NonUnitalCommRing.toNonUnitalRing ↦ 49
+  [reduction] NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing ↦ 49
+  [reduction] NonUnitalRing.toNonUnitalNonAssocRing ↦ 49
+  [reduction] NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring ↦ 48
+  [reduction] AddCommMagma.toAdd ↦ 47
+  [reduction] MonoidWithZero.toMonoid ↦ 46
+  [reduction] AddCommSemigroup.toAddCommMagma ↦ 45
+  [reduction] AddCommSemigroup.toAddSemigroup ↦ 45
+  [reduction] DenselyNormedField.toNormedField ↦ 45
+  [reduction] NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring ↦ 45
+  [reduction] NonUnitalNonAssocRing.toAddCommGroup ↦ 45
+  [reduction] NormedField.toField ↦ 45
+  [reduction] RCLike.toDenselyNormedField ↦ 45
+  [reduction] Semiring.toMonoidWithZero ↦ 45
+  [reduction] DivInvMonoid.toInv ↦ 44
+  [reduction] NormedCommRing.toNormedRing ↦ 44
+  [reduction] NormedField.toNormedCommRing ↦ 44
+  [reduction] NormedRing.toRing ↦ 44
+  [reduction] Preorder.toLT ↦ 44
+  [reduction] Real.instOne ↦ 44
+  [reduction] Real.instAddCommMonoid ↦ 42
+  [reduction] AddCancelMonoid.toAddLeftCancelMonoid ↦ 40
+  [reduction] Real.denselyNormedField ↦ 40
+  [reduction] Real.instMul ↦ 40
+  [reduction] Real.instRCLike ↦ 40
+  [reduction] Real.normedField ↦ 40
+  [reduction] AddMonoid.toZero ↦ 39
+  [reduction] One.toOfNat1 ↦ 39
+  [reduction] Real.semiring ↦ 39
+  [reduction] AddMonoidWithOne.toNatCast ↦ 38
+  [reduction] AddCommMonoid.toAddCommSemigroup ↦ 36
+  [reduction] Real.instAddCommSemigroup ↦ 36
+  [reduction] Semigroup.toMul ↦ 36
+  [reduction] Preorder.toLE ↦ 35
+  [reduction] AddGroupWithOne.toAddGroup ↦ 34
+  [reduction] Real.instAddGroup ↦ 34
+  [reduction] Real.instLT ↦ 33
+  [reduction] Real.instZero ↦ 32
+  [reduction] StrictOrderedRing.toPartialOrder ↦ 29
+  [reduction] Real.instMonoid ↦ 28
+  [reduction] Real.instMonoidWithZero ↦ 28
+  [reduction] Real.orderedAddCommGroup ↦ 27
+  [reduction] StrictOrderedRing.toOrderedAddCommGroup ↦ 27
+  [reduction] OrderedAddCommGroup.toAddCommGroup ↦ 26
+  [reduction] Real.instInv ↦ 26
+  [reduction] Ring.toSub ↦ 26
+  [reduction] NormedAddCommGroup.toAddCommGroup ↦ 24
+  [reduction] Real.instAddCommGroup ↦ 24
+  [reduction] Real.normedAddCommGroup ↦ 24
+  [reduction] Ring.toAddCommGroup ↦ 24
+  [reduction] instAddNat ↦ 23
+  [reduction] OrderedSemiring.toSemiring ↦ 23
+  [reduction] NonAssocSemiring.toNonUnitalNonAssocSemiring ↦ 22
+  [reduction] Real.instAddMonoid ↦ 21
+  [reduction] Zero.toOfNat0 ↦ 21[reduction] unfolded reducible declarations (max: 825, num: 6):
+  [reduction] inferInstance ↦ 825
+  [reduction] outParam ↦ 478
+  [reduction] re ↦ 223
+  [reduction] autoParam ↦ 47
+  [reduction] GT.gt ↦ 27
+  [reduction] Function.swap ↦ 21[type_class] used instances (max: 36, num: 3):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 36
+  [type_class] OrderDual.linearOrderedCommGroup ↦ 36
+  [type_class] Pi.preorder ↦ 36[def_eq] heuristic for solving `f a =?= f b` (max: 56, num: 1):
+  [def_eq] instHAdd ↦ 56[kernel] unfolded declarations (max: 61, num: 16):
+  [kernel] OfNat.ofNat ↦ 61
+  [kernel] HAdd.hAdd ↦ 60
+  [kernel] HMul.hMul ↦ 60
+  [kernel] Mul.mul ↦ 60
+  [kernel] LT.lt ↦ 54
+  [kernel] Add.add ↦ 46
+  [kernel] inferInstance ↦ 34
+  [kernel] AddCommMonoid.toAddMonoid ↦ 33
+  [kernel] AddGroupWithOne.toAddMonoidWithOne ↦ 33
+  [kernel] NatCast.natCast ↦ 29
+  [kernel] Ring.toSemiring ↦ 23
+  [kernel] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 22
+  [kernel] Sub.sub ↦ 22
+  [kernel] CommRing.toRing ↦ 21
+  [kernel] HSub.hSub ↦ 21
+  [kernel] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:130:0: [reduction] unfolded reducible declarations (max: 39, num: 1):
+  [reduction] outParam ↦ 39use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:138:0: [reduction] unfolded reducible declarations (max: 39, num: 1):
+  [reduction] outParam ↦ 39use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:151:0: [reduction] unfolded instances (max: 44, num: 4):
+  [reduction] Ring.toSemiring ↦ 44
+  [reduction] Semiring.toNonUnitalSemiring ↦ 33
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 32
+  [reduction] CommRing.toRing ↦ 21[reduction] unfolded reducible declarations (max: 58, num: 2):
+  [reduction] outParam ↦ 58
+  [reduction] Ne ↦ 35use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:166:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 113, num: 4):
+  [reduction] outParam ↦ 113
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:198:0: [reduction] unfolded declarations (max: 136, num: 2):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] Membership.mem ↦ 28[reduction] unfolded instances (max: 48, num: 14):
+  [reduction] Ring.toSemiring ↦ 48
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Semiring.toNonUnitalSemiring ↦ 37
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 36
+  [reduction] CommRing.toRing ↦ 35
+  [reduction] Complex.commRing ↦ 34
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] AddCommGroup.toAddGroup ↦ 22
+  [reduction] Complex.addCommGroup ↦ 22
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 143, num: 5):
+  [reduction] outParam ↦ 143
+  [reduction] Ne ↦ 32
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:231:0: [reduction] unfolded declarations (max: 136, num: 3):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] Not ↦ 28
+  [reduction] Membership.mem ↦ 22[reduction] unfolded instances (max: 48, num: 14):
+  [reduction] Ring.toSemiring ↦ 48
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Semiring.toNonUnitalSemiring ↦ 37
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 36
+  [reduction] CommRing.toRing ↦ 35
+  [reduction] Complex.commRing ↦ 34
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] AddCommGroup.toAddGroup ↦ 23
+  [reduction] Complex.addCommGroup ↦ 23
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 139, num: 5):
+  [reduction] outParam ↦ 139
+  [reduction] Ne ↦ 66
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:268:0: [reduction] unfolded declarations (max: 136, num: 3):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] Not ↦ 30
+  [reduction] Membership.mem ↦ 28[reduction] unfolded instances (max: 48, num: 14):
+  [reduction] Ring.toSemiring ↦ 48
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Semiring.toNonUnitalSemiring ↦ 37
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 36
+  [reduction] CommRing.toRing ↦ 35
+  [reduction] Complex.commRing ↦ 34
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] AddCommGroup.toAddGroup ↦ 23
+  [reduction] Complex.addCommGroup ↦ 23
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 149, num: 5):
+  [reduction] outParam ↦ 149
+  [reduction] Ne ↦ 69
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:312:0: [reduction] unfolded declarations (max: 27, num: 7):
+  [reduction] Mul.mul ↦ 27
+  [reduction] Add.add ↦ 24
+  [reduction] HAdd.hAdd ↦ 24
+  [reduction] HSub.hSub ↦ 22
+  [reduction] OfNat.ofNat ↦ 22
+  [reduction] Sub.sub ↦ 22
+  [reduction] Zero.zero ↦ 22[reduction] unfolded instances (max: 228, num: 31):
+  [reduction] Monoid.toSemigroup ↦ 228
+  [reduction] LeftCancelMonoid.toMonoid ↦ 104
+  [reduction] RightCancelMonoid.toMonoid ↦ 104
+  [reduction] MulOneClass.toMul ↦ 60
+  [reduction] Semigroup.toMul ↦ 60
+  [reduction] Monoid.toMulOneClass ↦ 56
+  [reduction] CancelMonoidWithZero.toMonoidWithZero ↦ 52
+  [reduction] Ring.toSemiring ↦ 52
+  [reduction] MonoidWithZero.toMonoid ↦ 50
+  [reduction] CommRing.toRing ↦ 45
+  [reduction] Complex.commRing ↦ 43
+  [reduction] Field.toCommRing ↦ 35
+  [reduction] Complex.instField ↦ 33
+  [reduction] AddCommMonoid.toAddMonoid ↦ 29
+  [reduction] AddCommGroup.toAddGroup ↦ 26
+  [reduction] AddGroup.toSubNegMonoid ↦ 26
+  [reduction] CommSemiring.toSemiring ↦ 26
+  [reduction] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 26
+  [reduction] SubNegMonoid.toAddMonoid ↦ 26
+  [reduction] AddMonoid.toZero ↦ 23
+  [reduction] Complex.instNormedField ↦ 23
+  [reduction] NormedField.toField ↦ 23
+  [reduction] NormedRing.toRing ↦ 23
+  [reduction] SeminormedRing.toRing ↦ 23
+  [reduction] NonUnitalNonAssocSemiring.toMul ↦ 22
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedCommRing.toSeminormedCommRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22
+  [reduction] SeminormedCommRing.toSeminormedRing ↦ 22
+  [reduction] Semiring.toNonUnitalSemiring ↦ 22[reduction] unfolded reducible declarations (max: 85, num: 1):
+  [reduction] outParam ↦ 85[type_class] used instances (max: 22, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 22[kernel] unfolded declarations (max: 29, num: 3):
+  [kernel] HMul.hMul ↦ 29
+  [kernel] HAdd.hAdd ↦ 28
+  [kernel] Mul.mul ↦ 25use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:323:0: [reduction] unfolded declarations (max: 136, num: 10):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] Mul.mul ↦ 53
+  [reduction] Add.add ↦ 50
+  [reduction] HAdd.hAdd ↦ 50
+  [reduction] HSub.hSub ↦ 45
+  [reduction] Sub.sub ↦ 45
+  [reduction] HMul.hMul ↦ 29
+  [reduction] OfNat.ofNat ↦ 25
+  [reduction] Zero.zero ↦ 25
+  [reduction] Membership.mem ↦ 22[reduction] unfolded instances (max: 456, num: 57):
+  [reduction] Monoid.toSemigroup ↦ 456
+  [reduction] LeftCancelMonoid.toMonoid ↦ 208
+  [reduction] RightCancelMonoid.toMonoid ↦ 208
+  [reduction] MulOneClass.toMul ↦ 120
+  [reduction] Semigroup.toMul ↦ 120
+  [reduction] Monoid.toMulOneClass ↦ 112
+  [reduction] Ring.toSemiring ↦ 110
+  [reduction] CancelMonoidWithZero.toMonoidWithZero ↦ 104
+  [reduction] MonoidWithZero.toMonoid ↦ 100
+  [reduction] CommRing.toRing ↦ 88
+  [reduction] Complex.commRing ↦ 84
+  [reduction] Semiring.toNonUnitalSemiring ↦ 69
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 68
+  [reduction] Field.toCommRing ↦ 59
+  [reduction] Complex.instField ↦ 57
+  [reduction] AddCommGroup.toAddGroup ↦ 55
+  [reduction] AddGroup.toSubNegMonoid ↦ 51
+  [reduction] Complex.instNormedField ↦ 51
+  [reduction] NormedCommRing.toNormedRing ↦ 50
+  [reduction] NormedField.toNormedCommRing ↦ 50
+  [reduction] AddCommMonoid.toAddMonoid ↦ 46
+  [reduction] NormedCommRing.toSeminormedCommRing ↦ 46
+  [reduction] SeminormedCommRing.toSeminormedRing ↦ 46
+  [reduction] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 43
+  [reduction] NormedField.toField ↦ 43
+  [reduction] NormedRing.toRing ↦ 43
+  [reduction] SeminormedRing.toRing ↦ 43
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] Complex.instMul ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] SubNegMonoid.toAddMonoid ↦ 42
+  [reduction] AddMonoid.toZero ↦ 41
+  [reduction] Complex.addCommGroup ↦ 41
+  [reduction] NonUnitalNonAssocSemiring.toMul ↦ 38
+  [reduction] Complex.addGroupWithOne ↦ 37
+  [reduction] instHAdd ↦ 36
+  [reduction] CommSemiring.toSemiring ↦ 34
+  [reduction] NonUnitalSeminormedCommRing.toNonUnitalSeminormedRing ↦ 34
+  [reduction] SeminormedCommRing.toNonUnitalSeminormedCommRing ↦ 34
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] NonUnitalRing.toNonUnitalNonAssocRing ↦ 31
+  [reduction] Real.instAdd ↦ 31
+  [reduction] NonUnitalSeminormedRing.toNonUnitalRing ↦ 30
+  [reduction] AddMonoidWithOne.toAddMonoid ↦ 29
+  [reduction] AddGroupWithOne.toAddMonoidWithOne ↦ 28
+  [reduction] instHMul ↦ 27
+  [reduction] instHSub ↦ 26
+  [reduction] Real.instSub ↦ 26
+  [reduction] NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing ↦ 25
+  [reduction] NonUnitalNonAssocRing.toMul ↦ 25
+  [reduction] NonUnitalCommRing.toNonUnitalNonAssocCommRing ↦ 24
+  [reduction] NonUnitalCommRing.toNonUnitalRing ↦ 24
+  [reduction] NonUnitalSeminormedCommRing.toNonUnitalCommRing ↦ 24
+  [reduction] NonUnitalNonAssocRing.toAddCommGroup ↦ 22
+  [reduction] MulZeroClass.toMul ↦ 21
+  [reduction] MulZeroClass.toZero ↦ 21[reduction] unfolded reducible declarations (max: 118, num: 6):
+  [reduction] outParam ↦ 118
+  [reduction] Ne ↦ 47
+  [reduction] inferInstance ↦ 41
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[type_class] used instances (max: 22, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 22[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 49, num: 4):
+  [kernel] HAdd.hAdd ↦ 49
+  [kernel] Add.add ↦ 39
+  [kernel] HMul.hMul ↦ 33
+  [kernel] Mul.mul ↦ 29use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:356:0: [reduction] unfolded declarations (max: 28, num: 2):
+  [reduction] Zero.zero ↦ 28
+  [reduction] OfNat.ofNat ↦ 25[reduction] unfolded instances (max: 56, num: 5):
+  [reduction] Ring.toSemiring ↦ 56
+  [reduction] Semiring.toNonUnitalSemiring ↦ 40
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 39
+  [reduction] CommRing.toRing ↦ 32
+  [reduction] AddMonoid.toZero ↦ 22[reduction] unfolded reducible declarations (max: 65, num: 5):
+  [reduction] outParam ↦ 65
+  [reduction] Nat.cast ↦ 56
+  [reduction] semiOutParam ↦ 53
+  [reduction] Ne ↦ 46
+  [reduction] inferInstance ↦ 28use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+warning: ././././rh/Proof/Main.lean:373:4: try 'simp at hζ' instead of 'simpa using hζ'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: ././././rh/Proof/Main.lean:366:0: [reduction] unfolded declarations (max: 89, num: 13):
+  [reduction] OfNat.ofNat ↦ 89
+  [reduction] Mul.mul ↦ 83
+  [reduction] Div.div ↦ 78
+  [reduction] Zero.zero ↦ 73
+  [reduction] HMul.hMul ↦ 71
+  [reduction] HDiv.hDiv ↦ 56
+  [reduction] Add.add ↦ 51
+  [reduction] HAdd.hAdd ↦ 51
+  [reduction] NatCast.natCast ↦ 50
+  [reduction] HSub.hSub ↦ 46
+  [reduction] Sub.sub ↦ 46
+  [reduction] One.one ↦ 28
+  [reduction] Neg.neg ↦ 27[reduction] unfolded instances (max: 402, num: 49):
+  [reduction] Group.toDivInvMonoid ↦ 402
+  [reduction] DivInvMonoid.toDiv ↦ 161
+  [reduction] AddMonoidWithOne.toNatCast ↦ 80
+  [reduction] CommRing.toRing ↦ 71
+  [reduction] Complex.commRing ↦ 70
+  [reduction] Complex.addGroupWithOne ↦ 69
+  [reduction] AddGroupWithOne.toAddMonoidWithOne ↦ 67
+  [reduction] Ring.toSemiring ↦ 65
+  [reduction] Complex.instField ↦ 61
+  [reduction] AddGroup.toSubNegMonoid ↦ 59
+  [reduction] AddMonoid.toZero ↦ 59
+  [reduction] AddCommGroup.toAddGroup ↦ 58
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 58
+  [reduction] Semiring.toNonUnitalSemiring ↦ 58
+  [reduction] instHMul ↦ 55
+  [reduction] NonUnitalNonAssocSemiring.toMul ↦ 54
+  [reduction] CommSemiring.toSemiring ↦ 52
+  [reduction] Complex.instMul ↦ 52
+  [reduction] Complex.addCommGroup ↦ 51
+  [reduction] SubNegMonoid.toAddMonoid ↦ 49
+  [reduction] instHAdd ↦ 47
+  [reduction] Field.toCommRing ↦ 42
+  [reduction] AddMonoidWithOne.toAddMonoid ↦ 40
+  [reduction] AddCommMonoid.toAddMonoid ↦ 34
+  [reduction] Field.toSemifield ↦ 34
+  [reduction] Real.instAdd ↦ 34
+  [reduction] Semifield.toDivisionSemiring ↦ 34
+  [reduction] Complex.instDivInvMonoid ↦ 32
+  [reduction] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 32
+  [reduction] DivisionSemiring.toGroupWithZero ↦ 31
+  [reduction] instHDiv ↦ 30
+  [reduction] Field.toDiv ↦ 30
+  [reduction] Semigroup.toMul ↦ 30
+  [reduction] Zero.toOfNat0 ↦ 30
+  [reduction] MonoidWithZero.toMonoid ↦ 28
+  [reduction] MonoidWithZero.toZero ↦ 27
+  [reduction] instHSub ↦ 26
+  [reduction] CommRing.toCommSemiring ↦ 26
+  [reduction] Complex.instCommSemiring ↦ 26
+  [reduction] DivisionSemiring.toSemiring ↦ 26
+  [reduction] Real.instSub ↦ 26
+  [reduction] Semifield.toCommSemiring ↦ 26
+  [reduction] SubNegZeroMonoid.toSubNegMonoid ↦ 25
+  [reduction] SubtractionMonoid.toSubNegMonoid ↦ 25
+  [reduction] SubtractionMonoid.toSubNegZeroMonoid ↦ 25
+  [reduction] GroupWithZero.toMonoidWithZero ↦ 23
+  [reduction] Semiring.toNatCast ↦ 23
+  [reduction] Complex.instZero ↦ 22
+  [reduction] Monoid.toSemigroup ↦ 22[reduction] unfolded reducible declarations (max: 249, num: 5):
+  [reduction] outParam ↦ 249
+  [reduction] Nat.cast ↦ 80
+  [reduction] inferInstance ↦ 47
+  [reduction] Complex.re ↦ 34
+  [reduction] Ne ↦ 32[type_class] used instances (max: 35, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 35[kernel] unfolded declarations (max: 88, num: 8):
+  [kernel] Neg.neg ↦ 88
+  [kernel] HMul.hMul ↦ 84
+  [kernel] Mul.mul ↦ 80
+  [kernel] HAdd.hAdd ↦ 65
+  [kernel] OfNat.ofNat ↦ 54
+  [kernel] Add.add ↦ 45
+  [kernel] Complex.re ↦ 26
+  [kernel] Complex.im ↦ 24use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:414:0: [reduction] unfolded declarations (max: 36, num: 1):
+  [reduction] Membership.mem ↦ 36[reduction] unfolded instances (max: 44, num: 4):
+  [reduction] Ring.toSemiring ↦ 44
+  [reduction] Semiring.toNonUnitalSemiring ↦ 33
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 32
+  [reduction] CommRing.toRing ↦ 21[reduction] unfolded reducible declarations (max: 102, num: 2):
+  [reduction] outParam ↦ 102
+  [reduction] Ne ↦ 32[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:451:0: [reduction] unfolded reducible declarations (max: 49, num: 1):
+  [reduction] outParam ↦ 49use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:486:0: [reduction] unfolded declarations (max: 136, num: 6):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] Mul.mul ↦ 48
+  [reduction] LT.lt ↦ 26
+  [reduction] OfNat.ofNat ↦ 26
+  [reduction] Inv.inv ↦ 24
+  [reduction] Membership.mem ↦ 24[reduction] unfolded instances (max: 1600, num: 37):
+  [reduction] LinearOrderedCommGroup.toOrderedCommGroup ↦ 1600
+  [reduction] OrderedCommGroup.toCommGroup ↦ 1408
+  [reduction] CommGroup.toGroup ↦ 1216
+  [reduction] CommGroup.toDivisionCommMonoid ↦ 192
+  [reduction] DivInvOneMonoid.toDivInvMonoid ↦ 192
+  [reduction] DivisionCommMonoid.toDivisionMonoid ↦ 192
+  [reduction] DivisionMonoid.toDivInvMonoid ↦ 192
+  [reduction] DivisionMonoid.toDivInvOneMonoid ↦ 192
+  [reduction] Group.toDivInvMonoid ↦ 192
+  [reduction] DivInvMonoid.toMonoid ↦ 71
+  [reduction] Real.instDivInvMonoid ↦ 59
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] DivInvMonoid.toInv ↦ 40
+  [reduction] MonoidWithZero.toMonoid ↦ 39
+  [reduction] CommRing.toRing ↦ 37
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] NonUnitalNonAssocSemiring.toMul ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Real.instMul ↦ 32
+  [reduction] Semigroup.toMul ↦ 32
+  [reduction] Ring.toSemiring ↦ 27
+  [reduction] Real.instInv ↦ 24
+  [reduction] CommRing.toCommSemiring ↦ 23
+  [reduction] CommSemiring.toSemiring ↦ 23
+  [reduction] Real.commRing ↦ 23
+  [reduction] Real.instCommSemiring ↦ 23
+  [reduction] Real.instMonoid ↦ 23
+  [reduction] Real.instMonoidWithZero ↦ 23
+  [reduction] Real.semiring ↦ 23
+  [reduction] Semiring.toMonoidWithZero ↦ 23
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 21
+  [reduction] Real.instLT ↦ 21
+  [reduction] Semiring.toNonUnitalSemiring ↦ 21[reduction] unfolded reducible declarations (max: 426, num: 6):
+  [reduction] outParam ↦ 426
+  [reduction] Complex.re ↦ 172
+  [reduction] inferInstance ↦ 92
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[type_class] used instances (max: 32, num: 2):
+  [type_class] OrderDual.linearOrderedCommGroup ↦ 32
+  [type_class] Pi.preorder ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 29, num: 1):
+  [def_eq] Set ↦ 29[kernel] unfolded declarations (max: 23, num: 2):
+  [kernel] Add.add ↦ 23
+  [kernel] HAdd.hAdd ↦ 23use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+warning: ././././rh/Proof/Main.lean:557:30: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: ././././rh/Proof/Main.lean:535:0: [reduction] unfolded declarations (max: 170, num: 5):
+  [reduction] DFunLike.coe ↦ 170
+  [reduction] Membership.mem ↦ 69
+  [reduction] Set.Mem ↦ 38
+  [reduction] setOf ↦ 28
+  [reduction] Set ↦ 25[reduction] unfolded instances (max: 51, num: 14):
+  [reduction] instDenselyNormedField ↦ 51
+  [reduction] DenselyNormedField.toNormedField ↦ 51
+  [reduction] instRCLike ↦ 39
+  [reduction] RCLike.toDenselyNormedField ↦ 39
+  [reduction] instNormedField ↦ 28
+  [reduction] NormedCommRing.toNormedRing ↦ 28
+  [reduction] NormedField.toNormedCommRing ↦ 28
+  [reduction] NormedCommRing.toSeminormedCommRing ↦ 23
+  [reduction] SeminormedCommRing.toSeminormedRing ↦ 23
+  [reduction] AddCommGroup.toAddGroup ↦ 22
+  [reduction] addCommGroup ↦ 22
+  [reduction] instNormedAddCommGroup ↦ 22
+  [reduction] RelEmbedding.instFunLike ↦ 22
+  [reduction] RelIso.instFunLike ↦ 22[reduction] unfolded reducible declarations (max: 187, num: 7):
+  [reduction] outParam ↦ 187
+  [reduction] Equiv.invFun ↦ 40
+  [reduction] Equiv.toFun ↦ 40
+  [reduction] Function.Embedding.toFun ↦ 40
+  [reduction] AddGroupNorm.toNormedAddCommGroup ↦ 22
+  [reduction] AddGroupNorm.toNormedAddGroup ↦ 22
+  [reduction] RelEmbedding.toEmbedding ↦ 22[type_class] used instances (max: 22, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 22[def_eq] heuristic for solving `f a =?= f b` (max: 51, num: 1):
+  [def_eq] Set ↦ 51use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:572:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 80, num: 4):
+  [reduction] outParam ↦ 80
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:598:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 78, num: 4):
+  [reduction] outParam ↦ 78
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[type_class] used instances (max: 22, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 22[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:615:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 57, num: 4):
+  [reduction] outParam ↦ 57
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+warning: ././././rh/Proof/Main.lean:648:8: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: ././././rh/Proof/Main.lean:631:0: [reduction] unfolded declarations (max: 136, num: 3):
+  [reduction] DFunLike.coe ↦ 136
+  [reduction] One.one ↦ 28
+  [reduction] Neg.neg ↦ 24[reduction] unfolded instances (max: 191, num: 52):
+  [reduction] Ring.toSemiring ↦ 191
+  [reduction] CommRing.toRing ↦ 142
+  [reduction] DivInvOneMonoid.toDivInvMonoid ↦ 132
+  [reduction] DivisionMonoid.toDivInvMonoid ↦ 132
+  [reduction] DivisionMonoid.toDivInvOneMonoid ↦ 132
+  [reduction] Group.toDivInvMonoid ↦ 132
+  [reduction] Group.toDivisionMonoid ↦ 132
+  [reduction] DivInvMonoid.toMonoid ↦ 116
+  [reduction] OrderedCommSemiring.toOrderedSemiring ↦ 78
+  [reduction] Real.commRing ↦ 75
+  [reduction] AddGroup.toSubNegMonoid ↦ 69
+  [reduction] AddCommGroup.toAddGroup ↦ 67
+  [reduction] StrictOrderedRing.toRing ↦ 62
+  [reduction] Real.instStrictOrderedCommRing ↦ 61
+  [reduction] StrictOrderedCommRing.toStrictOrderedRing ↦ 61
+  [reduction] OrderedCommRing.toOrderedRing ↦ 57
+  [reduction] OrderedSemiring.toSemiring ↦ 57
+  [reduction] StrictOrderedCommRing.toOrderedCommRing ↦ 57
+  [reduction] Complex.commRing ↦ 54
+  [reduction] OrderedRing.toRing ↦ 47
+  [reduction] CommSemiring.toSemiring ↦ 45
+  [reduction] OrderedRing.toOrderedSemiring ↦ 43
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] DivInvOneMonoid.toInvOneClass ↦ 40
+  [reduction] InvOneClass.toOne ↦ 40
+  [reduction] Monoid.toOne ↦ 40
+  [reduction] Complex.addCommGroup ↦ 38
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] OrderedCommRing.toOrderedCommSemiring ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] AddGroup.toSubtractionMonoid ↦ 30
+  [reduction] SubNegZeroMonoid.toSubNegMonoid ↦ 30
+  [reduction] SubtractionMonoid.toSubNegMonoid ↦ 30
+  [reduction] SubtractionMonoid.toSubNegZeroMonoid ↦ 30
+  [reduction] NonUnitalSemiring.toNonUnitalNonAssocSemiring ↦ 29
+  [reduction] Semiring.toNonUnitalSemiring ↦ 29
+  [reduction] Complex.addGroupWithOne ↦ 28
+  [reduction] NonUnitalNonAssocSemiring.toAddCommMonoid ↦ 28
+  [reduction] NormedAddGroup.toAddGroup ↦ 28
+  [reduction] Complex.instNormedAddCommGroup ↦ 26
+  [reduction] Complex.instRing ↦ 26
+  [reduction] OrderedRing.toPartialOrder ↦ 26
+  [reduction] StrictOrderedRing.toPartialOrder ↦ 26
+  [reduction] StrictOrderedSemiring.toPartialOrder ↦ 26
+  [reduction] StrictOrderedCommSemiring.toOrderedCommSemiring ↦ 25
+  [reduction] Real.orderedSemiring ↦ 24
+  [reduction] AddCommMonoid.toAddMonoid ↦ 22
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22
+  [reduction] NonUnitalNonAssocRing.toAddCommGroup ↦ 21[reduction] unfolded reducible declarations (max: 200, num: 8):
+  [reduction] outParam ↦ 200
+  [reduction] inferInstance ↦ 134
+  [reduction] FunLike ↦ 75
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32
+  [reduction] AddGroupNorm.toNormedAddCommGroup ↦ 26
+  [reduction] AddGroupNorm.toNormedAddGroup ↦ 26[def_eq] heuristic for solving `f a =?= f b` (max: 25, num: 1):
+  [def_eq] Set ↦ 25[kernel] unfolded declarations (max: 54, num: 7):
+  [kernel] LE.le ↦ 54
+  [kernel] Add.add ↦ 40
+  [kernel] HAdd.hAdd ↦ 40
+  [kernel] Neg.neg ↦ 36
+  [kernel] Ring.toSemiring ↦ 27
+  [kernel] HMul.hMul ↦ 24
+  [kernel] Mul.mul ↦ 22use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:652:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 44, num: 4):
+  [reduction] outParam ↦ 44
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 34, num: 1):
+  [def_eq] Set ↦ 34use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:691:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 42, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 42
+  [reduction] DenselyNormedField.toNormedField ↦ 42
+  [reduction] Complex.instRCLike ↦ 32
+  [reduction] RCLike.toDenselyNormedField ↦ 32
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 80, num: 4):
+  [reduction] outParam ↦ 80
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 28, num: 1):
+  [def_eq] Set ↦ 28[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+warning: ././././rh/Proof/Main.lean:759:18: try 'simp' instead of 'simpa'
+note: this linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: ././././rh/Proof/Main.lean:712:0: [reduction] unfolded declarations (max: 476, num: 11):
+  [reduction] DFunLike.coe ↦ 476
+  [reduction] dite ↦ 56
+  [reduction] Classical.propDecidable ↦ 56
+  [reduction] Function.comp ↦ 56
+  [reduction] Function.invFun ↦ 56
+  [reduction] Membership.mem ↦ 39
+  [reduction] Set ↦ 33
+  [reduction] NNReal.toReal ↦ 28
+  [reduction] Real.sqrt ↦ 28
+  [reduction] LE.le ↦ 25
+  [reduction] Set.Mem ↦ 21[reduction] unfolded instances (max: 128, num: 38):
+  [reduction] Complex.instDenselyNormedField ↦ 128
+  [reduction] DenselyNormedField.toNormedField ↦ 128
+  [reduction] Complex.instRCLike ↦ 102
+  [reduction] RCLike.toDenselyNormedField ↦ 102
+  [reduction] Complex.instNormedField ↦ 77
+  [reduction] NormedCommRing.toNormedRing ↦ 77
+  [reduction] NormedField.toNormedCommRing ↦ 77
+  [reduction] NormedCommRing.toSeminormedCommRing ↦ 63
+  [reduction] SeminormedCommRing.toSeminormedRing ↦ 63
+  [reduction] AddCommGroup.toAddGroup ↦ 62
+  [reduction] Complex.addCommGroup ↦ 62
+  [reduction] Complex.instNormedAddCommGroup ↦ 62
+  [reduction] RelEmbedding.instFunLike ↦ 62
+  [reduction] RelIso.instFunLike ↦ 62
+  [reduction] NormedField.toNorm ↦ 56
+  [reduction] NormedRing.toNorm ↦ 56
+  [reduction] SeminormedAddGroup.toNorm ↦ 56
+  [reduction] AddGroup.toSubNegMonoid ↦ 48
+  [reduction] CommRing.toRing ↦ 48
+  [reduction] Complex.addGroupWithOne ↦ 48
+  [reduction] Complex.commRing ↦ 48
+  [reduction] Complex.instField ↦ 48
+  [reduction] Field.toCommRing ↦ 48
+  [reduction] NormedField.toField ↦ 48
+  [reduction] NormedRing.toRing ↦ 48
+  [reduction] SeminormedRing.toRing ↦ 48
+  [reduction] MetricSpace.toPseudoMetricSpace ↦ 43
+  [reduction] NormedAddGroup.toNorm ↦ 42
+  [reduction] SeminormedRing.toNorm ↦ 42
+  [reduction] NormedAddCommGroup.toMetricSpace ↦ 35
+  [reduction] NonUnitalSeminormedCommRing.toNonUnitalSeminormedRing ↦ 34
+  [reduction] NormedAddGroup.toMetricSpace ↦ 34
+  [reduction] SeminormedCommRing.toNonUnitalSeminormedCommRing ↦ 34
+  [reduction] NonUnitalNonAssocRing.toAddCommGroup ↦ 28
+  [reduction] NonUnitalSeminormedRing.toNorm ↦ 28
+  [reduction] NormedAddCommGroup.toAddCommGroup ↦ 28
+  [reduction] NormedAddCommGroup.toNorm ↦ 28
+  [reduction] NontriviallyNormedField.toNormedField ↦ 26[reduction] unfolded reducible declarations (max: 258, num: 15):
+  [reduction] outParam ↦ 258
+  [reduction] Equiv.invFun ↦ 112
+  [reduction] Equiv.toFun ↦ 112
+  [reduction] Function.Embedding.toFun ↦ 112
+  [reduction] DecidableEq ↦ 110
+  [reduction] AddGroupNorm.toNormedAddCommGroup ↦ 62
+  [reduction] AddGroupNorm.toNormedAddGroup ↦ 62
+  [reduction] RelEmbedding.toEmbedding ↦ 62
+  [reduction] autoParam ↦ 60
+  [reduction] Decidable.casesOn ↦ 56
+  [reduction] AbsoluteValue.toMulHom ↦ 48
+  [reduction] AddGroupSeminorm.toSeminormedAddGroup ↦ 34
+  [reduction] MulHom.toFun ↦ 28
+  [reduction] Subtype.val ↦ 28
+  [reduction] Ne ↦ 24[type_class] used instances (max: 32, num: 1):
+  [type_class] instOfNatPNatOfNeZeroNat ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 69, num: 1):
+  [def_eq] Set ↦ 69[kernel] unfolded declarations (max: 21, num: 2):
+  [kernel] Add.add ↦ 21
+  [kernel] HAdd.hAdd ↦ 21use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+info: ././././rh/Proof/Main.lean:786:0: [reduction] unfolded declarations (max: 136, num: 1):
+  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 50, num: 7):
+  [reduction] Complex.instDenselyNormedField ↦ 50
+  [reduction] DenselyNormedField.toNormedField ↦ 50
+  [reduction] Complex.instRCLike ↦ 36
+  [reduction] RCLike.toDenselyNormedField ↦ 36
+  [reduction] Complex.instNormedField ↦ 22
+  [reduction] NormedCommRing.toNormedRing ↦ 22
+  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 129, num: 4):
+  [reduction] outParam ↦ 129
+  [reduction] Equiv.invFun ↦ 32
+  [reduction] Equiv.toFun ↦ 32
+  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 52, num: 1):
+  [def_eq] Set ↦ 52use `set_option diagnostics.threshold <num>` to control threshold for reporting counters
+✔ [2597/2604] Built rh.Proof.Export
+✔ [2598/2604] Built rh.RS.PinchWrappers
+✔ [2599/2604] Built rh.Proof.CRClosure
+✔ [2600/2604] Built rh.Proof.Closure
+✔ [2601/2604] Built rh.Proof.CRUnconditional
+✔ [2602/2604] Built rh.Proof.Entry
+ℹ [2603/2604] Built rh.Proof.AxiomsCheck
+info: ././././rh/Proof/AxiomsCheck.lean:7:0: 'RH.Proof.Export.RiemannHypothesis_final' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ././././rh/Proof/AxiomsCheck.lean:8:0: 'RH.Proof.Export.RiemannHypothesis_from_certificate_route' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ././././rh/Proof/AxiomsCheck.lean:9:0: 'RH.Proof.Export.RiemannHypothesis_from_certificate_rep_on_via_cov' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ././././rh/Proof/AxiomsCheck.lean:12:0: 'RH.Proof.Final.RiemannHypothesis_mathlib_from_CR_outer_ext' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ././././rh/Proof/AxiomsCheck.lean:15:0: 'RH.Proof.CRClosure.RH_from_CR_outer_choose' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ././././rh/Proof/AxiomsCheck.lean:16:0: 'RH.Proof.Entry.RiemannHypothesis_from_CR_outer' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required builds logged failures:
+- rh.academic_framework.PinchLocalHelpers
+error: build failed
