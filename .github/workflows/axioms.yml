@@ -13,6 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node (for proofwidgets, if needed)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install elan (Lean toolchain)
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
@@ -26,6 +31,10 @@ jobs:
       - name: Lake update
         working-directory: no-zeros
         run: ~/.elan/bin/lake update
+
+      - name: Fetch mathlib cache (avoid heavy dependency builds)
+        working-directory: no-zeros
+        run: ~/.elan/bin/lake exe cache get || true
 
       - name: Headless build (conservative)
         working-directory: no-zeros

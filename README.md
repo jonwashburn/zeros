@@ -4,13 +4,13 @@
     <img alt="CI" src="https://github.com/jonwashburn/zeros/actions/workflows/axioms.yml/badge.svg" />
   </a>
   <a href="#axioms-check">
-    <img alt="No custom axioms" src="https://img.shields.io/badge/axioms-no_custom-blue" />
+    <img alt="No custom axioms" src="https://img.shields.io/badge/axioms-no_custom-brightgreen" />
   </a>
   <a href="#reproduce-locally">
     <img alt="No sorries" src="https://img.shields.io/badge/sorries-none-brightgreen" />
   </a>
   <a href="#lean-artifact-how-the-proof-is-wired">
-    <img alt="RH entry wired" src="https://img.shields.io/badge/RH-entry_wired_in_Mathlib-8A2BE2" />
+    <img alt="RH entry available" src="https://img.shields.io/badge/RH-entry_available-brightgreen" />
   </a>
 </p>
 
