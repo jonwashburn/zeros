@@ -1,39 +1,42 @@
-# Lean Verification of the Riemann Hypothesis
+# zeros — Lean 4 artifact and verification
 
-This project provides a formal verification in Lean 4 of a proof of the Riemann Hypothesis using a boundary-to-interior method in classical function theory. It includes the Lean sources for the proof and a TeX document describing the approach.
+This repository contains a Lean 4 artifact that, given a single CR‑outer “local removable data” chooser at each ζ‑zero on Ω, produces Mathlib’s `RiemannZeta.RiemannHypothesis` as a formal theorem.
 
-The proof is modular, with each lemma's role and dependency explicit, and relies on a mathlib-only formalization with no axioms or admitted proofs. For more details, see the abstract in `Riemann-lean-verified.tex`:
+• Entry point (one input → final result)
+  - File: `no-zeros/rh/Proof/Entry.lean`
+  - Theorem: `RH.Proof.Entry.RiemannHypothesis_from_CR_outer`
+  - Input:
+    ```lean
+    choose : ∀ ρ, ρ ∈ RH.RS.Ω → riemannZeta ρ = 0 →
+      RH.RS.OffZeros.LocalData (riemannZeta := riemannZeta)
+        (Θ := RH.RS.Θ_of RH.RS.CRGreenOuterData) (ρ := ρ)
+    ```
+  - Output: `RiemannHypothesis`
 
-&gt; We prove the Riemann Hypothesis by a boundary--to--interior method in classical function theory. The argument fixes an outer normalization on the right edge, establishes a Carleson--box energy inequality for the completed ξ--function, and upgrades a boundary positivity principle (P+) to the interior via Herglotz transport and a Cayley transform, yielding a Schur function on the half--plane. A short removability pinch then forces nonvanishing away from the boundary, and a globalization step carries the interior nonvanishing across the zero set Z(ξ) to the full half--plane.
+## Reproduce (local)
 
-Repository reference: https://github.com/jonwashburn/rh (commit 9cb1780).
+```bash
+cd no-zeros
+lake update
+lake build
+```
 
-## How to Run/Build
+Conservative build (low memory): set `LEAN_EXTRA_ARGS="-j2 -M 4096"`.
 
-This is a Lean 4 project. To build and verify the proofs:
+## Axioms check
 
-1. Ensure you have Lean 4 installed (via [elan](https://leanprover-community.github.io/)).
-2. Navigate to the `no-zeros` directory:
-   ```bash
-   cd no-zeros
-   ```
-3. Update dependencies:
-   ```bash
-   lake update
-   ```
-4. Build the project:
-   ```bash
-   lake build
-   ```
+To build and print axioms for public theorems:
 
-Successful build verifies the proofs.
+```bash
+bash scripts/verify_axioms.sh
+```
 
-## How to Test/Verify
+This invokes `lake build +rh.Proof.AxiomsCheck`, which contains `#print axioms` statements for the final exports and public shims.
 
-The build process itself verifies the proofs. If the build succeeds without errors, the formalization is correct.
+## CI
 
-For progress and recent changes, see `no-zeros/PROGRESS.md`.
+GitHub Actions workflow `.github/workflows/axioms.yml` builds the project and runs the axioms check on pushes to `main` and `pinned-cdc6632`.
 
 ## License
 
-See `no-zeros/LICENSE` for licensing information.
+See `no-zeros/LICENSE`.
