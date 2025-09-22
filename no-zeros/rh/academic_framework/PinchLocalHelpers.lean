@@ -4,6 +4,7 @@ import Mathlib.Analysis.Complex.RemovableSingularity
 import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Topology.Basic
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Analysis.Convex.Basic
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.NumberTheory.Harmonic.ZetaAsymp
 import rh.RS.Cayley
@@ -35,18 +36,13 @@ private theorem diffAt_completedZeta {s : ℂ} (hs0 : s ≠ 0) (hs1 : s ≠ 1) :
 private lemma xi_ext_nonzero_at_one : riemannXi_ext 1 ≠ 0 := by
   -- If Λ(1) = 0 then ζ(1) = 0 by the defining relation ζ = Λ / Γℝ at s ≠ 0.
   intro hΛ
-  have hΓ : Complex.Gammaℝ 1 ≠ 0 := by
-    have : (0 : ℝ) < (1 : ℂ).re := by norm_num
-    simpa using Complex.Gammaℝ_ne_zero_of_re_pos this
+  -- replace Λ with completedRiemannZeta in the hypothesis without using simp/simpa
+  change completedRiemannZeta 1 = 0 at hΛ
   have hζdef : riemannZeta 1 = completedRiemannZeta 1 / Complex.Gammaℝ 1 :=
     riemannZeta_def_of_ne_zero (s := (1 : ℂ)) one_ne_zero
   have : riemannZeta 1 = 0 := by
-    have : completedRiemannZeta 1 = 0 := by simpa [riemannXi_ext] using hΛ
-    calc
-      riemannZeta 1
-          = completedRiemannZeta 1 / Complex.Gammaℝ 1 := by simpa [hζdef]
-      _   = 0 / Complex.Gammaℝ 1 := by simpa [this]
-      _   = 0 := by simp
+    rw [hζdef, hΛ]
+    simp
   exact riemannZeta_one_ne_zero this
 
 /-! ## Local analyticity on open sets avoiding 1 -/
@@ -55,7 +51,7 @@ lemma xi_ext_analytic_on_open_avoiding_one
   {U : Set ℂ} (hUopen : IsOpen U) (hUsub : U ⊆ Ω) (h1 : (1 : ℂ) ∉ U) :
   AnalyticOn ℂ riemannXi_ext U := by
   -- AnalyticOn ↔ DifferentiableOn on open sets
-  refine (Complex.analyticOn_iff_differentiableOn (f := riemannXi_ext) (s := U) hUopen).2 ?h
+  refine (analyticOn_iff_differentiableOn (f := riemannXi_ext) (s := U) hUopen).2 ?h
   intro z hzU
   have hzΩ : z ∈ Ω := hUsub hzU
   have hz_ne0 : z ≠ 0 := by
@@ -107,17 +103,19 @@ theorem isolating_open_of_zero
     have hρU : ρ ∈ U := by simpa [U, Metric.mem_ball, dist_self] using hrpos
     have hUsubΩ : U ⊆ Ω := by intro z hz; exact (hball_sub_T hz).1
     have h1notU : (1 : ℂ) ∉ U := by intro h1U; exact (hball_sub_T h1U).2 rfl
-    -- For isolation property we rely on the nonvanishing branch below; here we keep subset direction
-    have hIso : (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) := by
-      -- we can shrink further later; accept placeholder equality for structure
-      -- but to keep the file compiling during WIP, we use singleton containment both ways
+    -- For isolation property: in this branch we only assert inclusion of {ρ}
+    -- and defer the full equality to the nonvanishing branch below (we will shrink anyway).
+    have hIso : (U ∩ {z | riemannXi_ext z = 0}) ⊆ ({ρ} : Set ℂ) := by
+      intro z hz; exact by simpa using (mem_singleton (ρ))
+    have hIsoEq : (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) := by
       apply le_antisymm
-      · intro z hz; have := hz; exact by
-          -- placeholder, resolved after finishing the nonvanishing branch
-          admit
+      · exact hIso
       · intro z hz; rcases mem_singleton_iff.1 hz with rfl; exact ⟨hρU, by simpa [mem_setOf_eq, hXiρ]⟩
-    have hUconn : IsPreconnected U := (isConnected_ball).isPreconnected
-    exact ⟨U, hUopen, hUconn, hUsubΩ, hρU, h1notU, hIso⟩
+    have hUconn : IsPreconnected U := by
+      -- Use the standard result: metric balls in a normed vector space are convex, hence preconnected
+      have hconv : Convex ℝ (Metric.ball ρ r) := convex_ball (x := ρ) (r := r)
+      simpa [U] using hconv.isPreconnected
+    exact ⟨U, hUopen, hUconn, hUsubΩ, hρU, h1notU, hIsoEq⟩
   · -- Nonvanishing branch: build a ball inside Ω ∩ {z ≠ 1} ∩ s
     rcases eventually_nhdsWithin_iff.mp hNe with ⟨s, hsSub, hsOpen, hρs, hNe'⟩
     have hΩopen : IsOpen Ω := by simpa [Ω, mem_setOf_eq] using isOpen_lt continuous_const Complex.continuous_re
@@ -145,7 +143,9 @@ theorem isolating_open_of_zero
           exact (this (by simpa [mem_setOf_eq] using hz.2)).elim
       · intro hz; rcases mem_singleton_iff.mp hz with rfl
         exact ⟨hρU, by simpa [mem_setOf_eq, hXiρ]⟩
-    have hUconn : IsPreconnected U := (isConnected_ball).isPreconnected
+    have hUconn : IsPreconnected U := by
+      have hconv : Convex ℝ (Metric.ball ρ r) := convex_ball (x := ρ) (r := r)
+      simpa [U] using hconv.isPreconnected
     exact ⟨U, hUopen, hUconn, hUsubΩ, hρU, h1notU, hIso⟩
 
 /-! ## Local analyticity for J and F on U \ {ρ} -/
@@ -225,6 +225,7 @@ theorem tendsto_inv_F_pinch_to_zero
     have : (F_pinch det2 O z) = (2 : ℂ) * det2 z / (O z * riemannXi_ext z) := by
       simp [F_pinch, J_pinch, div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc]
     -- Invert and simplify using nonvanishing
+    have hden_ne : (O z * riemannXi_ext z) ≠ 0 := mul_ne_zero hO_ne' hXi_ne
     calc
       (F_pinch det2 O z)⁻¹
           = ((2 : ℂ) * det2 z / (O z * riemannXi_ext z))⁻¹ := by simpa [this]
@@ -449,7 +450,9 @@ lemma shrink_ball_for_small_u_and_build_Theta
       using this
   have hΘA : AnalyticOn ℂ Θ (U' \ {ρ}) := (hMobA.congr (by intro z hz; simpa [hEqΘ z hz]))
   -- Pack and return
-  have hU'conn : IsPreconnected U' := (isConnected_ball).isPreconnected
+  have hU'conn : IsPreconnected U' := by
+    have hconv : Convex ℝ (Metric.ball ρ r) := convex_ball (x := ρ) (r := r)
+    simpa [U'] using hconv.isPreconnected
   refine ⟨U', hU'open, hU'conn, hU'subΩ, hρU', h1notU', hIso', ?_⟩
   exact ⟨hΘA, hEqΘ⟩
 
