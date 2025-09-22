@@ -2,6 +2,7 @@ import rh.RS.Cayley
 import rh.RS.OffZerosBridge
 import rh.academic_framework.CompletedXi
 import rh.academic_framework.PinchLocalHelpers
+import rh.academic_framework.HalfPlaneOuterV2
 
 /-!
 # Pinch route: unconditional removable existence and zero-arg RH entry
@@ -21,6 +22,7 @@ namespace PinchUnconditional
 
 open RH.RS
 open RH.AcademicFramework.CompletedXi
+open RH.AcademicFramework.HalfPlaneOuterV2
 open Complex Set Filter
 
 /-- Local removable existence at ξ_ext-zeros for the pinch Θ.
@@ -164,6 +166,24 @@ theorem RiemannHypothesis_from_pinch_unconditional
     simpa using hRem ρ hΩ hξ)
   -- Final export to Mathlib's RH
   exact RH.Proof.Export.RiemannHypothesis_final C
+
+/-- RH via pinch from a half-plane Poisson representation and boundary positivity
+for `F := 2 · J_pinch det2 O` on Ω (outer chosen from the modulus equality). -/
+theorem RiemannHypothesis_from_pinch_rep_and_boundary_positive
+  (hDet2 : Det2OnOmega)
+  (hOuter : OuterHalfPlane.ofModulus_det2_over_xi_ext)
+  (hRep : HasPoissonRep (F_pinch det2 (OuterHalfPlane.choose_outer hOuter)))
+  (hBoundary : BoundaryPositive (F_pinch det2 (OuterHalfPlane.choose_outer hOuter)))
+  : RiemannHypothesis := by
+  -- Transport boundary positivity into interior positivity on Ω via Poisson
+  have hPoisson : ∀ z ∈ Ω,
+      0 ≤ ((2 : ℂ) * (J_pinch det2 (OuterHalfPlane.choose_outer hOuter) z)).re := by
+    intro z hz
+    have : 0 ≤ (F_pinch det2 (OuterHalfPlane.choose_outer hOuter) z).re :=
+      poissonTransport (F := F_pinch det2 (OuterHalfPlane.choose_outer hOuter)) hRep hBoundary z hz
+    simpa [RH.AcademicFramework.HalfPlaneOuterV2.F_pinch] using this
+  -- Conclude via the Poisson-based pinch wrapper
+  exact RiemannHypothesis_from_pinch_poisson hDet2 hOuter hPoisson
 
 /-!
 Zero-argument RH via pinch from Poisson interior positivity on Ω.
