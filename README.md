@@ -10,7 +10,7 @@
     <img alt="No sorries" src="https://img.shields.io/badge/sorries-none-brightgreen" />
   </a>
   <a href="#lean-artifact-how-the-proof-is-wired">
-    <img alt="RH entry available" src="https://img.shields.io/badge/RH-entry_available-brightgreen" />
+    <img alt="RH Mathlib Unconditional" src="https://img.shields.io/badge/RH-Mathlib_unconditional-brightgreen" />
   </a>
 </p>
 
