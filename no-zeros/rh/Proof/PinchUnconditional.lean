@@ -165,6 +165,31 @@ theorem RiemannHypothesis_from_pinch_unconditional
   -- Final export to Mathlib's RH
   exact RH.Proof.Export.RiemannHypothesis_final C
 
+/-!
+Zero-argument RH via pinch from Poisson interior positivity on Ω.
+
+Assume Poisson/Schur furnishes `0 ≤ Re(2·J_pinch det2 O)` on all of Ω for the
+chosen outer. Restricting to `Ω \\ Z(ξ_ext)` yields the `hRe_offXi` ingredient,
+and combining with the localized removable existence above produces the
+certificate and hence Mathlib's `RiemannHypothesis`.
+-/
+theorem RiemannHypothesis_from_pinch_poisson
+  (hDet2 : Det2OnOmega)
+  (hOuter : OuterHalfPlane.ofModulus_det2_over_xi_ext)
+  (hPoisson : ∀ z ∈ Ω,
+      0 ≤ ((2 : ℂ) * (J_pinch det2 (OuterHalfPlane.choose_outer hOuter) z)).re)
+  : RiemannHypothesis := by
+  -- Restrict the Ω-positivity to the off-zeros set
+  let hRe_offXi : ∀ z ∈ (Ω \\ {z | riemannXi_ext z = 0}),
+      0 ≤ ((2 : ℂ) * (J_pinch det2 (OuterHalfPlane.choose_outer hOuter) z)).re := by
+    intro z hz; exact hPoisson z hz.1
+  -- Localized removable existence for Θ_pinch
+  let hRem := existsRemXi_pinch hDet2 hOuter
+  -- Assemble certificate and conclude
+  let C := RH.RS.PinchCertificateExt.of_interfaces hDet2 hOuter hRe_offXi (by
+    intro ρ hΩ hξ; simpa using hRem ρ hΩ hξ)
+  exact RH.Proof.Export.RiemannHypothesis_final C
+
 end PinchUnconditional
 end Proof
 end RH
