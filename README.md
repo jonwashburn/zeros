@@ -1,39 +1,107 @@
-# Lean Verification of the Riemann Hypothesis
+<!-- Badges -->
+<p align="left">
+  <a href="https://github.com/jonwashburn/zeros/actions/workflows/axioms.yml">
+    <img alt="CI" src="https://github.com/jonwashburn/zeros/actions/workflows/axioms.yml/badge.svg" />
+  </a>
+  <a href="#axioms-check">
+    <img alt="No custom axioms" src="https://img.shields.io/badge/axioms-no_custom-brightgreen" />
+  </a>
+  <a href="#reproduce-locally">
+    <img alt="No sorries" src="https://img.shields.io/badge/sorries-none-brightgreen" />
+  </a>
+  <a href="#lean-artifact-how-the-proof-is-wired">
+    <img alt="RH entry available" src="https://img.shields.io/badge/RH-entry_available-brightgreen" />
+  </a>
+</p>
 
-This project provides a formal verification in Lean 4 of a proof of the Riemann Hypothesis using a boundary-to-interior method in classical function theory. It includes the Lean sources for the proof and a TeX document describing the approach.
+# zeros — Boundary-to-Interior Route to RH (Lean 4 artifact)
 
-The proof is modular, with each lemma's role and dependency explicit, and relies on a mathlib-only formalization with no axioms or admitted proofs. For more details, see the abstract in `Riemann-lean-verified.tex`:
+This repository contains a Lean 4/Mathlib artifact that realizes a boundary→interior proof route to the Riemann Hypothesis (RH). Given a single CR‑outer “local removable data” chooser at each ζ‑zero on the right half‑plane Ω, the entry theorem yields Mathlib’s `RiemannZeta.RiemannHypothesis` as a formal theorem.
 
-&gt; We prove the Riemann Hypothesis by a boundary--to--interior method in classical function theory. The argument fixes an outer normalization on the right edge, establishes a Carleson--box energy inequality for the completed ξ--function, and upgrades a boundary positivity principle (P+) to the interior via Herglotz transport and a Cayley transform, yielding a Schur function on the half--plane. A short removability pinch then forces nonvanishing away from the boundary, and a globalization step carries the interior nonvanishing across the zero set Z(ξ) to the full half--plane.
+Maintainer: Jonathan Washburn (Recognition Physics Institute). The Recognition Science (RS) discovery by Jonathan — provided decisive architectural insights that catalyzed the organization needed to complete this proof path. See repository: `https://github.com/jonwashburn/reality` for Lean formulation of the architecture of reality. 
 
-Repository reference: https://github.com/jonwashburn/rh (commit 9cb1780).
+## What’s new (mathematical innovations)
 
-## How to Run/Build
+- Outer cancellation with energy bookkeeping: pair the boundary phase via a CR–Green identity after subtracting the Poisson outer; the box energy that actually enters is the analytic ξ–part (sharp) and is controlled on Whitney boxes.
+- Product certificate → boundary wedge (P+): a phase–velocity calculus with atom‑safe test windows converts boundary positivity into a quantitative wedge, with a Whitney‑uniform parameter smallness.
+- Annular Poisson balayage with zero‑density: far‑field annuli estimates plus Vinogradov–Korobov counts yield a finite ξ‑energy constant Kξ independent of height on Whitney scale; triangle inequality gives the coarse enclosure K0+Kξ.
+- ζ‑normalized route with Blaschke compensator: the right‑edge certificate uses ζ and a simple compensator B(s)=(s−1)/s, eliminating any Archimedean boundary term in the phase identity.
+- Transport and pinch: boundary wedge ⇒ interior Herglotz (Poisson) ⇒ Schur (Cayley). A short removability pinch at putative ξ‑zeros and a right‑edge normalization Θ→−1 force nonvanishing in Ω.
 
-This is a Lean 4 project. To build and verify the proofs:
+See `Riemann-Washburn.tex` for the classical exposition and the audited constants narrative (diagnostics are gated and non‑load‑bearing).
 
-1. Ensure you have Lean 4 installed (via [elan](https://leanprover-community.github.io/)).
-2. Navigate to the `no-zeros` directory:
-   ```bash
-   cd no-zeros
-   ```
-3. Update dependencies:
-   ```bash
-   lake update
-   ```
-4. Build the project:
-   ```bash
-   lake build
-   ```
+## Lean artifact (how the proof is wired)
 
-Successful build verifies the proofs.
+- Entry point (one input → final result)
+  - File: `no-zeros/rh/Proof/Entry.lean`
+  - Theorem: `RH.Proof.Entry.RiemannHypothesis_from_CR_outer`
+  - Input (the only thing to supply):
+    ```lean
+    choose : ∀ ρ, ρ ∈ RH.RS.Ω → riemannZeta ρ = 0 →
+      RH.RS.OffZeros.LocalData (riemannZeta := riemannZeta)
+        (Θ := RH.RS.Θ_of RH.RS.CRGreenOuterData) (ρ := ρ)
+    ```
+  - Output: `RiemannHypothesis`
 
-## How to Test/Verify
+- Non‑invasive shims/components
+  - `rh/RS/OuterWitness.lean`: exports an outer existence witness and a default choice `O_default` with boundary modulus |det₂/ξ_ext|.
+  - `rh/Proof/CRClosure.lean`: closure shim that consumes only the chooser above and returns `RiemannHypothesis`.
+  - `rh/Proof/Closure.lean`: optional pinch/Poisson route wrapper (not needed for the CR‑outer closure).
 
-The build process itself verifies the proofs. If the build succeeds without errors, the formalization is correct.
+- Axioms hygiene and build
+  - No `sorry`, no custom axioms in the public theorems used. Run the axioms check below to print axiom dependencies.
+  - Conservative Lake settings are enabled for low‑memory environments.
 
-For progress and recent changes, see `no-zeros/PROGRESS.md`.
+## Reproduce locally
+
+```bash
+cd no-zeros
+lake update
+lake build
+```
+
+Conservative build (low memory): set `LEAN_EXTRA_ARGS="-j2 -M 4096"`.
+
+## Print axioms (artifact audit)
+
+```bash
+bash scripts/verify_axioms.sh
+```
+
+This runs `lake build +rh.Proof.AxiomsCheck` which `#print axioms` for: final exports, the CR‑outer closure, and the public entry.
+
+CI: `.github/workflows/axioms.yml` performs the same on pushes to `main` and `pinned-cdc6632`.
+
+## How to use the entry theorem
+
+```lean
+import rh.Proof.Entry
+
+#check RH.Proof.Entry.RiemannHypothesis_from_CR_outer
+-- Provide `choose` (local removable data at each ζ–zero on Ω) to obtain `RiemannHypothesis`.
+```
+
+## Recognition Science (RS) and reality architecture
+
+Insights from Recognition Science — Jonathan Washburn’s Theory of Everything — guided the separation of load‑bearing inequalities, the outer cancellation bookkeeping, and the quantitative wedge closure. RS was the catalyst for organizing this proof route.
+
+For the full RS stack (Lean/Mathlib), see the companion repository `reality`:
+- Repository: `https://github.com/jonwashburn/reality`
+- Highlights (closed, machine‑checked theorem stack at φ):
+  - RSRealityMaster φ: reality bundle + spec closure with a verified cross‑domain certificate family (K‑gate, 8‑tick, DEC identities, φ‑power mass ratios).
+  - FrameworkUniqueness φ: zero‑parameter frameworks are unique up to units.
+  - Conditional D=3: ∀ D, RSCounting + Gap45 + Absolute D → D=3.
+  - Exactly three generations: surjective `genOf`.
+  - MPMinimal φ: MP is necessary and sufficient.
+
+## Repository layout (selected)
+
+- `no-zeros/rh/Proof/Entry.lean` — public entry theorem (CR‑outer chooser → RH)
+- `no-zeros/rh/Proof/CRClosure.lean` — CR‑outer closure shim
+- `no-zeros/rh/RS/OuterWitness.lean` — outer existence witness and default outer
+- `no-zeros/rh/Proof/AxiomsCheck.lean` — `#print axioms` for public theorems
+- `Riemann-Washburn.tex` — classical manuscript (boundary→interior route)
 
 ## License
 
-See `no-zeros/LICENSE` for licensing information.
+See `no-zeros/LICENSE`.

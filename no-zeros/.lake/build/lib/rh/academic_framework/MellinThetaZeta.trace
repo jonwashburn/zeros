@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/academic_framework/MellinThetaZeta.lean -R ./././. -o ././.lake/build/lib/rh/academic_framework/MellinThetaZeta.olean -i ././.lake/build/lib/rh/academic_framework/MellinThetaZeta.ilean -c ././.lake/build/ir/rh/academic_framework/MellinThetaZeta.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/academic_framework/MellinThetaZeta.lean -R ./././. -o ././.lake/build/lib/rh/academic_framework/MellinThetaZeta.olean -i ././.lake/build/lib/rh/academic_framework/MellinThetaZeta.ilean -c ././.lake/build/ir/rh/academic_framework/MellinThetaZeta.c --json",
    "level": "trace"},
   {"message":
    "././././rh/academic_framework/MellinThetaZeta.lean:49:2: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
@@ -8,4 +8,4 @@
   {"message":
    "././././rh/academic_framework/MellinThetaZeta.lean:44:13: unused variable `hs`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "6619835857060922023"}
+ "depHash": "10678655058431206813"}

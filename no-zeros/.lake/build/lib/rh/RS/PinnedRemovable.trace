@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/PinnedRemovable.lean -R ./././. -o ././.lake/build/lib/rh/RS/PinnedRemovable.olean -i ././.lake/build/lib/rh/RS/PinnedRemovable.ilean -c ././.lake/build/ir/rh/RS/PinnedRemovable.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/RS/PinnedRemovable.lean -R ./././. -o ././.lake/build/lib/rh/RS/PinnedRemovable.olean -i ././.lake/build/lib/rh/RS/PinnedRemovable.ilean -c ././.lake/build/ir/rh/RS/PinnedRemovable.c --json",
    "level": "trace"},
   {"message":
    "././././rh/RS/PinnedRemovable.lean:129:23: unused variable `hUo`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
@@ -11,4 +11,4 @@
   {"message":
    "././././rh/RS/PinnedRemovable.lean:129:65: unused variable `hwne`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "12941695744967806808"}
+ "depHash": "1917071693222792488"}

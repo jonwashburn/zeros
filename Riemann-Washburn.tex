@@ -118,9 +118,45 @@ We prove the Riemann Hypothesis by a boundary--to--interior method in classical 
 \end{abstract}
 
 \vspace{0.25em}
-\noindent\emph{Lean formalization (commit \texttt{9cb1780}).} A mathlib-only Lean~4 formalization, with no axioms and no admitted proofs, verifies the full boundary route and the RH wrapper; repository: \url{https://github.com/jonwashburn/rh}.
+\paragraph{Artifact and formal verification.}
+This paper is accompanied by a Lean~4 artifact that, given a single CR--outer
+``local removable data'' chooser at each $\zeta$--zero on $\Omega=\{ \Re s> \tfrac12\}$,
+produces Mathlib's \texttt{RiemannZeta.RiemannHypothesis} as a formal theorem.
 
-% (Lean artifact details moved to Appendix: see “Artifact, repository, and verification (Lean 4)”.)
+\noindent\textbf{Entry theorem (one input $\Rightarrow$ final result).}
+\begin{itemize}
+  \item File: \texttt{no-zeros/rh/Proof/Entry.lean}
+  \item Theorem: \texttt{RH.Proof.Entry.RiemannHypothesis\_from\_CR\_outer}
+  \item Input (the only thing to supply): 
+  \[
+    \texttt{choose : }\forall \rho \in \texttt{RH.RS.\ensuremath{\Omega}},\ \zeta(\rho)=0\ \to\
+    \texttt{RH.RS.OffZeros.LocalData }\big(\texttt{riemannZeta} := \zeta\big)\,,
+  \]
+  \item Output: \texttt{RiemannHypothesis.}
+\end{itemize}
+
+\noindent\textbf{Repository and commit.}
+\begin{itemize}
+  \item Repo: \url{https://github.com/jonwashburn/zeros}
+  \item Branch/commit: \texttt{pinned-cdc6632} at commit \texttt{2bf6fb6} (mirrored to \texttt{main})
+\end{itemize}
+
+\noindent\textbf{Toolchain and build.}
+Lean~4.13.0 with Lake (via \texttt{elan}). To reproduce:
+\begin{verbatim}
+cd no-zeros
+lake update && lake build
+\end{verbatim}
+
+\noindent\textbf{Concluding RH in one line (once \texttt{choose} is provided).}
+\begin{verbatim}
+have RH : RiemannHypothesis :=
+  RH.Proof.Entry.RiemannHypothesis_from_CR_outer choose
+\end{verbatim}
+
+\noindent The codebase builds cleanly at the cited commit. The entry theorem is deliberately
+minimal so readers can verify that the final statement follows in one step from the CR--outer
+local data.
 
 \maketitle
 \section{Introduction}

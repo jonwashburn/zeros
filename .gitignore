@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Lake/Lean build artifacts (project-local)
+no-zeros/.lake/
+no-zeros/.lake/build/
+no-zeros/build/
+
+# Node/npm/pnpm
+node_modules/
+**/node_modules/
+
