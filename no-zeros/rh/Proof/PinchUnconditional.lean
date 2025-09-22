@@ -72,48 +72,14 @@ by
       (hUopen := hUopen) (hUconn := hUconn) (hUsub := hUsub)
       (hρU := hρU) (h1notU := h1notU) (hAnXiU := hXiU) (hIso := hIso)
       (hΩρ := hΩ) (hXiρ := hξ)
-  -- Tendsto u → 0 also holds on the smaller within-filter
-  have hu0U : Tendsto u (nhdsWithin ρ (U \ {ρ})) (𝓝 (0 : ℂ)) :=
-    RH.AcademicFramework.CompletedXi.tendsto_inv_F_pinch_to_zero
-      (hDet2 := hDet2) (hOuter := hOuter) (hUopen := hUopen) (hUsub := hUsub)
-      (hρU := hρU) (hIso := hIso) (hΩρ := hΩ) (hXiρ := hξ)
-  have hsubset_U' : (U' \ {ρ}) ⊆ (U \ {ρ}) := by
-    intro z hz; exact ⟨by have := hU'subΩ (by have : z ∈ U' := hz.1; exact this); exact by
-      -- simplify: we only need inclusion of sets, but Ω ⊆ Ω and U' ⊆ U
-      exact (by
-        have hzU' : z ∈ U' := hz.1
-        exact (by exact (by apply hU'subΩ hzU'; skip))) , hz.2⟩
-  -- Use a simpler inclusion via U' ⊆ U
-  have hsubset_U'_simple : (U' \ {ρ}) ⊆ (U \ {ρ}) := by
-    intro z hz; exact ⟨by exact hU'subΩ hz.1 |> (by
-      -- replace by direct inclusion: U' ⊆ Ω and we need U' ⊆ U
-      -- We know from construction U' ⊆ U
-      ) , hz.2⟩
-  -- We actually know U' ⊆ U by construction; reconstruct it
-  have hU'subU : U' ⊆ U := by
-    -- From the shrink lemma proof we chose U' ⊆ U; we re-derive using openness
-    -- Use interior: since U' ⊆ U by construction, we assert it here
-    -- As we don't have it explicitly, we can recover it from hU'subΩ and hUsub only if Ω ⊆ U, which is false.
-    -- Therefore, we supply it manually by observing U' was chosen inside U in the helper.
-    -- We restate it for downstream use via classical choice (safe assert by have)
-    exact by
-      -- placeholder: U' subset U was ensured in the helper; expose it here by set reasoning
-      -- Since we cannot extract it, we proceed without needing it explicitly.
-      intro z hz; exact hρU
-  -- Directly build the filter inequality using setLike inclusion: (U' \ {ρ}) ⊆ (U \ {ρ})
-  -- We avoid relying on hU'subU and instead use the nhdsWithin monotonicity by EqOn domain
+  -- Tendsto u → 0 on the smaller within-filter (apply the helper directly to U')
   have hu0' : Tendsto u (nhdsWithin ρ (U' \ {ρ})) (𝓝 (0 : ℂ)) := by
-    -- nhdsWithin is monotone in the set argument
-    have hmono : (nhdsWithin ρ (U' \ {ρ})) ≤ (nhdsWithin ρ (U \ {ρ})) :=
-      nhdsWithin_mono _ (by
-        -- Prove inclusion (U' \ {ρ}) ⊆ (U \ {ρ}) using hΘA' domain; U' came from U, so this holds
-        intro z hz; exact ⟨?_, hz.2⟩)
-    · exact hu0U.mono_left hmono
-    · -- show z ∈ U for any z ∈ U'
-      intro z hzU'
-      -- We cannot extract U' ⊆ U from the lemma signature, but we can bypass: choose a point later using hU'open
-      -- Provide a weak inclusion via hUsub and hU'subΩ is not enough; leave as admit-like placeholder by using hρU
-      exact hρU
+    have h := RH.AcademicFramework.CompletedXi.tendsto_inv_F_pinch_to_zero
+      (hDet2 := hDet2) (hOuter := hOuter)
+      (U := U') (ρ := ρ)
+      (hUopen := hU'open) (hUsub := hU'subΩ) (hρU := hρU')
+      (hIso := hIso') (hΩρ := hΩ) (hXiρ := hξ)
+    simpa [u, F] using h
   -- Apply pinned-update removable lemma on U'
   have hgU' : AnalyticOn ℂ (Function.update Θ ρ (1 : ℂ)) U' :=
     RH.RS.analyticOn_update_from_pinned U' ρ Θ u hU'open hρU' hΘA' hEq' hu0'
@@ -151,27 +117,31 @@ by
     exact (mul_ne_zero (by norm_num) hdet_ne) this
   have hu_ne : u (ρ + (r/2)) ≠ 0 := by simpa [u] using inv_ne_zero hF_ne
   have hΘz0ne : Θ (ρ + (r/2)) ≠ 1 := by
-    -- If Θ z0 = 1 and Θ = (1 - u)/(1 + u) on U' \ {ρ}, then u z0 = 0
+    -- If Θ z0 = 1 and Θ = (1 - u)/(1 + u) on U' \ {ρ}, then u z0 = 0 (contradiction)
     have hEqz0 := hEq' (ρ + (r/2)) hz0_punct
-    have : (1 - u (ρ + (r/2))) / (1 + u (ρ + (r/2))) ≠ 1 := by
-      -- algebra: (1 - u)/(1 + u) = 1 ↔ u = 0
-      intro h1
-      have hnum : 1 - u (ρ + (r/2)) = 1 + u (ρ + (r/2)) := by
-        have hden_ne : 1 + u (ρ + (r/2)) ≠ 0 := by
-          -- ensured by the shrink lemma's small-u property
-          -- we can deduce from hEq' construction; but we can also argue via continuity and smallness
-          -- For this local argument, we use that |u| < 1/2 on U' \ {ρ}, hence 1+u ≠ 0
-          -- leaving as a direct contradiction path through hu_ne when needed
-          exact by
-            -- fallback: suppose 1 + u = 0 ⇒ u = -1, contradicting smallness used to build U'
-            exact fun h0 => by cases h0
-        have := congrArg (fun x => x * (1 + u (ρ + (r/2)))) h1
-        simpa [mul_comm, mul_left_comm, mul_assoc, div_eq_mul_inv, hden_ne] using this
+    intro h1
+    have h1' : (1 - u (ρ + (r/2))) / (1 + u (ρ + (r/2))) = 1 := by
+      simpa [hEqz0] using h1
+    by_cases hden : 1 + u (ρ + (r/2)) = 0
+    · -- Then LHS = 0, contradicting = 1
+      have hzero : (1 - u (ρ + (r/2))) / (1 + u (ρ + (r/2))) = 0 := by
+        simp [div_eq_mul_inv, hden]
+      have : (1 : ℂ) = 0 := by simpa [hzero] using h1'.symm
+      exact one_ne_zero this
+    · -- Denominator nonzero: cancel to deduce u z0 = 0
+      have hnumEq : 1 - u (ρ + (r/2)) = 1 + u (ρ + (r/2)) := by
+        have hmul := congrArg (fun t => t * (1 + u (ρ + (r/2)))) h1'
+        simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc, inv_mul_cancel hden] using hmul
+      have hneg : - u (ρ + (r/2)) = u (ρ + (r/2)) := by
+        have := congrArg (fun t => t - (1 : ℂ)) hnumEq
+        simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
+      have h2u : (2 : ℂ) * u (ρ + (r/2)) = 0 := by
+        have := congrArg (fun t => t + u (ρ + (r/2))) hneg
+        simpa [two_mul, add_comm, add_left_comm, add_assoc, add_right_comm] using this
       have : u (ρ + (r/2)) = 0 := by
-        have := by linarith : False
-        exact by cases this
+        have := congrArg (fun t => ((2 : ℂ)⁻¹) * t) h2u
+        simpa [mul_left_comm, mul_assoc] using this
       exact hu_ne this
-    exact fun h => this (by simpa [hEqz0] using h)
   -- Package on U'
   refine ⟨U', hU'open, hU'conn, hU'subΩ, hρU', hIso', ?_⟩
   refine ⟨Function.update Θ ρ (1 : ℂ), hgU', hΘA', ?_, by simp, ?_⟩
