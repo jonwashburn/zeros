@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/CRGreenOuter.lean -R ./././. -o ././.lake/build/lib/rh/RS/CRGreenOuter.olean -i ././.lake/build/lib/rh/RS/CRGreenOuter.ilean -c ././.lake/build/ir/rh/RS/CRGreenOuter.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/RS/CRGreenOuter.lean -R ./././. -o ././.lake/build/lib/rh/RS/CRGreenOuter.olean -i ././.lake/build/lib/rh/RS/CRGreenOuter.ilean -c ././.lake/build/ir/rh/RS/CRGreenOuter.c --json",
    "level": "trace"},
   {"message":
    "././././rh/RS/CRGreenOuter.lean:60:7: unused variable `hsum`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
@@ -80,4 +80,4 @@
   {"message":
    "././././rh/RS/CRGreenOuter.lean:922:4: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"}],
- "depHash": "11756027293457786210"}
+ "depHash": "16051066794000443096"}

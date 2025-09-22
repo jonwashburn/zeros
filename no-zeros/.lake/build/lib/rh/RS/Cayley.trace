@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/Cayley.lean -R ./././. -o ././.lake/build/lib/rh/RS/Cayley.olean -i ././.lake/build/lib/rh/RS/Cayley.ilean -c ././.lake/build/ir/rh/RS/Cayley.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/RS/Cayley.lean -R ./././. -o ././.lake/build/lib/rh/RS/Cayley.olean -i ././.lake/build/lib/rh/RS/Cayley.ilean -c ././.lake/build/ir/rh/RS/Cayley.c --json",
    "level": "trace"},
   {"message":
    "././././rh/RS/Cayley.lean:128:16: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
@@ -26,4 +26,4 @@
   {"message":
    "././././rh/RS/Cayley.lean:274:3: unused variable `hDet2`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "908039115165141086"}
+ "depHash": "16728908112903933257"}

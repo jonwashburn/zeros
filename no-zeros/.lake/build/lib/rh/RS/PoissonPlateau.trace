@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/PoissonPlateau.lean -R ./././. -o ././.lake/build/lib/rh/RS/PoissonPlateau.olean -i ././.lake/build/lib/rh/RS/PoissonPlateau.ilean -c ././.lake/build/ir/rh/RS/PoissonPlateau.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/RS/PoissonPlateau.lean -R ./././. -o ././.lake/build/lib/rh/RS/PoissonPlateau.olean -i ././.lake/build/lib/rh/RS/PoissonPlateau.ilean -c ././.lake/build/ir/rh/RS/PoissonPlateau.c --json",
    "level": "trace"},
   {"message":
    "././././rh/RS/PoissonPlateau.lean:87:7: unused variable `hμS`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
@@ -47,4 +47,4 @@
   {"message":
    "././././rh/RS/PoissonPlateau.lean:590:42: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"}],
- "depHash": "9510456294358049928"}
+ "depHash": "4551529348658450168"}

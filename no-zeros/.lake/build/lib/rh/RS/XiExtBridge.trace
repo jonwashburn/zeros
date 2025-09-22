@@ -1,6 +1,6 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false ././././rh/RS/XiExtBridge.lean -R ./././. -o ././.lake/build/lib/rh/RS/XiExtBridge.olean -i ././.lake/build/lib/rh/RS/XiExtBridge.ilean -c ././.lake/build/ir/rh/RS/XiExtBridge.c --json",
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH= /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.13.0/bin/lean -Dpp.unicode.fun=true -Dpp.proofs.withType=false -DautoImplicit=false -DrelaxedAutoImplicit=false -j2 -M 6144 ././././rh/RS/XiExtBridge.lean -R ./././. -o ././.lake/build/lib/rh/RS/XiExtBridge.olean -i ././.lake/build/lib/rh/RS/XiExtBridge.ilean -c ././.lake/build/ir/rh/RS/XiExtBridge.c --json",
    "level": "trace"},
   {"message":
    "././././rh/RS/XiExtBridge.lean:145:4: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
@@ -26,4 +26,4 @@
   {"message":
    "././././rh/RS/XiExtBridge.lean:156:9: unused variable `hzIn`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "11746594853442723968"}
+ "depHash": "6530183858150333154"}
