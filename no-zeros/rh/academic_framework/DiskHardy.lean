@@ -65,13 +65,20 @@ HasDiskPoissonRepresentation_of_data (F := F) hA hI hEq
 
 /-! Statement-level placeholders retained for API compatibility. -/
 /-- Prop-level: a.e. boundary nonnegativity for Re F on ∂𝔻. -/
-def PPlusOnCircle (F : ℂ → ℂ) : Prop := True
+def PPlusOnCircle (F : ℂ → ℂ) : Prop :=
+  ∀ᵐ θ : ℝ, 0 ≤ (F (boundary θ)).re
 
-/-- Prop-level: positivity transport on 𝔻 from boundary a.e. nonnegativity. -/
-def DiskPoissonTransport (F : ℂ → ℂ) : Prop := True
+/-- Prop-level: Poisson transport on 𝔻 expressed via the existence of a Poisson
+real-part representation on the unit disk. -/
+def DiskPoissonTransport (F : ℂ → ℂ) : Prop :=
+  HasDiskPoissonRepresentation F
 
-/-- Prop-level: disk outer existence with prescribed boundary modulus. -/
-def ExistsDiskOuterWithBoundaryModulus (F : ℂ → ℂ) : Prop := True
+/-- Prop-level: existence of a disk outer with prescribed boundary modulus
+along the unit circle parametrized by `θ ↦ e^{iθ}`. -/
+def ExistsDiskOuterWithBoundaryModulus (F : ℂ → ℂ) : Prop :=
+  ∃ O : ℂ → ℂ,
+    AnalyticOn ℂ O unitDisk ∧
+    (∀ θ : ℝ, Complex.abs (O (boundary θ)) = Complex.abs (F (boundary θ)))
 
 end DiskHardy
 end AcademicFramework
