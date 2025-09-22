@@ -232,7 +232,7 @@ theorem tendsto_inv_F_pinch_to_zero
             field_simp [div_eq_mul_inv, hO_ne', hXi_ne, hDet2_ne']
   -- `v` is continuous at ρ and `v ρ = 0`, hence `v → 0` on any within-filter
   have hΩopen : IsOpen Ω := by simpa [Ω, mem_setOf_eq] using isOpen_lt continuous_const Complex.continuous_re
-  have hWithinO : ContinuousWithinAt O Ω ρ := (AnalyticOn.continuousOn hO.analytic).continuousWithinAt hΩρ
+  have hWithinO : ContinuousWithinAt O Ω ρ := (AnalyticOn.continuousOn hO.analytic) hΩρ
   have hcontO : ContinuousAt O ρ := (continuousWithinAt_iff_continuousAt (hΩopen.mem_nhds hΩρ)).1 hWithinO
   have hcontXi : ContinuousAt riemannXi_ext ρ := by
     -- Use differentiability at ρ to get continuity
@@ -242,7 +242,7 @@ theorem tendsto_inv_F_pinch_to_zero
     have hρ_ne1 : ρ ≠ 1 := by intro h; exact xi_ext_nonzero_at_one (by simpa [h] using hXiρ)
     have : DifferentiableAt ℂ completedRiemannZeta ρ := diffAt_completedZeta hρ_ne0 hρ_ne1
     simpa [riemannXi_ext] using this.continuousAt
-  have hWithinDet2 : ContinuousWithinAt det2 Ω ρ := (AnalyticOn.continuousOn hDet2.analytic).continuousWithinAt hΩρ
+  have hWithinDet2 : ContinuousWithinAt det2 Ω ρ := (AnalyticOn.continuousOn hDet2.analytic) hΩρ
   have hcontDet2 : ContinuousAt det2 ρ :=
     (continuousWithinAt_iff_continuousAt (hΩopen.mem_nhds hΩρ)).1 hWithinDet2
   have hcont_v : ContinuousAt v ρ := by
@@ -259,38 +259,6 @@ theorem tendsto_inv_F_pinch_to_zero
   have hEq_ev : (fun z => (F_pinch det2 O z)⁻¹) =ᶠ[nhdsWithin ρ (U \ {ρ})] v :=
     Set.EqOn.eventuallyEq_nhdsWithin (s := U \ {ρ}) hEq_on
   exact hv_within.congr' hEq_ev.symm
-
-/-! ## A simple nontriviality witness -/
-
-theorem nontrivial_point_for_pinch
-  {Θ : ℂ → ℂ} (U : Set ℂ) (hUopen : IsOpen U) {ρ : ℂ} (hρU : ρ ∈ U) :
-  ∃ z0, z0 ∈ U ∧ z0 ≠ ρ ∧ Θ z0 ≠ 1 := by
-  classical
-  -- Use openness of U to pick a small ball around ρ
-  have hU_nhds : U ∈ 𝓝 ρ := hUopen.mem_nhds hρU
-  rcases Metric.mem_nhds_iff.1 hU_nhds with ⟨r, hrpos, hball⟩
-  have hz0_in : (ρ + (r/2)) ∈ Metric.ball ρ r := by
-    have : dist (ρ + (r/2)) ρ = |r/2| := by simp [dist_eq, sub_eq_add_neg]
-    have : dist (ρ + (r/2)) ρ < r := by simpa [this] using (half_lt_self hrpos)
-    simpa [Metric.mem_ball] using this
-  refine ⟨ρ + (r/2), hball hz0_in, ?_, ?_⟩
-  · intro h; have : (r/2) = 0 := by simpa [h] using add_right_cancel (a := ρ) (b := ρ + (r/2)) (c := ρ)
-    exact (ne_of_gt (half_pos hrpos)) this
-  · -- if `Θ (ρ + r/2) = 1` pick a second symmetric point; one of them differs from 1
-    by_cases h1 : Θ (ρ + (r/2)) = 1
-    · -- symmetric point
-      have hz1_in : (ρ - (r/2)) ∈ Metric.ball ρ r := by
-        have : dist (ρ - (r/2)) ρ = |r/2| := by simp [dist_eq, add_comm, sub_eq_add_neg]
-        have : dist (ρ - (r/2)) ρ < r := by simpa [this] using (half_lt_self hrpos)
-        simpa [Metric.mem_ball] using this
-      refine ?_
-      refine Exists.intro (ρ - (r/2)) ?_
-      refine And.intro (hball hz1_in) ?_
-      refine And.intro (by intro h; exact (ne_of_gt (half_pos hrpos)) (by simpa [h, add_comm, sub_eq_add_neg])) ?_
-      by_cases h2 : Θ (ρ - (r/2)) = 1
-      · exact by simpa [h2]
-      · exact h2
-    · exact h1
 
 /-!
 ## Shrinking the isolating ball to control the u-denominator and build Θ analyticity
@@ -336,9 +304,14 @@ lemma shrink_ball_for_small_u_and_build_Theta
       (hΩρ := hΩρ) (hXiρ := hXiρ)
   -- Extract an open `S` with ρ ∈ S ⊆ U ensuring |u| < 1/2 on S \ {ρ}
   have hSmall_ev : ∀ᶠ z in nhdsWithin ρ (U \ {ρ}), Complex.abs ((F_pinch det2 O z)⁻¹) < (1/2 : ℝ) := by
-    have : Metric.ball (0 : ℂ) (1/2 : ℝ) ∈ 𝓝 (0 : ℂ) := by
-      simpa using (isOpen_ball.mem_nhds (by norm_num : (0 : ℂ) ∈ Metric.ball (0 : ℂ) (1/2 : ℝ)))
-    exact hu0 this
+    -- Construct an open neighborhood around 0 and pull back via hu0
+    refine hu0 (by
+      -- Metric.ball 0 (1/2) is a neighborhood of 0
+      have : Metric.ball (0 : ℂ) (1/2 : ℝ) ∈ 𝓝 (0 : ℂ) := by
+        exact Metric.ball_mem_nhds (by norm_num)
+      -- convert to the set formulation for Complex.abs < 1/2
+      -- use that abs z < r ↔ z ∈ ball 0 r
+      simpa [Metric.mem_ball, Complex.dist_eq] using this)
   rcases eventually_nhdsWithin_iff.mp hSmall_ev with ⟨S, hSsub, hSopen, hρS, hSmall⟩
   -- Intersect S with U to keep subset of Ω and avoid 1, then pick a small ball inside
   have hSn : S ∈ 𝓝 ρ := hSopen.mem_nhds hρS
