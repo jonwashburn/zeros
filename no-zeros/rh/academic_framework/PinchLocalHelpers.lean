@@ -40,10 +40,10 @@ private lemma xi_ext_nonzero_at_one : riemannXi_ext 1 ≠ 0 := by
   change completedRiemannZeta 1 = 0 at hΛ
   have hζdef : riemannZeta 1 = completedRiemannZeta 1 / Complex.Gammaℝ 1 :=
     riemannZeta_def_of_ne_zero (s := (1 : ℂ)) one_ne_zero
-  have : riemannZeta 1 = 0 := by
+  have hζ0 : riemannZeta 1 = 0 := by
     rw [hζdef, hΛ]
     simp
-  exact riemannZeta_one_ne_zero this
+  exact riemannZeta_one_ne_zero hζ0
 
 /-! ## Local analyticity on open sets avoiding 1 -/
 
@@ -88,34 +88,48 @@ theorem isolating_open_of_zero
     simpa [riemannXi_ext] using hΛ
   -- Isolated zeros: use eventual nonvanishing to isolate ρ
   rcases (AnalyticAt.eventually_eq_zero_or_eventually_ne_zero (f := riemannXi_ext) (z₀ := ρ) hAnAt)
-    with _hAll | hNe
-  · -- Fallback branch: choose a small ball in Ω avoiding 1
-    have hΩopen : IsOpen Ω := by simpa [Ω, mem_setOf_eq] using isOpen_lt continuous_const Complex.continuous_re
-    have hNopen : IsOpen ({z : ℂ | z ≠ 1}) := isOpen_ne
-    have hρN : ρ ∈ {z : ℂ | z ≠ 1} := by intro h; exact ρ_ne1 h
-    let T : Set ℂ := Ω ∩ {z : ℂ | z ≠ 1}
-    have hTopen : IsOpen T := hΩopen.inter hNopen
-    have hρT : ρ ∈ T := ⟨hΩρ, hρN⟩
-    have hT_nhds : T ∈ 𝓝 ρ := hTopen.mem_nhds hρT
-    rcases Metric.mem_nhds_iff.1 hT_nhds with ⟨r, hrpos, hball_sub_T⟩
-    let U : Set ℂ := Metric.ball ρ r
-    have hUopen : IsOpen U := Metric.isOpen_ball
-    have hρU : ρ ∈ U := by simpa [U, Metric.mem_ball, dist_self] using hrpos
-    have hUsubΩ : U ⊆ Ω := by intro z hz; exact (hball_sub_T hz).1
-    have h1notU : (1 : ℂ) ∉ U := by intro h1U; exact (hball_sub_T h1U).2 rfl
-    -- For isolation property: in this branch we only assert inclusion of {ρ}
-    -- and defer the full equality to the nonvanishing branch below (we will shrink anyway).
-    have hIso : (U ∩ {z | riemannXi_ext z = 0}) ⊆ ({ρ} : Set ℂ) := by
-      intro z hz; exact by simpa using (mem_singleton (ρ))
-    have hIsoEq : (U ∩ {z | riemannXi_ext z = 0}) = ({ρ} : Set ℂ) := by
-      apply le_antisymm
-      · exact hIso
-      · intro z hz; rcases mem_singleton_iff.1 hz with rfl; exact ⟨hρU, by simpa [mem_setOf_eq, hXiρ]⟩
-    have hUconn : IsPreconnected U := by
-      -- Use the standard result: metric balls in a normed vector space are convex, hence preconnected
-      have hconv : Convex ℝ (Metric.ball ρ r) := convex_ball (x := ρ) (r := r)
-      simpa [U] using hconv.isPreconnected
-    exact ⟨U, hUopen, hUconn, hUsubΩ, hρU, h1notU, hIsoEq⟩
+    with hAll | hNe
+  · -- Identity theorem eliminates this branch: Λ cannot vanish on a neighborhood in ℂ \ {0,1}
+    -- Extract an open neighborhood `s` of ρ on which Λ = 0
+    rcases eventually_nhds_iff.1 hAll with ⟨s, hsSub, hsOpen, hρs, hZero⟩
+    -- Intersect with S := {z ≠ 0 ∧ z ≠ 1} to avoid singularities
+    let S : Set ℂ := {z : ℂ | z ≠ 0 ∧ z ≠ 1}
+    have hSopen : IsOpen S := isOpen_ne.inter isOpen_ne
+    have hρS : ρ ∈ S := by exact ⟨by simpa using ρ_ne0, by simpa using ρ_ne1⟩
+    -- Analyticity of Λ on S
+    have hAnalS : AnalyticOn ℂ riemannXi_ext S := by
+      refine (analyticOn_iff_differentiableOn (f := riemannXi_ext) (s := S) hSopen).2 ?_
+      intro z hz
+      have : DifferentiableAt ℂ completedRiemannZeta z := diffAt_completedZeta hz.1 hz.2
+      simpa [riemannXi_ext] using this.differentiableWithinAt
+    -- The zero set contains a nonempty open subset of S (namely s ∩ S)
+    have hOpenInS : IsOpen (s ∩ S) := hsOpen.inter hSopen
+    have hNonempty : (s ∩ S).Nonempty := ⟨ρ, hρs, hρS⟩
+    -- On s, Λ = 0, hence on s ∩ S, Λ = 0
+    have hEqOn : EqOn riemannXi_ext (fun _ => (0 : ℂ)) (s ∩ S) := by
+      intro z hz; exact hZero (hsSub hz.1)
+    -- Apply the identity theorem on the preconnected set S: if analytic and equal on a nonempty open
+    -- subset, they are equal on S. We use the `eqOn_of_preconnected_of_frequently_eq` helper by
+    -- upgrading the open equality to a frequent equality at ρ.
+    have hSconn : IsPreconnected S := by
+      -- S = ℂ \ {0,1} is path-connected, hence preconnected (standard in mathlib)
+      -- We use the convexity of lines to connect any two points avoiding the two excluded points
+      -- Provided by mathlib as a library lemma
+      simpa using isPreconnected_univ.compl_finite (s := ({0, (1:ℂ)} : Finset ℂ).toSet)
+    have hEqOnS : EqOn riemannXi_ext (fun _ => (0 : ℂ)) S := by
+      -- Use analytic identity theorem packaged for EqOn on preconnected sets
+      refine AnalyticOn.eqOn_of_preconnected_of_eqOn_isOpen hAnalS (analyticOn_const : AnalyticOn ℂ (fun _ => (0:ℂ)) S) hSconn ?_ hEqOn
+      exact hOpenInS
+    -- Specialize at 2 ∈ S to get Λ(2) = 0, contradiction
+    have h2S : (2 : ℂ) ∈ S := by simp [S, mem_setOf_eq]
+    have : riemannXi_ext 2 = 0 := hEqOnS h2S
+    -- But Λ(2) ≠ 0
+    have : completedRiemannZeta 2 = 0 := by simpa [riemannXi_ext] using this
+    -- Use ζ(2) ≠ 0 and Γℝ(2) ≠ 0 to contradict Λ(2) = 0 via ζ = Λ / Γℝ
+    have hζdef : riemannZeta 2 = completedRiemannZeta 2 / Complex.Gammaℝ 2 :=
+      riemannZeta_def_of_ne_zero (s := (2 : ℂ)) (by norm_num)
+    have : riemannZeta 2 = 0 := by simpa [hζdef, this]
+    exact (riemannZeta_two_ne_zero) this
   · -- Nonvanishing branch: build a ball inside Ω ∩ {z ≠ 1} ∩ s
     rcases eventually_nhdsWithin_iff.mp hNe with ⟨s, hsSub, hsOpen, hρs, hNe'⟩
     have hΩopen : IsOpen Ω := by simpa [Ω, mem_setOf_eq] using isOpen_lt continuous_const Complex.continuous_re
