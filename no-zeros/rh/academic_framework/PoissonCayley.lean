@@ -145,57 +145,15 @@ theorem hReEq_on_of_halfplane_rep_on (F : ℂ → ℂ) {S : Set ℂ}
 
 -- Pinch specialization (ext): if the pinch field admits a half-plane Poisson
 -- representation on Ω, then the real-part identity holds on the off-zeros subset `S`.
-theorem hReEq_pinch_ext_of_rep_on_offZeros
+theorem hReEq_pinch_ext_of_halfplane_rep
   (det2 O : ℂ → ℂ)
-  (hRepOn : HasPoissonRepOn (F_pinch det2 O)
-              (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0})) :
+  (hRep : HasPoissonRep (F_pinch det2 O)) :
   HasHalfPlanePoissonReEqOn_pinch_ext det2 O := by
   intro z hz
-  exact hRepOn.formula z hz
-
-/-- From a real-part identity on the off-zeros subset and boundary positivity, get
-interior nonnegativity for the pinch field on the off-zeros subset. -/
-theorem pinch_interior_nonneg_from_reEqOn
-  (det2 O : ℂ → ℂ)
-  (hReEqOn : HasHalfPlanePoissonReEqOn_pinch_ext det2 O)
-  (hPPlus : BoundaryPositive (F_pinch det2 O)) :
-  ∀ z ∈ (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
-    0 ≤ ((F_pinch det2 O z).re) := by
-  intro z hz
-  have hzΩ : z ∈ Ω := hz.1
-  -- Use the real-part identity to rewrite and apply nonnegativity of kernel and boundary
-  have hformula : (F_pinch det2 O z).re
+  have : (F_pinch det2 O z).re
       = poissonIntegral (fun t : ℝ => (F_pinch det2 O (boundary t)).re) z :=
-    hReEqOn z hz
-  -- Conclude nonnegativity of the Poisson integral from boundary positivity and kernel ≥ 0
-  have : 0 ≤ poissonIntegral (fun t : ℝ => (F_pinch det2 O (boundary t)).re) z := by
-    apply integral_nonneg_of_ae
-    filter_upwards [hPPlus] with t ht
-    exact mul_nonneg ht (poissonKernel_nonneg hzΩ t)
-  have hn : 0 ≤ ((F_pinch det2 O z).re) := by
-    simpa [hformula.symm] using this
-  exact hn
-
-/-- RS-facing bridge: with an outer existence, a subset Poisson representation
-for `F_pinch` on the off-zeros set, and boundary positivity, obtain the RS-style
-interior nonnegativity on the off-zeros set. -/
-theorem hPoisson_nonneg_for_pinch_ext
-  (hOuter : ∃ O : ℂ → ℂ, RH.RS.OuterHalfPlane O ∧
-      RH.RS.BoundaryModulusEq O (fun s => RH.RS.det2 s /
-        RH.AcademicFramework.CompletedXi.riemannXi_ext s))
-  (hRepOn : HasPoissonRepOn (F_pinch RH.RS.det2 (Classical.choose hOuter))
-              (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}))
-  (hPPlus : BoundaryPositive (F_pinch RH.RS.det2 (Classical.choose hOuter))) :
-  ∀ z ∈ (Ω \ {z | RH.AcademicFramework.CompletedXi.riemannXi_ext z = 0}),
-    0 ≤ ((2 : ℂ) * (RH.RS.J_pinch RH.RS.det2 (Classical.choose hOuter) z)).re := by
-  -- Use the subset transport and rewrite F_pinch = 2 * J_pinch
-  have hReEq := hReEq_pinch_ext_of_rep_on_offZeros (det2 := RH.RS.det2)
-                  (O := Classical.choose hOuter) hRepOn
-  have hnn := pinch_interior_nonneg_from_reEqOn (det2 := RH.RS.det2)
-                (O := Classical.choose hOuter) hReEq hPPlus
-  intro z hz
-  have := hnn z hz
-  simpa [F_pinch, RH.RS.J_pinch] using this
+    hRep.formula z hz.1
+  simpa using this
 
 end PoissonCayley
 end AcademicFramework

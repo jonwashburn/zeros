@@ -11,7 +11,7 @@ package «riemann» where
   -- Build optimizations for performance
   buildType := BuildType.release
   -- Parallel compilation (uncomment and adjust for your CPU cores)
-  -- moreLeanArgs := #["-j8"] -- Enable if you have 8+ CPU cores
+  moreLeanArgs := #["-j2", "-M", "6144"] -- limit threads and memory for stability
   -- Enable incremental compilation
   -- moreGlobalServerArgs := #["--worker-pool-size=8"]
 
