@@ -57,6 +57,11 @@ private lemma exists_ball_subset_of_nhdsWithin {ρ : ℂ} {S : Set ℂ} {f : ℂ
   have hzU : z ∈ U := hBall hz.1
   exact hU ⟨hzU, hz.2⟩
 
+private lemma exists_ball_subset_of_eventually {ρ : ℂ} {S : Set ℂ} {f : ℂ → ℂ}
+    (h : ∀ᶠ z in nhdsWithin ρ S, f z ≠ 0) :
+    ∃ r > 0, Metric.ball ρ r ∩ S ⊆ {z : ℂ | f z ≠ 0} :=
+  exists_ball_subset_of_nhdsWithin (by simpa using h)
+
 /-! ## Local analyticity on open sets avoiding 1 -/
 
 lemma xi_ext_analytic_on_open_avoiding_one
