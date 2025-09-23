@@ -45,6 +45,18 @@ private lemma xi_ext_nonzero_at_one : riemannXi_ext 1 ≠ 0 := by
     simp
   exact riemannZeta_one_ne_zero hζ0
 
+private lemma exists_ball_subset_of_nhdsWithin {ρ : ℂ} {S : Set ℂ} {f : ℂ → ℂ}
+    (h : {z : ℂ | f z ≠ 0} ∈ nhdsWithin ρ S) :
+    ∃ r > 0, Metric.ball ρ r ∩ S ⊆ {z : ℂ | f z ≠ 0} := by
+  classical
+  obtain ⟨U, hU_nhds, hU⟩ :=
+    (ContinuousOn.mem_nhdsWithin_iff_exists_mem_nhds_inter).mp h
+  obtain ⟨r, hrpos, hBall⟩ := Metric.mem_nhds_iff.mp hU_nhds
+  refine ⟨r, hrpos, ?_⟩
+  intro z hz
+  have hzU : z ∈ U := hBall hz.1
+  exact hU ⟨hzU, hz.2⟩
+
 /-! ## Local analyticity on open sets avoiding 1 -/
 
 lemma xi_ext_analytic_on_open_avoiding_one
@@ -491,5 +503,3 @@ lemma shrink_ball_for_small_u_and_build_Theta
 end CompletedXi
 end AcademicFramework
 end RH
-
-
