@@ -50,7 +50,7 @@ private lemma exists_ball_subset_of_nhdsWithin {ρ : ℂ} {S : Set ℂ} {f : ℂ
     ∃ r > 0, Metric.ball ρ r ∩ S ⊆ {z : ℂ | f z ≠ 0} := by
   classical
   obtain ⟨U, hU_nhds, hU⟩ :=
-    (ContinuousOn.mem_nhdsWithin_iff_exists_mem_nhds_inter).mp h
+    (mem_nhdsWithin_iff_exists_mem_nhds_inter).mp h
   obtain ⟨r, hrpos, hBall⟩ := Metric.mem_nhds_iff.mp hU_nhds
   refine ⟨r, hrpos, ?_⟩
   intro z hz
