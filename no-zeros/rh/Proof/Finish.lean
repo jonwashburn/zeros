@@ -67,6 +67,20 @@ theorem RiemannHypothesis_unconditional
   exact RH.Proof.Unconditional.RiemannHypothesis_from_transport_and_pinned
     hTrans hP hPinned
 
+-- Usage note (wiring):
+-- Given
+--   hDet2 : RH.RS.Det2OnOmega,
+--   hXi   : AnalyticOn ℂ riemannXi_ext Ω,
+--   boundary trace measurability (use HalfPlaneOuterV2 composition lemmas), and
+--   hFormula on Ω \ {ξ_ext = 0} (via Cayley scaffold or direct derivation),
+-- transport gives
+--   hTrans := RH.Proof.Transport.hTrans_default … hFormula.
+-- Together with pinned data
+--   hPinned := RH.Proof.PinnedData.hPinned_default hDet2
+-- and a (P+) provider, e.g.
+--   hP := RH.RS.PPlusFromCarleson_exists_proved_default
+-- the one-shot glue concludes RH via this theorem.
+
 /-!
 Scaffold wiring: derive the transport predicate `hTrans` for the default pinch
 field from a disk-side Poisson representation and a Cayley change-of-variables
@@ -124,6 +138,14 @@ theorem RiemannHypothesis_unconditional_from_disk_scaffold
   -- Final close
   exact RH.Proof.Unconditional.RiemannHypothesis_from_transport_and_pinned
     hTrans hP hPinned
+
+-- Usage note (scaffold route):
+-- If you prefer to pass a disk-side Poisson representation and a Cayley
+-- change-of-variables identity instead of an explicit half-plane hFormula,
+-- use this scaffold theorem by supplying
+--   Hdisk, hDisk, hMap, hAnalytic, hIntegrable, hRel, hChange,
+-- then the same (hDet2, hXi, boundary measurability, hP). It internally builds
+-- the off-zeros hFormula and calls the same unconditional glue.
 
 end Finish
 end Proof
