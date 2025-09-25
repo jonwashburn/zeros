@@ -63,6 +63,16 @@ lemma HasDiskPoissonRepresentation_real
   : HasDiskPoissonRepresentation F :=
 HasDiskPoissonRepresentation_of_data (F := F) hA hI hEq
 
+/-- Convenience alias: build a disk Poisson representation record from supplied
+analyticity, integrability, and the Poisson real-part identity on the unit disk. -/
+lemma hasDiskRep_of_data
+  {F : ℂ → ℂ}
+  (hA : AnalyticOn ℂ F unitDisk)
+  (hI : ∀ z ∈ unitDisk, Integrable (fun θ : ℝ => (F (boundary θ)).re * poissonKernel z θ))
+  (hEq : ∀ z ∈ unitDisk, (F z).re = ∫ θ : ℝ, (F (boundary θ)).re * poissonKernel z θ)
+  : HasDiskPoissonRepresentation F :=
+HasDiskPoissonRepresentation_of_data (F := F) hA hI hEq
+
 /-! Statement-level placeholders retained for API compatibility. -/
 /-- Prop-level: a.e. boundary nonnegativity for Re F on ∂𝔻. -/
 def PPlusOnCircle (F : ℂ → ℂ) : Prop :=

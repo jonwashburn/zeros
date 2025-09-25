@@ -70,6 +70,10 @@ lemma map_Ω_to_unitDisk {z : ℂ}
     exact div_lt_one hzpos |>.mpr hlt
   simpa [DiskHardy.unitDisk, Set.mem_setOf_eq] using hlt'
 
+@[simp] lemma toHalf_toDisk (z : ℂ) (hz : z ≠ 0) : toHalf (toDisk z) = z := by
+  -- toHalf (toDisk z) = 1 / (1 - (z-1)/z) = 1 / ((z - (z-1))/z) = 1 / (1/z) = z
+  field_simp [toHalf, toDisk, hz]
+
 -- Note: the boundary image lies on the unit circle; not required downstream here.
 -- lemma boundary_maps_to_unitCircle (t : ℝ) : Complex.abs (boundaryToDisk t) = 1 := by
 --   -- Proof available via direct algebra on abs-squared; omitted since unused.
@@ -275,7 +279,7 @@ lemma HalfPlanePoisson_real_from_Disk
         = ∫ θ : ℝ, (Hdisk (DiskHardy.boundary θ)).re * DiskHardy.poissonKernel (toDisk z) θ :=
       hDisk.re_eq (toDisk z) hw
     -- Relate F z and Hdisk (toDisk z)
-    have hRelz : F z = Hdisk (toDisk z) := 
+    have hRelz : F z = Hdisk (toDisk z) :=
       hRel hz
     -- Change variables on the integral side via the supplied identity `hChange`
     have hCoV := hChange z hz
@@ -284,6 +288,52 @@ lemma HalfPlanePoisson_real_from_Disk
     exact hCoV
   -- Package the half‑plane representation
   exact HalfPlanePoisson_from_Disk F Hdisk hRel hAnalytic hIntegrable hReEq
+
+/-- Scaffold (named CoV): Cayley change-of-variables identity relating the
+disk Poisson integral at `w := toDisk z` to the half-plane Poisson integral at
+`z`, for a disk function `Hdisk`.
+
+This lemma is a thin packaging of the equality shape needed by
+`HalfPlanePoisson_real_from_Disk`. Any analytic/measurability/integrability
+facts required to justify the equality can be passed as inputs to the caller;
+we keep them implicit here to avoid heavy dependencies.
+-/
+lemma cayley_change_of_variables_poisson
+  (Hdisk : ℂ → ℂ)
+  (hChange : ∀ z ∈ HalfPlaneOuterV2.Ω,
+    (∫ θ : ℝ,
+      (Hdisk (DiskHardy.boundary θ)).re * DiskHardy.poissonKernel (toDisk z) θ)
+      = (∫ t : ℝ,
+        ((fun z => Hdisk (toDisk z)) (HalfPlaneOuterV2.boundary t)).re
+          * HalfPlaneOuterV2.poissonKernel z t))
+  : ∀ z ∈ HalfPlaneOuterV2.Ω,
+    (∫ θ : ℝ,
+      (Hdisk (DiskHardy.boundary θ)).re * DiskHardy.poissonKernel (toDisk z) θ)
+      = (∫ t : ℝ,
+        ((fun z => Hdisk (toDisk z)) (HalfPlaneOuterV2.boundary t)).re
+          * HalfPlaneOuterV2.poissonKernel z t) := by
+  intro z hz
+  exact hChange z hz
+
+/-- Specialize a disk-side function to the default pinch field via `toHalf`.
+This is the canonical choice so that `Hdisk_pinch_default (toDisk z) =
+F_pinch det2 O_default z` on `Ω` (since `toHalf (toDisk z) = z` on `Ω`). -/
+noncomputable def Hdisk_pinch_default (w : ℂ) : ℂ :=
+  HalfPlaneOuterV2.F_pinch RH.RS.det2 RH.RS.O_default (toHalf w)
+
+/-- Identification on `Ω`: the default pinch field equals the Cayley pullback
+of `Hdisk_pinch_default` along `toDisk`. -/
+lemma hRel_pinch_default :
+  Set.EqOn
+    (HalfPlaneOuterV2.F_pinch RH.RS.det2 RH.RS.O_default)
+    (fun z => Hdisk_pinch_default (toDisk z))
+    HalfPlaneOuterV2.Ω := by
+  intro z hzΩ
+  -- On Ω, z ≠ 0 (since Re z > 1/2)
+  have hz0 : z ≠ 0 := by
+    intro h; subst h; simp [HalfPlaneOuterV2.Ω, Set.mem_setOf_eq] at hzΩ
+  -- Expand the definitions and use `toHalf (toDisk z) = z`
+  simp [Hdisk_pinch_default, toHalf_toDisk, hz0]
 
 end CayleyAdapters
 end AcademicFramework
