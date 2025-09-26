@@ -5,4 +5,4 @@
   {"message":
    "././././rh/RS/OffZerosBridge.lean:397:14: try 'simp' instead of 'simpa'\nnote: this linter can be disabled with `set_option linter.unnecessarySimpa false`",
    "level": "warning"}],
- "depHash": "8842414832397112507"}
+ "depHash": "7462665772230771342"}

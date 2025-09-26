@@ -8,4 +8,4 @@
   {"message":
    "././././rh/academic_framework/MellinThetaZeta.lean:44:13: unused variable `hs`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
    "level": "warning"}],
- "depHash": "10678655058431206813"}
+ "depHash": "4906056167141647008"}

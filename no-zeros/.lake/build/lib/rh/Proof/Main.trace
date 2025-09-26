@@ -92,4 +92,4 @@
   {"message":
    "././././rh/Proof/Main.lean:786:0: [reduction] unfolded declarations (max: 136, num: 1):\n  [reduction] DFunLike.coe ↦ 136[reduction] unfolded instances (max: 50, num: 7):\n  [reduction] Complex.instDenselyNormedField ↦ 50\n  [reduction] DenselyNormedField.toNormedField ↦ 50\n  [reduction] Complex.instRCLike ↦ 36\n  [reduction] RCLike.toDenselyNormedField ↦ 36\n  [reduction] Complex.instNormedField ↦ 22\n  [reduction] NormedCommRing.toNormedRing ↦ 22\n  [reduction] NormedField.toNormedCommRing ↦ 22[reduction] unfolded reducible declarations (max: 129, num: 4):\n  [reduction] outParam ↦ 129\n  [reduction] Equiv.invFun ↦ 32\n  [reduction] Equiv.toFun ↦ 32\n  [reduction] Function.Embedding.toFun ↦ 32[def_eq] heuristic for solving `f a =?= f b` (max: 52, num: 1):\n  [def_eq] Set ↦ 52use `set_option diagnostics.threshold <num>` to control threshold for reporting counters",
    "level": "info"}],
- "depHash": "7729565755522552418"}
+ "depHash": "17103897140463165939"}
