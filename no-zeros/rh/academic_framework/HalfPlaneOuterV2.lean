@@ -80,7 +80,7 @@ def ExistsOuterWithModulus (F : ℂ → ℂ) : Prop :=
   (1 / Real.pi) * (a / (a^2 + (t - b)^2))
 
 /-- Non-negativity of the Poisson kernel for z ∈ Ω -/
-lemma poissonKernel_nonneg {z : ℂ} (hz : z ∈ Ω) (t : ℝ) : 
+lemma poissonKernel_nonneg {z : ℂ} (hz : z ∈ Ω) (t : ℝ) :
     0 ≤ poissonKernel z t := by
   unfold poissonKernel Ω at *
   simp only [Set.mem_setOf_eq] at hz
@@ -89,7 +89,7 @@ lemma poissonKernel_nonneg {z : ℂ} (hz : z ∈ Ω) (t : ℝ) :
     apply add_pos_of_pos_of_nonneg
     · exact sq_pos_of_ne_zero (ne_of_gt ha)
     · exact sq_nonneg _
-  exact mul_nonneg (one_div_nonneg.mpr Real.pi_pos.le) 
+  exact mul_nonneg (one_div_nonneg.mpr Real.pi_pos.le)
     (div_nonneg ha.le hdenom.le)
 
 /-! ### Measurability helpers (placed early to be available downstream) -/
@@ -100,6 +100,32 @@ lemma measurable_boundary_affine : Measurable (boundary : ℝ → ℂ) := by
   · exact measurable_const
   · apply Measurable.const_mul
     exact Complex.continuous_ofReal.measurable
+
+/-- Generic helper: pull back measurability along the half-plane boundary map. -/-
+lemma measurable_comp_boundary {α} [MeasurableSpace α]
+    {f : ℂ → α} (hf : Measurable f) :
+    Measurable (fun t : ℝ => f (boundary t)) := by
+  exact hf.comp measurable_boundary_affine
+
+/-! #### Boundary composition measurability for key traces -/-
+
+/-- Boundary measurability for `det2` composed with the affine boundary map. -/
+lemma measurable_boundary_det2
+  (hDet_measC : Measurable RH.RS.det2) :
+  Measurable (fun t : ℝ => RH.RS.det2 (boundary t)) :=
+  measurable_comp_boundary hDet_measC
+
+/-- Boundary measurability for the chosen default outer `O_default`. -/
+lemma measurable_boundary_O_default
+  (hO_measC : Measurable RH.RS.O_default) :
+  Measurable (fun t : ℝ => RH.RS.O_default (boundary t)) :=
+  measurable_comp_boundary hO_measC
+
+/-- Boundary measurability for `riemannXi_ext` along the critical line. -/
+lemma measurable_boundary_xi_ext
+  (hXi_measC : Measurable riemannXi_ext) :
+  Measurable (fun t : ℝ => riemannXi_ext (boundary t)) :=
+  measurable_comp_boundary hXi_measC
 
 lemma measurable_boundary_F_pinch
     {O : ℂ → ℂ}
@@ -188,7 +214,7 @@ lemma J_pinch_analyticOn_offZeros
   -- Restrict all functions to the off-zeros set
   have h1' : AnalyticOn ℂ det2 (Ω \ {z | riemannXi_ext z = 0}) := by
     apply h1.mono; intro z hz; exact hz.1
-  have h2' : AnalyticOn ℂ O (Ω \ {z | riemannXi_ext z = 0}) := by  
+  have h2' : AnalyticOn ℂ O (Ω \ {z | riemannXi_ext z = 0}) := by
     apply h2.mono; intro z hz; exact hz.1
   have h3' : AnalyticOn ℂ riemannXi_ext (Ω \ {z | riemannXi_ext z = 0}) := by
     apply h3.mono; intro z hz; exact hz.1
@@ -199,7 +225,7 @@ lemma J_pinch_analyticOn_offZeros
 /-- Analyticity of F_pinch on the off-zeros set -/
 lemma F_pinch_analyticOn_offZeros
     (hDet2 : Det2OnOmega)
-    {O : ℂ → ℂ} (hO : OuterHalfPlane O) 
+    {O : ℂ → ℂ} (hO : OuterHalfPlane O)
     (hXi : AnalyticOn ℂ riemannXi_ext Ω) :
     AnalyticOn ℂ (F_pinch det2 O) (Ω \ {z | riemannXi_ext z = 0}) := by
   unfold F_pinch
@@ -225,7 +251,7 @@ lemma F_pinch_boundary_bound
         norm_cast
         simp
       -- Create the BoundaryModulusEq for the RS module
-      have hBME' : ∀ u, Complex.abs (O (RH.RS.boundary u)) = 
+      have hBME' : ∀ u, Complex.abs (O (RH.RS.boundary u)) =
                          Complex.abs ((det2 (RH.RS.boundary u)) / (riemannXi_ext (RH.RS.boundary u))) := by
         intro u
         rw [boundary_eq]
@@ -243,7 +269,7 @@ lemma F_pinch_boundary_bound
         rw [boundary_eq]
     · -- ξ_ext = 0 at boundary: J_pinch = det2/(O·ξ_ext) = det2/0 = 0
       push_neg at hXi_ne
-      simp only [F_pinch, J_pinch, hXi_ne, mul_zero, div_zero, zero_mul, 
+      simp only [F_pinch, J_pinch, hXi_ne, mul_zero, div_zero, zero_mul,
                  Complex.zero_re, abs_zero]
       norm_num
   · -- O = 0 at boundary: J_pinch = det2/(O·ξ_ext) = det2/0 = 0
@@ -345,12 +371,12 @@ private lemma poissonKernel_bound (z : ℂ) (hz : z ∈ Ω) :
           mul_pos hposL hposR
         have := div_le_div_of_nonneg_right hcore (le_of_lt hdenom_pos)
         -- Simplify: LHS = a*(1+X)/((a^2+X)*(1+X)) = a/(a^2+X)
-        have lhs_simp : a * (1 + (t - z.im) ^ 2) / ((a ^ 2 + (t - z.im) ^ 2) * (1 + (t - z.im) ^ 2)) = 
+        have lhs_simp : a * (1 + (t - z.im) ^ 2) / ((a ^ 2 + (t - z.im) ^ 2) * (1 + (t - z.im) ^ 2)) =
                         a / (a ^ 2 + (t - z.im) ^ 2) := by
           field_simp
           ring
         -- Simplify: RHS = C0*(a^2+X)/((a^2+X)*(1+X)) = C0/(1+X)
-        have rhs_simp : (max a (1 / a)) * (a ^ 2 + (t - z.im) ^ 2) / ((a ^ 2 + (t - z.im) ^ 2) * (1 + (t - z.im) ^ 2)) = 
+        have rhs_simp : (max a (1 / a)) * (a ^ 2 + (t - z.im) ^ 2) / ((a ^ 2 + (t - z.im) ^ 2) * (1 + (t - z.im) ^ 2)) =
                         (max a (1 / a)) / (1 + (t - z.im) ^ 2) := by
           field_simp
           ring
@@ -367,7 +393,7 @@ lemma poissonKernel_integrable {z : ℂ} (hz : z ∈ Ω) :
     Integrable (fun t : ℝ => poissonKernel z t) := by
   -- Get the bound
   obtain ⟨C, hC_pos, hbound⟩ := poissonKernel_bound z hz
-  -- The dominating function is integrable  
+  -- The dominating function is integrable
   have h_dom : Integrable (fun t => C / (1 + (t - z.im)^2)) := by
     -- integrable_inv_one_add_sq gives integrability of 1/(1+t²)
     -- Translation and scaling preserve integrability
@@ -406,14 +432,14 @@ lemma poissonKernel_integrable {z : ℂ} (hz : z ∈ Ω) :
       apply add_pos_of_pos_of_nonneg
       · norm_num
       · exact sq_nonneg _
-    have hquot_nonneg : 0 ≤ C / (1 + (t - z.im) ^ 2) := 
+    have hquot_nonneg : 0 ≤ C / (1 + (t - z.im) ^ 2) :=
       div_nonneg hC_nonneg (le_of_lt hden_pos)
     have hC_norm : ‖C / (1 + (t - z.im) ^ 2)‖ = C / (1 + (t - z.im) ^ 2) := by
       rw [Real.norm_eq_abs, _root_.abs_of_nonneg hquot_nonneg]
     rw [hC_norm]
     exact hbound t
 
-/-- Integrability with bounded boundary data 
+/-- Integrability with bounded boundary data
     Note: The measurability assumption `hMeas` is needed since F may not be continuous.
     For analytic functions, this follows from continuity. -/
 lemma integrable_boundedBoundary
@@ -424,17 +450,17 @@ lemma integrable_boundedBoundary
     Integrable (fun t => (F (boundary t)).re * poissonKernel z t) := by
   -- The kernel is integrable
   have hker := poissonKernel_integrable hz
-  
+
   -- M must be nonnegative since |F.re| ≥ 0
   have hM_nonneg : 0 ≤ M := by
     trans |(F (boundary 0)).re|
     · exact abs_nonneg _
     · exact hBound 0
-  
+
   -- The dominating function M * poissonKernel is integrable
   have h_dom : Integrable (fun t => M * poissonKernel z t) := by
     exact Integrable.const_mul hker M
-  
+
   -- Apply comparison test
   refine h_dom.mono ?_ ?_
   · -- Measurability
@@ -531,3 +557,126 @@ def BoundaryAI (F : ℂ → ℂ) : Prop :=
 def boundaryAI_from_poissonRep (F : ℂ → ℂ) : Prop :=
   HasPoissonRep F → BoundaryAI F
 
+/-!
+## Section 8: Montel/Hurwitz Packaging for Outer Existence
+
+This section records a clean, Mathlib-ready packaging of the standard
+Montel/Hurwitz argument for building an outer function on the right
+half-plane Ω with a prescribed boundary modulus along the critical line.
+
+The heavy complex-analytic steps (normality via Montel, zero-freeness via
+Hurwitz, and passage of boundary modulus) are intentionally kept at the
+statement level via compact data structures. This lets downstream users
+instantiate the result once the corresponding inputs become available
+(e.g., via a Poisson A.1 construction on shifted lines), while keeping the
+present file free of admits.
+-/
+
+/-- Shifted right half-plane Ω(ε) = { s : ℂ | Re s > 1/2 + ε }.
+We use this to index the A.1 outer family built on lines Re s = 1/2 + ε. -/
+@[simp] def Ωshift (ε : ℝ) : Set ℂ := { s : ℂ | (1/2 + ε : ℝ) < s.re }
+
+/-- Boundary parametrization of the shifted line Re s = 1/2 + ε. -/
+@[simp] def boundaryShift (ε : ℝ) (t : ℝ) : ℂ := (1/2 + ε : ℝ) + I * (t : ℂ)
+
+/-- An outer function on a set `S`: analytic and non-vanishing on `S`. -/
+structure IsOuterOn (S : Set ℂ) (O : ℂ → ℂ) : Prop where
+  analytic : AnalyticOn ℂ O S
+  nonvanishing : ∀ z ∈ S, O z ≠ 0
+
+/-- A.1: Per-ε outer family with prescribed boundary modulus along
+the shifted line Re s = 1/2 + ε.
+
+This is the input typically provided by a Poisson construction on Ω(ε)
+using the boundary datum `u := log |F|` at height 1/2 + ε. -/
+structure A1Family (F : ℂ → ℂ) : Prop :=
+  (O : ℝ → ℂ → ℂ)
+  (outer : ∀ ⦃ε : ℝ⦄, 0 < ε → IsOuterOn (Ωshift ε) (O ε))
+  (boundary_modulus : ∀ ⦃ε : ℝ⦄, 0 < ε → ∀ t : ℝ,
+    Complex.abs ((O ε) (boundaryShift ε t)) = Complex.abs (F (boundaryShift ε t)))
+
+/-- A.2: Locally-uniform limit witness for the A.1 family yielding an outer `O`
+on Ω with the target boundary modulus along Re s = 1/2.
+
+Mathematically, `analytic` and `nonvanishing` are furnished by Montel's
+theorem (normal families) and Hurwitz's theorem, respectively, for a
+locally-uniform limit extracted from the A.1 family as ε ↓ 0; and
+`boundary_modulus_limit` records the passage of the boundary modulus in
+the limit. We keep these facts as explicit fields to avoid heavy proofs. -/
+structure A2LimitWitness (F : ℂ → ℂ) (fam : A1Family F) : Prop :=
+  (limit : ℂ → ℂ)
+  (analytic : AnalyticOn ℂ limit Ω)
+  (nonvanishing : ∀ z ∈ Ω, limit z ≠ 0)
+  (boundary_modulus_limit : ∀ t : ℝ,
+    Complex.abs (limit (boundary t)) = Complex.abs (F (boundary t)))
+
+/-- Montel/Hurwitz packaging: from an A.1 family on shifted half-planes and a
+limit witness at ε ↓ 0, produce an outer `O` on Ω with boundary modulus `|F|`
+along Re s = 1/2.
+
+This result is a light wrapper: it packages the analytic, zero-free limit and
+the boundary-modulus identity supplied by `A2LimitWitness` into the
+`ExistsOuterWithModulus` interface used elsewhere in this file. -/
+theorem ExistsOuterWithModulus_from_A1A2
+    {F : ℂ → ℂ}
+    (fam : A1Family F)
+    (lim : A2LimitWitness F fam) :
+    ExistsOuterWithModulus F := by
+  refine ⟨lim.limit, ?_, ?_⟩
+  · exact IsOuter.mk lim.analytic lim.nonvanishing
+  · intro t; exact lim.boundary_modulus_limit t
+
+/-! ### Minimal demo: constant datum
+
+As a sanity check, we instantiate the packaging with a trivial A.1 family
+for the constant boundary datum `F ≡ 1`. This demonstrates how a caller
+supplies the A.1 data and the limit witness to obtain an outer on Ω. -/
+
+namespace Demo
+
+noncomputable section
+
+/-- Constant boundary datum `F ≡ 1`. -/
+@[simp] def Fconst : ℂ → ℂ := fun _ => (1 : ℂ)
+
+/-- Trivial A.1 family: `O_ε ≡ 1` on each shifted half-plane. -/
+def famConst : A1Family Fconst := by
+  refine
+  { O := fun _ε => fun _ => (1 : ℂ)
+  , outer := ?_
+  , boundary_modulus := ?_ }
+  · intro ε hε
+    exact { analytic := analyticOn_const, nonvanishing := by intro z hz; simp }
+  · intro ε hε t; simp [boundaryShift]
+
+/-- Trivial A.2 witness: the constant limit `O ≡ 1` on Ω with boundary modulus `|1|`. -/
+def witnessConst : A2LimitWitness Fconst famConst := by
+  refine
+  { limit := fun _ => (1 : ℂ)
+  , analytic := analyticOn_const
+  , nonvanishing := by intro z hz; simp
+  , boundary_modulus_limit := ?_ }
+  intro t; simp [boundary]
+
+/-- Existence of an outer on Ω with constant boundary modulus `|1|`. -/
+theorem existsOuter_const : ExistsOuterWithModulus Fconst :=
+  ExistsOuterWithModulus_from_A1A2 famConst witnessConst
+
+end Demo
+
+/-!
+### Specialization notes (det₂ once available in Mathlib)
+
+To specialize this packaging to the det₂ ratio used elsewhere, set
+`F := fun s => det2 s / riemannXi_ext s` and supply:
+
+- an A.1 family `fam` on shifted lines from a Poisson construction with
+  datum `u := log |F|`,
+- an A.2 witness `lim` obtained via Montel (normal families) and Hurwitz
+  (zero-freeness) as ε ↓ 0,
+- the boundary passage `lim.boundary_modulus_limit`, which follows from the
+  Poisson limit on the real axis.
+
+With these in hand, apply `ExistsOuterWithModulus_from_A1A2 fam lim` to get
+the required outer on Ω with boundary modulus `|det₂/ξ_ext|` along Re s = 1/2.
+-/

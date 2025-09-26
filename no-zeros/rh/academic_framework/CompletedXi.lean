@@ -3,6 +3,7 @@ import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Tactic
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.NumberTheory.LSeries.RiemannZeta
+import Mathlib.Analysis.Analytic.Basic
 import rh.academic_framework.ZetaFunctionalEquation
 import rh.RS.Domain
 -- Do not import RS here to avoid cycles; keep this module self-contained in AF.
@@ -17,7 +18,7 @@ callers or other modules.
 
 noncomputable section
 
-open Complex
+open Complex Set
 
 namespace RH.AcademicFramework.CompletedXi
 
@@ -146,5 +147,33 @@ theorem xi_ext_zeros_eq_zeta_zeros_on_Ω :
     | inr hζ0 => exact hζ0
   · intro hζ
     simp [hfac, hζ]
+
+/-! Analyticity of ξ_ext on Ω away from 1. -/
+lemma xi_ext_analytic_on_Ω_away_one :
+  AnalyticOn ℂ riemannXi_ext (RH.RS.Ω \ ({1} : Set ℂ)) := by
+  classical
+  -- Ω is open, so Ω \ {1} is open
+  have hΩopen : IsOpen RH.RS.Ω := by
+    simpa [RH.RS.Ω, Set.mem_setOf_eq] using
+      isOpen_lt continuous_const Complex.continuous_re
+  have hOpen : IsOpen (RH.RS.Ω \ ({1} : Set ℂ)) :=
+    IsOpen.diff hΩopen isClosed_singleton
+  -- Use AnalyticOn ↔ DifferentiableOn on open sets
+  refine (analyticOn_iff_differentiableOn (f := riemannXi_ext)
+    (s := RH.RS.Ω \ ({1} : Set ℂ)) hOpen).2 ?_
+  intro z hz
+  have hzΩ : z ∈ RH.RS.Ω := hz.1
+  have hz_ne0 : z ≠ 0 := by
+    have hzRe : (1 / 2 : ℝ) < z.re := by
+      simpa [RH.RS.Ω, Set.mem_setOf_eq] using hzΩ
+    intro h
+    simpa [h, Complex.zero_re] using
+      (lt_trans (by norm_num : (0 : ℝ) < 1/2) hzRe)
+  have hz_ne1 : z ≠ 1 := by
+    have : z ∉ ({1} : Set ℂ) := hz.2
+    simpa [Set.mem_singleton_iff] using this
+  have hdiff : DifferentiableAt ℂ completedRiemannZeta z :=
+    differentiableAt_completedZeta (s := z) hz_ne0 hz_ne1
+  simpa [riemannXi_ext] using hdiff.differentiableWithinAt
 
 -- The ext ξ equals mathlib's completed zeta `

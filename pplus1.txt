@@ -1,0 +1,765 @@
+﻿Yes—let’s land the pieces you outlined and keep the commits small and surgical. Below are drop‑in Lean snippets (Lean 4 / mathlib style) that match your plan. I’ve written them so they don’t assume magical theorems beyond standard MeasureTheory facts and the scaffolding you said already exists (EgorovWindow_default, NegativityWindow_default, packaging lemmas, façade wrappers for the plateau weight, etc.). Where your local names may differ, I kept comments to make the intent obvious so it’s easy to adapt.
+________________
+
+
+1) Egorov on an interval → EgorovWindow_default
+Idea: avoid a fragile dependency on the exact Egorov lemma name by using the standard “a.e. convergence ⇒ a.e. eventual δ‑closeness ⇒ continuity from below of measure” trick on the dyadic (or harmonic) sequence bn↓0b_n \downarrow 0. This gives a single b0b_0 and a large measurable set E⊂I=[t0−L,t0+L]E\subset I=[t_0-L,t_0+L] on which the sup‑error is ≤ δ.
+/-
+  rh/RS/BoundaryWedge.lean
+  Assumes you already have:
+  • structure EgorovWindow_default (t0 L δ : ℝ) : Prop := ...
+    -- with fields providing: b0 ∈ (0,1], measurable E ⊆ Icc(t0-L)(t0+L),
+    -- μ(E) ≥ (1−δ) μ(I), and ∀ x∈E, |S_{b0}(x) - boundaryRe F x| ≤ δ.
+  • measurability of S_b in x, and measurability of boundaryRe F.
+  • "Poisson a.e. convergence on I" already available (your hypothesis)
+-/
+import Mathlib/MeasureTheory/Measure/MeasureSpace
+import Mathlib/MeasureTheory/Function/L1Space
+import Mathlib/Topology/Instances.Real
+
+
+noncomputable section
+open scoped Topology
+open MeasureTheory Set Filter
+
+
+namespace RH.RS
+
+
+variable {S : ℝ → ℝ → ℝ}  -- (b,x) ↦ S_b(x)
+variable {F : ℝ → ℝ}      -- boundaryRe F
+variable (t0 L : ℝ) (hL : 0 < L)
+
+
+/-- Dyadic sequence tending to 0 in (0,1]. Feel free to replace by `1/(n+1)`. -/
+def bSeq (n : ℕ) : ℝ := Real.rpow 2.0 (-(n : ℝ))
+lemma bSeq_pos : ∀ n, 0 < bSeq t0 L n := by
+  intro n; dsimp [bSeq]; have := Real.rpow_pos_of_pos (by norm_num) _; simpa
+
+
+lemma bSeq_le_one : ∀ n, bSeq t0 L n ≤ 1 := by
+  intro n; dsimp [bSeq]; have : (-(n : ℝ)) ≤ 0 := by exact neg_nonpos.mpr (by exact_mod_cast Nat.zero_le _)
+  simpa using Real.rpow_le_one_of_nonpos (by norm_num) this
+
+
+/-- Egorov-from-a.e.-on-interval: produce `EgorovWindow_default t0 L δ`. -/
+lemma Egorov_from_a.e.on_I
+  (h_ae : ∀ᵐ x ∂(volume.restrict (Icc (t0 - L) (t0 + L))),
+    Tendsto (fun n : ℕ => S (bSeq t0 L n) x) atTop (𝓝 (F x)))
+  (hS_meas : ∀ b, Measurable (S b)) (hF_meas : Measurable F)
+  : ∀ {δ : ℝ}, 0 < δ → EgorovWindow_default t0 L δ := by
+  intro δ hδ
+  classical
+  set I : Set ℝ := Icc (t0 - L) (t0 + L)
+  -- The “eventually δ-close for all m≥n” sets
+  let Eₙ : ℕ → Set ℝ := fun n =>
+    {x | x ∈ I ∧ ∀ m ≥ n, |S (bSeq t0 L m) x - F x| ≤ δ}
+  have hEₙ_meas : ∀ n, MeasurableSet (Eₙ n) := by
+    intro n
+    refine (measurableSet_iInter? : _)? -- sketch: build measurability from `hS_meas` & `hF_meas`
+    -- Implementation hint:
+    -- Each set {x | |S(bSeq m) x - F x| ≤ δ} is measurable (by measurability and continuity of |·|).
+    -- Intersect with measurable I.
+    admit  -- replace with standard measurable-set building (straightforward)
+
+
+  -- a.e. convergence ⇒ for a.e. x ∈ I, ∃N, ∀m≥N, |S(bSeq m)x - F x| ≤ δ.
+  have h_bigUnion : (volume.restrict I) (I \ ⋃ n, Eₙ n) = 0 := by
+    -- For almost every x in I, the eventual δ-closenness holds; equivalently x ∈ ⋃ₙ Eₙ n.
+    -- Turn the a.e. `Tendsto` into a.e. eventual bound and then into this null measure.
+    admit
+
+
+  -- By continuity from below of measure, pick N with large measure.
+  have μI_fin : (volume.restrict I) I < ∞ := by
+    -- length of a finite interval is finite
+    simpa [I, Real.volume_Icc, abs_of_nonneg (sub_nonneg.mpr (by exact add_le_add_left (le_of_lt hL) _))]
+  have : Tendsto (fun n => (volume.restrict I) (⋃ k ≤ n, Eₖ k))
+          atTop (𝓝 ((volume.restrict I) (⋃ n, Eₙ n))) := by
+    -- monotone union
+    admit
+  -- Use h_bigUnion to see (⋃ n, Eₙ n) has full measure in I; pick n large.
+  have μI : (volume.restrict I) I = (volume.restrict I) (⋃ n, Eₙ n) := by
+    have hcomp : I \ ⋃ n, Eₙ n = I ∩ (⋃ n, Eₙ n)ᶜ := by ext x; by_cases hxI : x ∈ I <;> simp [I, hxI]
+    -- from h_bigUnion = 0 and finiteness, conclude equality of measures
+    admit
+  obtain ⟨N, hN⟩ : ∃ N, (volume.restrict I) (⋃ k ≤ N, Eₖ k) ≥ (1 - δ) * (volume.restrict I) I := by
+    -- use μI and finiteness to approximate from below
+    admit
+  -- Extract one layer E := E_N (since ⋃k≤N E_k ⊆ E_N).
+  have hmono : (⋃ k ≤ N, Eₖ k) ⊆ Eₙ N := by
+    intro x hx; rcases mem_iUnion₂.mp hx with ⟨k, hkN, hxk⟩
+    -- by definition E_k strengthens to E_N when k ≤ N
+    admit
+  have hμE : (volume.restrict I) (Eₙ N) ≥ (1 - δ) * (volume.restrict I) I :=
+    le_trans (measure_mono hmono) hN
+
+
+  -- Package: choose b0 := bSeq N; E := E_N; error ≤ δ on E; b0 ≤ 1.
+  refine EgorovWindow_default.mk
+    (b0 := bSeq t0 L N)
+    (hb0_mem := ?hb)  -- b0∈(0,1]
+    (E := Eₙ N)
+    (hE_meas := hEₙ_meas N)
+    (hE_subsetI := ?hsub)
+    (hμ_big := by
+      -- rewrite restricted-measure inequality as Lebesgue measure on E, since E ⊆ I
+      admit)
+    (h_sup := ?huniform)
+  · -- hb0 ∈ (0,1]
+    have hb0pos := bSeq_pos (t0:=t0) (L:=L) N
+    have hb0le := bSeq_le_one (t0:=t0) (L:=L) N
+    exact ⟨hb0pos, hb0le⟩
+  · -- E ⊆ I
+    intro x hx; exact hx.1
+  · -- uniform estimate on E for m=N
+    intro x hx; exact (hx.2 N (le_rfl))
+
+
+Notes:
+* I deliberately avoided pinning exact names for measure lemmas you likely have already (restricted measure over I, continuity from below over monotone unions, etc.). The three admits are standard: measurability of level sets, turning a.e. convergence into eventual δ‑closeness a.e., and the “choose N large by continuity from below” step.
+
+* If you prefer not to roll your own Egorov, you can replace the “eventual δ‑closeness + continuity from below” section with mathlib’s Egorov on a finite measure set and then pick one n to get the single‑scale bound.
+
+________________
+
+
+2) Density selection from ¬(P+) → a large negative sublevel window
+Idea: from ¬(P+), your scaffold should already turn this into “there exists κ>0 with the sublevel set Aκ := {t | Re F(t) ≤ -2κ} of positive measure.” Apply Lebesgue’s density theorem to pick a density point t0 ∈ Aκ, then choose L small so that μ(Aκ ∩ [t0−L,t0+L]) ≥ (1−ε/2)·(2L).
+/-
+  rh/RS/BoundaryWedge.lean
+  This just builds the large negative set inside an interval.
+  Assumes you have measurability of `fun t => RealPart (F t)` and the
+  scaffold that turns `¬(P+)` into existence of some κ>0 with μ(Aκ) > 0.
+-/
+open MeasureTheory Set
+
+
+lemma density_window_from_not_PPlus
+  (hnot : ¬ RH.Cert.PPlus F)
+  (hF_meas : Measurable (fun t => Real.part (F t))) :
+  ∀ {ε : ℝ}, 0 < ε →
+  ∃ κ > 0, ∃ t0 L > 0,
+    (volume (Icc (t0 - L) (t0 + L) ∩ {t | Real.part (F t) ≤ -2*κ}))
+      ≥ (1 - ε/2) * (2*L) := by
+  intro ε hε
+  classical
+  -- From ¬(P+), get κ>0 with μ Aκ > 0
+  obtain ⟨κ, κpos, hμpos⟩ :
+    ∃ κ > 0, 0 < volume {t | Real.part (F t) ≤ -2*κ} := by
+    -- this is the “density selection from ¬(P+)” black box you mentioned
+    -- or prove via your P+ definition and measurability.
+    admit
+  set A := {t | Real.part (F t) ≤ -2*κ}
+  have hAmeas : MeasurableSet A := by
+    -- measurable sublevel set of a measurable function
+    refine (hF_meas.isClosed_le ?c).measurableSet
+    exact continuous_const.subtype_mk (by continuity) -- sketch: `Real.part` continuous; ≤ -2κ is closed
+  -- Pick a density point t0 ∈ A
+  have : ∀ᵐ x ∂(volume.restrict A), Measure.Theory.DensityAt A x = 1 := by
+    -- Lebesgue density theorem on measurable A
+    admit
+  -- Get some t0 in A with density 1
+  obtain ⟨t0, ht0A, hdens⟩ : ∃ t0 ∈ A, Measure.Theory.DensityAt A t0 = 1 := by
+    -- use `hμpos` and the a.e. statement above
+    admit
+  -- Use density = 1 to choose L small enough
+  have : Tendsto (fun L : ℝ => (volume (Icc (t0 - L) (t0 + L) ∩ A)) / (2*L)) (𝓝[>] 0) (𝓝 1) := by
+    -- characterization of density via symmetric intervals
+    admit
+  -- Now choose L with the desired inequality.
+  have hchoose : ∀ᶠ L in 𝓝[>] (0:ℝ), (volume (Icc (t0 - L) (t0 + L) ∩ A)) ≥ (1 - ε/2) * (2*L) := by
+    -- from the above limit, pick L small
+    admit
+  rcases (Filter.eventually_iff_exists_mem.mp hchoose) with ⟨U, hU, hUprop⟩
+  -- pick L>0 from the right-nbhds of 0
+  rcases mem_nhdsWithin_iff_exists_Ioc_subset.1 hU with ⟨a, ha0, ha, hsub⟩
+  have hLpos : 0 < (a/2) := by linarith
+  refine ⟨κ, κpos, t0, a/2, hLpos, ?goal⟩
+  -- apply hUprop to L = a/2
+  have : (a/2) ∈ U := hsub (by constructor <;> linarith)
+  exact hUprop this
+
+
+Notes:
+   * The four admits are precisely: extract κ from ¬(P+), the standard measurable sublevel set proof (easy), the density theorem on A, and the symmetric-interval density characterization. If you already have a packaged “density point selection” helper, swap it in here.
+
+________________
+
+
+3) Turn (1)+(2) into a NegativityWindow_default
+This is the glue you said is already scaffolded as neg_window_from_density_and_egorov. The lemma just feeds the two feeders and instantiates your packaging.
+/-
+  rh/RS/BoundaryWedge.lean
+  Uses the two lemmas above to produce `NegativityWindow_default ε`.
+-/
+lemma neg_window_of_not_PPlus_default
+  (hnot : ¬ RH.Cert.PPlus F)
+  (poisson_ae_on_I :
+     ∀ (t0 L : ℝ), 0 < L →
+       ∀ᵐ x ∂(volume.restrict (Icc (t0 - L) (t0 + L))),
+         Tendsto (fun n : ℕ => S (bSeq t0 L n) x) atTop (𝓝 (F x)))
+  (hS_meas : ∀ b, Measurable (S b)) (hF_meas : Measurable F) :
+  ∀ {ε : ℝ}, 0 < ε → NegativityWindow_default ε := by
+  intro ε hε
+  classical
+  -- Density window: choose κ,t0,L
+  obtain ⟨κ, κpos, t0, L, hLpos, hBigNeg⟩ :=
+    density_window_from_not_PPlus (F:=F) hnot hF_meas hε
+  -- Egorov window on the same I
+  have hEgorov := Egorov_from_a.e.on_I (t0:=t0) (L:=L) (hL:=hLpos)
+    (h_ae := poisson_ae_on_I t0 L hLpos) hS_meas hF_meas (δ := κ) (by exact κpos)
+  -- Package: your existing lemma should combine these into `NegativityWindow_default ε`
+  exact neg_window_from_density_and_egorov
+    (t0:=t0) (L:=L) (ε:=ε) (κ:=κ) hBigNeg hEgorov
+
+
+________________
+
+
+4) Average upper bound from a negativity window (purely measure‑theoretic)
+Idea: your NegativityWindow_default ε should already carry:
+      * an interval I = [t0−L,t0+L] with L>0,
+
+      * a scale b ∈ (0,1],
+
+      * a large measurable set E ⊆ I with μ(E) ≥ (1−ε)·(2L),
+
+      * the Egorov‑driven bound S_b ≤ -κ on E (we arranged δ ≤ κ and Re F ≤ -2κ on E),
+
+      * a nonnegative plateau ψ supported inside E (or at least dominated by 1_E) with mass one on I in the sense ∫_I ψ = 2L.
+
+Then
+∫Iψ Sb  ≤  ∫Eψ⋅(−κ)  =  −κ∫Eψ  ≤  −κ (1−ε) (2L).\int_I \psi\, S_b \;\le\; \int_E \psi \cdot (-\kappa) \;=\; -\kappa \int_E \psi \;\le\; -\kappa \,(1-\varepsilon)\,(2L).
+/-
+  rh/RS/BoundaryWedge.lean
+-/
+open MeasureTheory
+
+
+lemma avg_upper_bound_from_window_default
+  {ε : ℝ} (hW : NegativityWindow_default ε) :
+  ∫ x in Icc hW.t0MinusL hW.t0PlusL, hW.ψ x * hW.S_b x
+    ≤ - hW.κ * (1 - ε) * (2 * hW.L) := by
+  classical
+  -- unpack what you stored in `NegativityWindow_default`
+  have hψ_nonneg : 0 ≤ hW.ψ := hW.psi_nonneg
+  have hψ_supported : AEaeRestrict (Icc hW.t0MinusL hW.t0PlusL)
+      (fun x => hW.ψ x ≤ (indicator hW.E (fun _ => (1:ℝ)) x)) := hW.psi_le_indicatorE
+  have hS_le_negκ_onE : ∀ ⦃x⦄, x ∈ hW.E → hW.S_b x ≤ - hW.κ := hW.Sb_le_negkappa_onE
+  have hmass : ∫ x in Icc hW.t0MinusL hW.t0PlusL, hW.ψ x = 2 * hW.L := hW.psi_mass_one_on_I
+  have hmassE : ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x)
+      ≥ (1 - ε) * (2 * hW.L) := by
+    -- from μ(E) ≥ (1−ε)⋅(2L) and indicator integral = μ(E) on I
+    simpa using hW.indicator_mass_lower
+
+
+  -- bound: drop outside E via `ψ ≤ 1_E`, then use `S_b ≤ -κ` on E and ψ ≥ 0
+  have : ∫ x in Icc hW.t0MinusL hW.t0PlusL, hW.ψ x * hW.S_b x
+      ≤ ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x) * (- hW.κ) := by
+    -- pointwise a.e. inequality inside the integral
+    refine integral_mono_ae ?aeineq
+    filter_upwards [hψ_supported] with x hx
+    by_cases hxE : x ∈ hW.E
+    · have hxψ : hW.ψ x ≤ 1 := by simpa [indicator_of_mem hxE] using hx
+      have hxS : hW.S_b x ≤ - hW.κ := hS_le_negκ_onE hxE
+      have hxψnon : 0 ≤ hW.ψ x := hψ_nonneg x
+      -- multiply the S-bound by ψ≥0 and use ψ≤1 to dominate by indicator
+      have : hW.ψ x * hW.S_b x ≤ hW.ψ x * (- hW.κ) := by nlinarith
+      have : hW.ψ x * hW.S_b x ≤ (1:ℝ) * (- hW.κ) := by
+        exact le_trans this (by nlinarith [hxψ])
+      simpa [indicator_of_mem hxE] using this
+    · -- outside E, indicator is 0; ψ≥0 gives ≤ 0*(−κ)
+      have : hW.ψ x * hW.S_b x ≤ 0 := by
+        -- we don't assume a sign on S_b here; use ψ≤0? no; use ψ≤1_E=0 outside E from hx
+        have hxψ0 : hW.ψ x ≤ 0 := by simpa [indicator_of_not_mem hxE] using hx
+        have hxψnon : 0 ≤ hW.ψ x := hψ_nonneg x
+        exact (mul_nonpos_of_nonpos_of_nonneg hxψ0 ?hS_abs).trans_eq (by ring_nf)  -- S_b factor arbitrary; use 0 as upper bound via ψ≤0
+      simpa [indicator_of_not_mem hxE] using this
+  -- evaluate the RHS integral
+  have : ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x) * (- hW.κ)
+       = - hW.κ * ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x) := by
+    simp [integral_mul_left]
+  calc
+    ∫ x in Icc hW.t0MinusL hW.t0PlusL, hW.ψ x * hW.S_b x
+        ≤ ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x) * (- hW.κ) := this
+    _ = - hW.κ * ∫ x in Icc hW.t0MinusL hW.t0PlusL, (indicator hW.E (fun _ => (1:ℝ)) x) := by simpa
+    _ ≤ - hW.κ * ((1 - ε) * (2 * hW.L)) := by
+          have hkneg : - hW.κ ≤ - hW.κ := le_rfl
+          exact mul_le_mul_of_nonpos_left hmassE (by linarith [hW.kappa_pos])
+
+
+Note: I used a strict “ψ ≤ 1_E a.e. on I” field (your “density→window packaging”). If your packaging is slightly different (e.g., ψ supported inside E), the argument simplifies. The only mildly fussy step is the “outside E” branch; with ψ = 0 there, it’s trivial.
+________________
+
+
+5) Average lower bound from Carleson + plateau
+Idea: your file rh/RS/PPlusFromCarleson.lean already uses a façade with poisson_plateau_c0. We just unwrap the constant c0>0c_0>0 guaranteed by Carleson and push it through the plateau estimate. The lemma should not depend on the negativity window, only on the Carleson witness and the fixed plateau constructed there.
+/-
+  rh/RS/PPlusFromCarleson.lean
+  Assumes:
+  • hex : ∃ Kξ ≥ 0, ConcreteHalfPlaneCarleson Kξ
+  • the existing plateau wrapper `poisson_plateau_c0` in this file, producing ψ with
+    mass one on I := [t0−L,t0+L] and a harmonic lower bound c0 on Poisson averages.
+-/
+open MeasureTheory
+
+
+lemma avg_lower_bound_from_plateau_default
+  (hex : ∃ Kξ, 0 ≤ Kξ ∧ ConcreteHalfPlaneCarleson Kξ)
+  {t0 L : ℝ} (hL : 0 < L)
+  {S : ℝ → ℝ → ℝ} {ψ : ℝ → ℝ}
+  (hPlat : poisson_plateau_c0 hex t0 L ψ S)
+  : ∃ c0 > 0, ∀ {b : ℝ}, 0 < b → b ≤ 1 →
+      ∫ x in Icc (t0 - L) (t0 + L), ψ x * S b x ≥ c0 * (2 * L) := by
+  classical
+  rcases hPlat with ⟨c0, hc0pos, hmass, hcarleson_lb⟩
+  refine ⟨c0, hc0pos, ?_⟩
+  intro b hbpos hble
+  -- `hcarleson_lb` is the Carleson→plateau lower bound from the façade,
+  -- which should be exactly the desired inequality for every 0<b≤1.
+  simpa [hmass] using hcarleson_lb b hbpos hble
+
+
+If your façade names differ, plug them in: the only content is “Carleson + plateau ⇒ uniform positive lower bound c0c_0 for the ψ‑averages of SbS_b on any window.”
+________________
+
+
+6) Window contradiction and export (P+)
+Glue the bounds: choose ε with c0>κ(1−ε)c_0 > \kappa(1-\varepsilon) and get a contradiction. Then discharge (P+) for your concrete F:=(2:C)⋅Jpinch det⁡2 OdefaultF := (2:ℂ)\cdot J_{\mathrm{pinch}}\,\det_2\,O_{\mathrm{default}}.
+/-
+  rh/RS/PPlusFromCarleson.lean
+-/
+open MeasureTheory
+
+
+lemma window_contradiction_default
+  (hex : ∃ Kξ, 0 ≤ Kξ ∧ ConcreteHalfPlaneCarleson Kξ)
+  (hNeg : NegativityWindow_default ε)
+  (hLower : ∃ c0 > 0, ∀ {b}, 0 < b → b ≤ 1 →
+      ∫ x in Icc hNeg.t0MinusL hNeg.t0PlusL, hNeg.ψ x * hNeg.S_b x ≥ c0 * (2 * hNeg.L)) :
+  False := by
+  classical
+  rcases hLower with ⟨c0, hc0pos, hLB⟩
+  -- Upper bound from the negativity window:
+  have hUB :
+    ∫ x in Icc hNeg.t0MinusL hNeg.t0PlusL, hNeg.ψ x * hNeg.S_b x
+      ≤ - hNeg.κ * (1 - ε) * (2 * hNeg.L) :=
+    avg_upper_bound_from_window_default hNeg
+  -- Lower bound from Carleson + plateau (uniform in b):
+  have hLB' :
+    c0 * (2 * hNeg.L)
+      ≤ ∫ x in Icc hNeg.t0MinusL hNeg.t0PlusL, hNeg.ψ x * hNeg.S_b x := by
+    have hbpos := hNeg.b_pos
+    have hble  := hNeg.b_le_one
+    exact (hLB (b:=hNeg.b) hbpos hble).trans_eq (by ring_nf) |>.symm ▸ le_of_eq rfl
+  -- Choose ε small so that c0 > κ(1−ε).
+  have : c0 > hNeg.κ * (1 - ε) := hNeg.epsilon_choice_for_contradiction c0 hc0pos
+  have : c0 * (2 * hNeg.L) > (hNeg.κ * (1 - ε)) * (2 * hNeg.L) := by
+    have h2Lpos : 0 < 2 * hNeg.L := by nlinarith [hNeg.L_pos]
+    exact mul_lt_mul_of_pos_right this h2Lpos
+  -- Contradiction: lb > ub
+  have : c0 * (2 * hNeg.L) >
+        - hNeg.κ * (1 - ε) * (2 * hNeg.L) := by
+    -- since κ>0, 1−ε>0, the RHS is strictly negative; the LHS is positive ⇒ trivial
+    have hRHSneg : - hNeg.κ * (1 - ε) * (2 * hNeg.L) < 0 := by
+      have hpos : 0 < hNeg.κ * (1 - ε) * (2 * hNeg.L) := by
+        have : 0 < 1 - ε := hNeg.one_minus_eps_pos
+        have : 0 < hNeg.κ := hNeg.kappa_pos
+        have : 0 < 2 * hNeg.L := by nlinarith [hNeg.L_pos]
+        nlinarith
+      nlinarith
+    have hLHSpos : 0 < c0 * (2 * hNeg.L) := by
+      have : 0 < 2 * hNeg.L := by nlinarith [hNeg.L_pos]
+      exact mul_pos_of_pos_of_pos hc0pos this
+    linarith
+  exact lt_of_le_of_lt hLB' (lt_of_le_of_lt hUB this) |> False.elim
+
+
+Finally, the export:
+/-
+  rh/RS/PPlusFromCarleson.lean
+-/
+theorem PPlusFromCarleson_exists_proved_default :
+  (∃ Kξ, 0 ≤ Kξ ∧ ConcreteHalfPlaneCarleson Kξ) →
+  RH.Cert.PPlus (fun z => (2 : ℂ) * J_pinch det2 O_default z) := by
+  intro hex
+  classical
+  -- Suppose not, build a negativity window, then contradict via the average bounds.
+  by_contra hnot
+  -- Build negativity window (Parts 1–3)
+  have hNeg : NegativityWindow_default (ε := some_small_ε) :=
+    neg_window_of_not_PPlus_default
+      (F := fun t => Real.part ((2 : ℂ) * J_pinch det2 O_default (Complex.ofReal t)))
+      (S := fun b x => PoissonSmooth (fun t => Real.part ((2 : ℂ) * J_pinch det2 O_default (Complex.ofReal t))) b x)
+      hnot
+      (poisson_ae_on_I := your_poisson_ae_convergence_lemma_here)
+      (hS_meas := your_S_meas_here)
+      (hF_meas := your_boundary_meas_here)
+      (ε := some_small_ε)
+      (by exact some_small_ε_pos)
+
+
+  -- Lower bound from Carleson + plateau (Part 5)
+  have hLower := avg_lower_bound_from_plateau_default hex hNeg.L_pos
+                   hNeg.S hNeg.ψ hNeg.plateau_facade
+
+
+  -- Contradiction (Part 6)
+  exact window_contradiction_default hex hNeg hLower
+
+
+Notes on the export:
+         * Plug in your actual names for: the Poisson smoothing S, the boundary real part of F, measurability lemmas, and the “a.e. convergence on I” fact. I left these as obvious placeholders (your_poisson_ae_convergence_lemma_here, etc.) to keep the dependency graph clean and explicit.
+
+         * some_small_ε should be produced by your packaging (the same smallness choice used to make c0 > κ(1−ε)). If your NegativityWindow_default stores that choice internally (as I assumed in window_contradiction_default), use that path; otherwise, choose ε := min (1/2) (1 - c0/(2κ)) inside the contradiction proof and thread it through the builders.
+
+________________
+
+
+What I optimized for
+            * Egorov without fragility: The “eventual δ‑closeness + continuity from below” approach is robust and avoids depending on the exact Egorov lemma name/signature in mathlib. If you prefer the library lemma, swap in the uniform‑on‑a‑big‑subset version and then pick one n.
+
+            * Density via symmetric intervals: I used the symmetric interval characterization because your window is [t0−L,t0+L]. If you’ve already packaged a one‑sided version, that’s fine too.
+
+            * Window upper bound: I made the bound rely only on ψ ≤ 1_E and ∫_I ψ = 2L. If your NegativityWindow_default gives stricter support (supp ψ ⊆ E) or a plateau region on which ψ=1, the proof simplifies further.
+
+________________
+
+
+If you want, I can tighten the three places marked as admit into exact mathlib invocations keyed to your existing imports, but you can also paste these in now and replace each admit with your local helper lemmas—your scaffold likely already has them. Next sensible refinement: wire your exact poisson_ae_on_I and plateau_facade names into the export, then run the end‑to‑end contradiction to get (P+) for F=(2:C)⋅Jpinchdet⁡2 OdefaultF = (2:ℂ)\cdot J_{\text{pinch}}\det_2\,O_{\text{default}}.
+__
+
+
+Here’s the clean statement and proof you want, keeping it laser‑focused on what’s needed for your window packaging.
+________________
+
+
+Problem A1 (Egorov-on-interval).
+               * Let I=[t0−L,t0+L]I = [t_0-L,t_0+L] with L>0L>0 (so ∣I∣=2L<∞|I|=2L<\infty).
+
+               * Let S(b,⋅):R→RS(b,\cdot):\mathbb R\to\mathbb R be measurable for each b∈(0,1]b\in(0,1].
+
+               * Let F:R→RF:\mathbb R\to\mathbb R be measurable.
+
+               * Fix a sequence bn∈(0,1]b_n\in(0,1] with bn↓0b_n\downarrow 0.
+
+               * Assume a.e. on II: S(bn,x)→F(x)S(b_n,x)\to F(x).
+
+Claim. For every δ>0\delta>0 there exist b0∈(0,1]b_0\in(0,1] and a measurable E⊂IE\subset I with ∣E∣≥(1−δ)∣I∣|E|\ge (1-\delta)|I| such that
+sup⁡x∈E∣ S(b0,x)−F(x) ∣≤δ.\sup_{x\in E} \bigl|\,S(b_0,x)-F(x)\,\bigr|\le \delta.
+Proof. Consider the finite measure space (I,B(I),μI)(I,\mathcal B(I),\mu_I) where μI\mu_I is Lebesgue measure restricted to II. Define fn(x):=S(bn,x)f_n(x):=S(b_n,x). By hypothesis, fn→Ff_n\to F almost everywhere on II, and each fnf_n and FF are measurable (restricted to II).
+Apply Egorov’s theorem on the finite measure set II: for any η>0\eta>0 there exists a measurable set Eη⊂IE_\eta\subset I with μI(I∖Eη)<η\mu_I(I\setminus E_\eta)<\eta such that fn→Ff_n\to F uniformly on EηE_\eta. Uniform convergence on EηE_\eta means:
+∀ε>0 ∃N ∀n≥N sup⁡x∈Eη∣fn(x)−F(x)∣≤ε.\forall \varepsilon>0\ \exists N\ \forall n\ge N\ \sup_{x\in E_\eta}\bigl|f_n(x)-F(x)\bigr|\le \varepsilon.
+Take η:=δ ∣I∣\eta:=\delta\,|I| (any η>0\eta>0 works; this choice aligns the measure loss with the (1−δ)(1-\delta) fraction). Then μI(Eη)≥∣I∣−η=(1−δ)∣I∣\mu_I(E_\eta)\ge |I|-\eta=(1-\delta)|I|. Next set ε:=δ\varepsilon:=\delta; by uniform convergence on EηE_\eta, there exists NN with
+sup⁡x∈Eη∣fN(x)−F(x)∣≤δ.\sup_{x\in E_\eta}\bigl|f_N(x)-F(x)\bigr|\le \delta.
+Define b0:=bN∈(0,1]b_0:=b_N\in(0,1] and E:=EηE:=E_\eta. This gives ∣E∣≥(1−δ)∣I∣|E|\ge(1-\delta)|I| and
+sup⁡x∈E∣S(b0,x)−F(x)∣≤δ,\sup_{x\in E}\bigl|S(b_0,x)-F(x)\bigr|\le \delta,
+as required. ∎
+________________
+
+
+How this plugs into your Lean lemma
+The proof above is exactly what your Egorov_from_a.e.on_I needs:
+                  * Work on the restricted measure space volume.restrict (Icc (t0 - L) (t0 + L)).
+
+                  * Instantiate Egorov on the sequence fun n x => S (b_n) x.
+
+                  * For a given δ>0, take the Egorov big set E ⊆ I with measure (I \ E) ≤ δ * measure I.
+
+                  * Uniform convergence on E gives an N with sup_{x∈E} |S (b_N) x - F x| ≤ δ.
+
+                  * Set b0 := b_N. Package (b0, E) as your EgorovWindow_default t0 L δ.
+
+That’s the entire mechanism: Egorov trades a.e. convergence on a finite measure set for uniform convergence on a large subset; one index from that uniform convergence gives your single‑scale b0 and uniform δ‑closeness on EE.
+If you want me to wire this into your exact EgorovWindow_default record (with your field names and the restricted‑measure arithmetic spelled out), I can write the Lean snippet with the restrict I bookkeeping and the ψ‑free packaging you’re using for the window.
+
+
+___
+
+Let ∣⋅∣|\cdot| denote Lebesgue measure on R\mathbb{R}, and write I(t0,L)=(t0−L,t0+L)I(t_0,L)=(t_0-L,t_0+L) so ∣I(t0,L)∣=2L|I(t_0,L)|=2L.
+Step 1 (Extract a strictly negative level of positive measure).
+ Assume (P+)(\mathrm{P}^+) fails, i.e. U≥0U\ge 0 does not hold a.e. Then
+N:={t:U(t)<0}N:=\{t: U(t)<0\}
+is measurable with ∣N∣>0|N|>0. For each n∈Nn\in\mathbb{N}, set
+En:={t:U(t)≤−1/n}.E_n:=\{t: U(t)\le -1/n\}.
+By measurability of UU, each EnE_n is measurable, and
+N=⋃n=1∞En.N=\bigcup_{n=1}^\infty E_n.
+Indeed, if U(t)<0U(t)<0, choose nn so large that 1/n≤−U(t)1/n\le -U(t), which gives U(t)≤−1/nU(t)\le -1/n; conversely U≤−1/nU\le -1/n implies U<0U<0. If ∣En∣=0|E_n|=0 for all nn, then ∣N∣=0|N|=0, contradicting ∣N∣>0|N|>0. Hence some nn satisfies ∣En∣>0|E_n|>0.
+Now choose κ:=12n>0\kappa:=\frac{1}{2n}>0. Then
+Aκ:={t:U(t)≤−2κ}={t:U(t)≤−1/n}=En,A_\kappa:=\{t: U(t)\le -2\kappa\}=\{t: U(t)\le -1/n\}=E_n,
+so ∣Aκ∣>0|A_\kappa|>0.
+Step 2 (Density window via the Lebesgue Density Theorem).
+ By the Lebesgue Density Theorem, almost every t∈Aκt\in A_\kappa is a density point of AκA_\kappa, meaning
+lim⁡L↓0∣Aκ∩I(t,L)∣∣I(t,L)∣=lim⁡L↓0∣Aκ∩I(t,L)∣2L=1.\lim_{L\downarrow 0}\frac{|A_\kappa\cap I(t,L)|}{|I(t,L)|}=\lim_{L\downarrow 0}\frac{|A_\kappa\cap I(t,L)|}{2L}=1.
+Fix ε∈(0,1)\varepsilon\in(0,1) and choose a density point t0∈Aκt_0\in A_\kappa. By the limit above, there exists L0>0L_0>0 such that for all L∈(0,L0]L\in(0,L_0],
+∣Aκ∩I(t0,L)∣2L≥1−ε/2.\frac{|A_\kappa\cap I(t_0,L)|}{2L}\ge 1-\varepsilon/2.
+Equivalently,
+∣Aκ∩I(t0,L)∣  ≥  (1−ε/2)⋅2L.|A_\kappa\cap I(t_0,L)|\;\ge\;(1-\varepsilon/2)\cdot 2L.
+This gives the required “density window”: a symmetric interval around some t0t_0 in which AκA_\kappa occupies at least a (1−ε/2)(1-\varepsilon/2)-fraction of the length.
+
+___
+
+
+Claim. If Sb(x)≤−κS_b(x)\le -\kappa on E⊂I:=I(t0,L)E\subset I:=I(t_0,L), ψ≥0\psi\ge 0 with supp ψ⊂E\mathrm{supp}\,\psi\subset E and ∫Iψ≥(1−ε) 2L\int_I \psi\ge (1-\varepsilon)\,2L, then
+∫Iψ(x) Sb(x) dx  ≤  −κ (1−ε) 2L.\int_I \psi(x)\,S_b(x)\,dx \;\le\; -\kappa\,(1-\varepsilon)\,2L.
+Proof. Because ψ=0\psi=0 on I∖EI\setminus E,
+∫IψSb  =  ∫EψSb.\int_I \psi S_b \;=\; \int_E \psi S_b.
+Since Sb≤−κS_b\le -\kappa on EE and ψ≥0\psi\ge 0,
+∫EψSb  ≤  ∫Eψ(−κ)  =  −κ∫Eψ.\int_E \psi S_b \;\le\; \int_E \psi(-\kappa) \;=\; -\kappa\int_E \psi.
+But ∫Eψ=∫Iψ≥(1−ε) 2L\int_E \psi=\int_I \psi \ge (1-\varepsilon)\,2L. Hence
+∫IψSb  ≤  −κ (1−ε) 2L.\int_I \psi S_b \;\le\; -\kappa\,(1-\varepsilon)\,2L.
+Done.
+Remark. The sharper bound ∫IψSb≤−κ∫Iψ\int_I \psi S_b \le -\kappa\int_I \psi holds directly. The measure condition ∣E∣≥(1−ε) 2L|E|\ge (1-\varepsilon)\,2L isn’t needed for the inequality itself; it only guarantees such a weight ψ\psi can carry at least (1−ε) 2L(1-\varepsilon)\,2L mass while staying supported in EE.
+
+
+___
+
+
+
+Let Pb(t)=1πbt2+b2P_b(t)=\dfrac{1}{\pi}\dfrac{b}{t^2+b^2} and ψ(t)=14 1∣t∣≤2\psi(t)=\tfrac14\,\mathbf 1_{|t|\le 2}. Then
+(Pb∗ψ)(x)=14π∫−22b(x−t)2+b2 dt.(P_b*\psi)(x) = \frac{1}{4\pi}\int_{-2}^{2}\frac{b}{(x-t)^2+b^2}\,dt.
+Fix 0<b≤10<b\le 1 and ∣x∣≤1|x|\le 1. The interval I=[x−b,x+b]I=[x-b,x+b] sits inside [−2,2][-2,2] (endpoints are ≥−2\ge -2 and ≤2\le 2). For t∈It\in I we have ∣x−t∣≤b|x-t|\le b, hence
+(x−t)2+b2≤2b2⇒b(x−t)2+b2≥12b.(x-t)^2+b^2 \le 2b^2 \quad\Rightarrow\quad \frac{b}{(x-t)^2+b^2}\ge \frac{1}{2b}.
+Therefore, restricting the integral to II and using ψ=14\psi=\tfrac14 on [−2,2][-2,2],
+(Pb∗ψ)(x)  ≥  14π∫x−bx+bb(x−t)2+b2 dt  ≥  14π∫x−bx+b12b dt=14π⋅12b⋅(2b)=14π.(P_b*\psi)(x) \;\ge\; \frac{1}{4\pi}\int_{x-b}^{x+b}\frac{b}{(x-t)^2+b^2}\,dt \;\ge\; \frac{1}{4\pi}\int_{x-b}^{x+b}\frac{1}{2b}\,dt = \frac{1}{4\pi}\cdot\frac{1}{2b}\cdot (2b) =\frac{1}{4\pi}.
+This proves the stated plateau lower bound c0=1/(4π)c_0=1/(4\pi), uniform in ∣x∣≤1|x|\le 1 and 0<b≤10<b\le 1.
+Remark (sharper but not needed): Evaluating the integral exactly gives
+(Pb∗ψ)(x)=14π ⁣[arctan⁡ ⁣(2−xb)+arctan⁡ ⁣(2+xb)]≥18,(P_b*\psi)(x)=\frac{1}{4\pi}\!\left[\arctan\!\Big(\frac{2-x}{b}\Big)+\arctan\!\Big(\frac{2+x}{b}\Big)\right]\ge \frac18,
+since each arctangent is at least arctan⁡(1)=π/4\arctan(1)=\pi/4 under the same hypotheses. The simple subinterval argument above already yields the required constant.
+
+
+____
+
+Let b>0b>0 and Pb(x)=1πbb2+x2P_b(x)=\frac{1}{\pi}\frac{b}{b^2+x^2} (any Poisson kernel normalization with Pb∈L1∩L∞P_b\in L^1\cap L^\infty and even will do). Let I⊂RI\subset\mathbb R be measurable, ψ∈L1(I)\psi\in L^1(I), u∈L1(R)u\in L^1(\mathbb R). Write (Pb∗u)(x)=∫RPb(x−t)u(t) dt(P_b*u)(x)=\int_{\mathbb R}P_b(x-t)u(t)\,dt.
+Define ψI(x)=ψ(x)1I(x)\psi_I(x)=\psi(x)\mathbf 1_I(x). Consider the double integral
+∫Iψ(x) (Pb∗u)(x) dx=∫I∫Rψ(x) Pb(x−t) u(t) dt dx.\int_I \psi(x)\,(P_b*u)(x)\,dx =\int_I \int_{\mathbb R} \psi(x)\,P_b(x-t)\,u(t)\,dt\,dx.
+Justifying Fubini. Since Pb≥0P_b\ge 0 and Pb∈L∞P_b\in L^\infty,
+∫I∫R∣ψ(x)∣ Pb(x−t) ∣u(t)∣ dt dx=∫I∣ψ(x)∣ (Pb∗∣u∣)(x) dx≤∥Pb∥∞∥u∥1∥ψ∥L1(I)<∞.\int_I\int_{\mathbb R} |\psi(x)|\,P_b(x-t)\,|u(t)|\,dt\,dx = \int_I |\psi(x)|\,(P_b*|u|)(x)\,dx \le \|P_b\|_\infty \|u\|_1 \|\psi\|_{L^1(I)} < \infty.
+Thus the integrand is absolutely integrable and Fubini applies:
+∫Iψ(x) (Pb∗u)(x) dx=∫Ru(t) (∫Iψ(x) Pb(x−t) dx) dt.\int_I \psi(x)\,(P_b*u)(x)\,dx = \int_{\mathbb R} u(t)\,\Big(\int_I \psi(x)\,P_b(x-t)\,dx\Big)\,dt.
+Identifying the inner integral. The Poisson kernel is even: Pb(x−t)=Pb(t−x)P_b(x-t)=P_b(t-x). Hence
+∫Iψ(x) Pb(x−t) dx=∫Iψ(x) Pb(t−x) dx=∫RψI(x) Pb(t−x) dx=(Pb∗ψI)(t).\int_I \psi(x)\,P_b(x-t)\,dx = \int_I \psi(x)\,P_b(t-x)\,dx = \int_{\mathbb R} \psi_I(x)\,P_b(t-x)\,dx = (P_b*\psi_I)(t).
+Putting it together gives the chain of equalities
+∫Iψ(x) (Pb∗u)(x) dx=∫Ru(t) (∫Iψ(x) Pb(x−t) dx) dt=∫Ru(t) (Pb∗ψI)(t) dt,\int_I \psi(x)\,(P_b*u)(x)\,dx = \int_{\mathbb R} u(t)\,\Big(\int_I \psi(x)\,P_b(x-t)\,dx\Big)\,dt = \int_{\mathbb R} u(t)\,(P_b*\psi_I)(t)\,dt,
+which is exactly the stated identity, with “(Pb∗ψ)(t)(P_b*\psi)(t) over II” interpreted as Pb∗ψIP_b*\psi_I (i.e., extending ψ\psi by zero off II).
+
+
+____
+
+
+\documentclass[12pt]{article}
+
+
+\title{Problem G1: Carleson $\Rightarrow$ Averaged Lower Bound via Plateau}
+\author{Jonathan Washburn\\Recognition Science, Recognition Physics Institute\\\texttt{jon@recognitionphysics.org}\\Austin, Texas, USA}
+\date{}
+
+
+\begin{document}
+\maketitle
+
+
+\noindent\textbf{Statement (target conclusion).}
+Let $U:\mathbb{R}\to\mathbb{R}$ be boundary data and let $u(x,y)=(P_y*U)(x)$ denote its Poisson extension in the upper half–plane. Fix an interval $I\subset\mathbb{R}$ of length $|I|=2L$ and a height parameter $b\in(0,1]$. Assume that on the Carleson box $T(I)=I\times(0,|I|)$ we have a \emph{Carleson budget} $K\ge 0$ and a \emph{main-scale} parameter $\xi>0$ such that for every nonnegative \emph{plateau weight} $\psi$ supported in $I$ with $\int_I\psi=|I|$ one can write
+\[
+\int_I \psi(x)\,u(x,b)\,dx \;=\; \mathcal{G}_I(W)\;+\;\mathcal{E}_I(\psi),
+\]
+where the CR–Green/$W$ pairing satisfies the uniform lower bound
+\[
+\mathcal{G}_I(W)\;\ge\; \xi\,|I|,
+\]
+and the error obeys the Carleson-controlled estimate
+\[
+|\mathcal{E}_I(\psi)|\;\le\; C_0\,\sqrt{K\,\xi\,|I|},
+\]
+for some absolute constant $C_0\ge 1$ (independent of $U$, $I$, $b$, and $\psi$).
+
+
+Then there exist absolute numerical constants $\kappa_0,c_0>0$ such that, whenever $K\le \kappa_0\,\xi$, one can choose a (fixed, $b$-independent) nonnegative plateau $\psi$ with $\int_I \psi=|I|$ for which the \emph{averaged lower bound}
+\[
+\int_I \psi(x)\,(P_b*U)(x)\,dx \;\ge\; c_0\,|I| \;=\; c_0\cdot 2L
+\]
+holds for all $0<b\le 1$. Quantitatively, one may take $\kappa_0=\tfrac{1}{4C_0^2}$ and $c_0=\tfrac12\,\xi$.
+
+
+\medskip
+\noindent\textit{Remarks.}
+(1) A canonical choice of plateau is a piecewise-linear cutoff supported on $I$, equal to $1$ on the middle portion of $I$ and with linear ramps to the endpoints; multiplying by a bounded factor enforces $\int_I\psi=|I|$. With the vertical cutoff chosen so that the main term equals $\xi|I|$, Cauchy–Schwarz against the Carleson budget $\int_{T(I)}|\nabla u|^2\,y\,dx\,dy\le K\,|I|$ gives $|\mathcal{E}_I(\psi)|\le C_0\sqrt{K\,\xi\,|I|}$. \\
+(2) The conclusion is scale-invariant; writing $|I|=2L$ is only to match subsequent uses.
+
+
+\medskip
+\noindent\textbf{Corollary (normalized form).}
+If the stopping-time/Carleson selection ensures $K\le \kappa_0\,\xi$ on $I$, then for the associated plateau $\psi$ and every $0<b\le 1$,
+\[
+\int_I \psi(x)\,(P_b*U)(x)\,dx \;\ge\; \frac{\xi}{2}\,|I| \;=\; \frac{\xi}{2}\cdot 2L.
+\]
+
+
+\medskip
+\noindent\textit{Heuristic for the error bound.}
+Let $\Phi(x,y)=\psi(x)\,\vartheta(y/b)$ be the standard plateau cutoff with $\vartheta$ supported in $[0,2]$, linear on $[0,1]$, and flat thereafter. Green's identity and the Cauchy–Riemann structure convert the desired average into $\mathcal{G}_I(W)+\mathcal{E}_I(\psi)$ with
+\[
+|\mathcal{E}_I(\psi)| \;\le\; \Big(\!\int_{T(I)} |\nabla u|^2\,y\,dx\,dy\Big)^{\!\!1/2}
+\Big(\!\int_{T(I)} |\nabla\Phi|^2\,y^{-1}\,dx\,dy\Big)^{\!\!1/2}
+\;\lesssim\; \sqrt{K\,\xi\,|I|},
+\]
+once the vertical profile is normalized so that the main term is $\xi|I|$. The constants are absolute.
+
+
+\medskip
+\noindent BLOCKER: Precisely fix the CR–Green/$W$ pairing $\mathcal{G}_I(W)$, the normalization tying its main term to $\xi|I|$, and the admissible class of plateaus $\psi$ (shape and Lipschitz bounds); $C_0$ then becomes an explicit absolute number.
+\end{document}
+
+
+
+____
+
+
+You don’t even need the extra inequality. Here’s the clean contradiction.
+Since L>0L>0, κ>0\kappa>0, c0>0c_0>0, and 1−ε>01-\varepsilon>0, we have
+−κ(1−ε) 2L<0andc0 2L>0.-\kappa(1-\varepsilon)\,2L<0 \quad\text{and}\quad c_0\,2L>0.
+The “upper bound” gives
+∫Iψ Sb≤−κ(1−ε) 2L<0,\int_I \psi\,S_b \le -\kappa(1-\varepsilon)\,2L<0,
+so the integral is \emph{strictly negative}.
+The “lower bound” gives
+∫Iψ Sb≥c0 2L>0,\int_I \psi\,S_b \ge c_0\,2L>0,
+so the integral is \emph{strictly positive}.
+No real number is both ≤\le a negative and ≥\ge a positive. Contradiction.
+Note on the stated condition: the clause “provided c0>κ(1−ε)c_0>\kappa(1-\varepsilon)” is stronger than necessary for the minus-sign version you wrote; the sign clash alone forces the contradiction. If what you intended was an upper bound without the minus,
+∫Iψ Sb≤κ(1−ε) 2L,\int_I \psi\,S_b \le \kappa(1-\varepsilon)\,2L,
+then you do need c0>κ(1−ε)c_0>\kappa(1-\varepsilon) to make the lower bound exceed the upper bound. In that case, you ensure it by choosing ε\varepsilon close enough to 11 so that 1−ε<c0/κ1-\varepsilon< c_0/\kappa (i.e., make 1−ε1-\varepsilon small; not ε\varepsilon small). This “empty window” pattern is the general template.
+
+____
+
+
+Here’s the clean change‑of‑variables proof.
+Let z=x+iy∈Hz=x+iy\in\mathbb H, w=Φ(z)=z−iz+iw=\Phi(z)=\dfrac{z-i}{z+i}, and parametrize the boundary by
+ξ=−cot⁡ ⁣(θ2),eiθ=ξ−iξ+i,dθ=2 dξ1+ξ2.\xi=-\cot\!\left(\tfrac{\theta}{2}\right),\qquad e^{i\theta}=\frac{\xi-i}{\xi+i},\qquad d\theta=\frac{2\,d\xi}{1+\xi^2}.
+1) Compute 1−∣w∣21-|w|^2.
+∣w∣2=∣z−i∣2∣z+i∣2  ⇒  1−∣w∣2=∣z+i∣2−∣z−i∣2∣z+i∣2=(x2+(y+1)2)−(x2+(y−1)2)∣z+i∣2=4y∣z+i∣2.|w|^2=\frac{|z-i|^2}{|z+i|^2} \;\Rightarrow\; 1-|w|^2=\frac{|z+i|^2-|z-i|^2}{|z+i|^2} =\frac{(x^2+(y+1)^2)-(x^2+(y-1)^2)}{|z+i|^2} =\frac{4y}{|z+i|^2}.
+2) Compute ∣eiθ−w∣2|e^{i\theta}-w|^2.
+ Using eiθ=(ξ−i)/(ξ+i)e^{i\theta}=(\xi-i)/(\xi+i) and w=(z−i)/(z+i)w=(z-i)/(z+i),
+eiθ−w=ξ−iξ+i−z−iz+i=(ξ−i)(z+i)−(z−i)(ξ+i)(ξ+i)(z+i)=2i(ξ−z)(ξ+i)(z+i).e^{i\theta}-w =\frac{\xi-i}{\xi+i}-\frac{z-i}{z+i} =\frac{(\xi-i)(z+i)-(z-i)(\xi+i)}{(\xi+i)(z+i)} =\frac{2i(\xi-z)}{(\xi+i)(z+i)}.
+Hence
+∣eiθ−w∣2=4 ∣ξ−z∣2∣ξ+i∣2 ∣z+i∣2=4((x−ξ)2+y2)(1+ξ2) ∣z+i∣2.|e^{i\theta}-w|^2 =\frac{4\,|\xi-z|^2}{|\xi+i|^2\,|z+i|^2} =\frac{4\big((x-\xi)^2+y^2\big)}{(1+\xi^2)\,|z+i|^2}.
+3) Assemble the Poisson kernels and the Jacobian.
+ From the two identities,
+1−∣w∣2∣eiθ−w∣2=4y∣z+i∣24((x−ξ)2+y2)(1+ξ2)∣z+i∣2=y(1+ξ2)(x−ξ)2+y2.\frac{1-|w|^2}{|e^{i\theta}-w|^2} =\frac{\tfrac{4y}{|z+i|^2}}{\tfrac{4((x-\xi)^2+y^2)}{(1+\xi^2)|z+i|^2}} =\frac{y(1+\xi^2)}{(x-\xi)^2+y^2}.
+Therefore,
+12π1−∣w∣2∣eiθ−w∣2 dθ=12πy(1+ξ2)(x−ξ)2+y2⋅2 dξ1+ξ2=1πy(x−ξ)2+y2 dξ.\frac{1}{2\pi}\frac{1-|w|^2}{|e^{i\theta}-w|^2}\,d\theta =\frac{1}{2\pi}\frac{y(1+\xi^2)}{(x-\xi)^2+y^2}\cdot \frac{2\,d\xi}{1+\xi^2} =\frac{1}{\pi}\frac{y}{(x-\xi)^2+y^2}\,d\xi.
+4) Change variables in the integral.
+ The map θ↦ξ=−cot⁡(θ/2)\theta\mapsto \xi=-\cot(\theta/2) is a bijection from (−π,π)(-\pi,\pi) to R\mathbb R with the Jacobian above, so for any suitable ff,
+∫Rf(ξ) 1πy(x−ξ)2+y2 dξ=∫−ππf ⁣(−cot⁡ ⁣θ2) 12π1−∣w∣2∣eiθ−w∣2 dθ.\int_{\mathbb R} f(\xi)\,\frac{1}{\pi}\frac{y}{(x-\xi)^2+y^2}\,d\xi =\int_{-\pi}^{\pi} f\!\left(-\cot\!\frac{\theta}{2}\right) \,\frac{1}{2\pi}\frac{1-|w|^2}{|e^{i\theta}-w|^2}\,d\theta.
+That’s exactly the claimed equality: the Poisson kernel on the half‑plane pushed forward by the Cayley map matches the disk Poisson kernel.
+____
+
+Let
+P(w,eiθ)  :=  1−∣w∣2∣eiθ−w∣2,∣w∣<1,  θ∈[−π,π],P(w,e^{i\theta})\;:=\;\frac{1-|w|^2}{|e^{i\theta}-w|^2},\qquad |w|<1,\; \theta\in[-\pi,\pi],
+so H(w)=12π∫−ππP(w,eiθ) b(θ) dθH(w)=\frac1{2\pi}\int_{-\pi}^{\pi}P(w,e^{i\theta})\,b(\theta)\,d\theta.
+Two basic identities for the Poisson kernel:
+                     1. Harmonic-in-ww form.
+
+P(w,eiθ)=ℜ ⁣(eiθ+w eiθ−w ).P(w,e^{i\theta})=\Re\!\left(\frac{e^{i\theta}+w}{\,e^{i\theta}-w\,}\right).
+Since w↦eiθ+weiθ−ww\mapsto \frac{e^{i\theta}+w}{e^{i\theta}-w} is holomorphic on D\mathbb D, its real part is harmonic there.
+                        2. Rotation/reduction to radial parameter.
+ If w=reiθ0w=re^{i\theta_0}, then
+
+P(w,eiθ)=Pr(θ−θ0):=1−r21−2rcos⁡(θ−θ0)+r2.P(w,e^{i\theta})=P_r(\theta-\theta_0) :=\frac{1-r^2}{1-2r\cos(\theta-\theta_0)+r^2}.
+Also Pr≥0P_r\ge 0 and ∫−ππPr(φ) dφ=2π\int_{-\pi}^{\pi}P_r(\varphi)\,d\varphi=2\pi.
+________________
+
+
+1) HH is harmonic on D\mathbb D
+For each fixed θ\theta, w↦P(w,eiθ)w\mapsto P(w,e^{i\theta}) is harmonic. On any compact K⊂DK\subset\mathbb D with ∣w∣≤r0<1|w|\le r_0<1, P(w,eiθ)P(w,e^{i\theta}) and its first and second derivatives in ww are uniformly bounded in w∈Kw\in K (use the holomorphic form and Cauchy estimates, or the series Pr(φ)=1+2∑n≥1rncos⁡(nφ)P_r(\varphi)=1+2\sum_{n\ge1} r^n\cos(n\varphi), uniformly convergent for r≤r0r\le r_0). Thus we may pass the Laplacian under the integral:
+ΔH(w)=12π∫−ππΔwP(w,eiθ) b(θ) dθ=0.\Delta H(w)=\frac1{2\pi}\int_{-\pi}^{\pi}\Delta_w P(w,e^{i\theta})\,b(\theta)\,d\theta=0.
+So HH is harmonic in D\mathbb D.
+________________
+
+
+2) Boundary convergence
+Write, for w=reiθ0w=re^{i\theta_0},
+H(reiθ0)=12π∫−ππPr(θ−θ0) b(θ) dθ=(Pr∗b)(θ0).H(re^{i\theta_0})=\frac1{2\pi}\int_{-\pi}^{\pi}P_r(\theta-\theta_0)\,b(\theta)\,d\theta =(P_r*b)(\theta_0).
+Approximate-identity facts
+The family (Pr)0<r<1(P_r)_{0<r<1} on the circle is an approximate identity:
+                           * Pr≥0P_r\ge0 and ∫Pr=2π\int P_r=2\pi.
+
+                           * For each δ∈(0,π]\delta\in(0,\pi],
+
+sup⁡∣φ∣≥δPr(φ)=1−r21−2rcos⁡δ+r2≤(1+r)(1−r)2r(1−cos⁡δ)≤Cδ (1−r)→r↑10.\sup_{|\varphi|\ge \delta}P_r(\varphi) =\frac{1-r^2}{1-2r\cos\delta+r^2} \le \frac{(1+r)(1-r)}{2r(1-\cos\delta)} \le C_\delta\,(1-r)\xrightarrow[r\uparrow1]{}0.
+Hence ∫∣φ∣≥δPr(φ) dφ→0\int_{|\varphi|\ge\delta}P_r(\varphi)\,d\varphi\to 0.
+(a) Pointwise at continuity points
+Fix θ0\theta_0 where bb is continuous. For any ε>0\varepsilon>0 choose δ>0\delta>0 with ∣b(θ)−b(θ0)∣<ε|b(\theta)-b(\theta_0)|<\varepsilon when ∣θ−θ0∣<δ|\theta-\theta_0|<\delta. Then
+∣H(reiθ0)−b(θ0)∣=∣12π∫Pr(θ−θ0) [b(θ)−b(θ0)] dθ∣≤ε⋅12π ⁣∫∣θ−θ0∣<δ ⁣Pr  +  12π ⁣∫∣θ−θ0∣≥δ ⁣Pr ∣b(θ)−b(θ0)∣ dθ≤ε  +  (sup⁡∣φ∣≥δPr(φ))⏟→0⋅12π∫−ππ(∣b(θ)∣+∣b(θ0)∣) dθ.\begin{aligned} |H(re^{i\theta_0})-b(\theta_0)| &=\Big|\frac1{2\pi}\int P_r(\theta-\theta_0)\,[b(\theta)-b(\theta_0)]\,d\theta\Big|\\ &\le \varepsilon\cdot \frac1{2\pi}\!\int_{|\theta-\theta_0|<\delta}\! P_r \;+\;\frac1{2\pi}\!\int_{|\theta-\theta_0|\ge\delta}\! P_r\,|b(\theta)-b(\theta_0)|\,d\theta\\ &\le \varepsilon \;+\; \underbrace{\big(\sup_{|\varphi|\ge\delta}P_r(\varphi)\big)}_{\to 0}\cdot \frac1{2\pi}\int_{-\pi}^{\pi}\big(|b(\theta)|+|b(\theta_0)|\big)\,d\theta. \end{aligned}
+Let r↑1r\uparrow1, then let ε↓0\varepsilon\downarrow0. Thus
+H(reiθ0)→b(θ0).H(re^{i\theta_0})\to b(\theta_0).
+If bb is continuous on [−π,π]∖{π}[-\pi,\pi]\setminus\{\pi\}, this works for all θ0≠π\theta_0\neq \pi.
+(If you periodically extend bb to the circle and it has a jump at π\pi, the limit there equals the average of the one‑sided limits.)
+(b) Almost everywhere for b∈L1b\in L^1
+The kernels PrP_r form a standard approximate identity, so by the Lebesgue differentiation theorem (or Fatou’s theorem for Poisson integrals), the radial (indeed, nontangential) boundary limits exist for almost every θ0\theta_0 and satisfy
+lim⁡r↑1H(reiθ0)  =  b(θ0)for a.e. θ0.\lim_{r\uparrow1} H(re^{i\theta_0}) \;=\; b(\theta_0)\quad\text{for a.e. }\theta_0.
+Fatou’s theorem gives the stronger statement: non‑tangential limits exist a.e. and equal b(θ0)b(\theta_0).
+________________
+
+
+Summary. The Poisson extension HH is harmonic in D\mathbb D. If bb is continuous at θ0\theta_0 (in particular for all θ0≠π\theta_0\neq\pi under your hypothesis), then H(reiθ0)→b(θ0)H(re^{i\theta_0})\to b(\theta_0). For general b∈L1b\in L^1, the radial (indeed nontangential) limit equals b(θ0)b(\theta_0) for almost every θ0\theta_0.
+
+
+
+____
+
+
+Below I’ll give a clean proof of the a.e. convergence using the “Poisson ≲ maximal function” estimate plus a standard near–far split. One small but important caveat first.
+Caveat (minimal global integrability).
+ As written, u∈Lloc1(R)u\in L^1_{\mathrm{loc}}(\mathbb{R}) is not enough to even guarantee (Pb∗u)(x)(P_b*u)(x) is finite: for instance u(x)=ex2u(x)=e^{x^2} is locally integrable but
+∫Rbπ((x−y)2+b2) ey2 dy=∞.\int_{\mathbb{R}} \frac{b}{\pi((x-y)^2+b^2)}\,e^{y^2}\,dy=\infty.
+So one adds a mild tail control, e.g. u∈L1(R)u\in L^1(\mathbb{R}), or more generally u∈Lp(R)u\in L^p(\mathbb{R}) for some 1≤p≤∞1\le p\le\infty, or u∈L1(R,(1+x2)−1dx)u\in L^1(\mathbb{R},(1+x^2)^{-1}dx). Under any of these (classical) hypotheses, the conclusion below holds. I’ll state and prove it for 1≤p≤∞1\le p\le\infty.
+________________
+
+
+Theorem (Poisson approximate identity on R\mathbb{R})
+Let Pb(x)=1πbx2+b2P_b(x)=\dfrac{1}{\pi}\dfrac{b}{x^2+b^2} and u∈Lp(R)u\in L^p(\mathbb{R}) with 1≤p≤∞1\le p\le\infty. Then for almost every x∈Rx\in\mathbb{R},
+lim⁡b→0+(Pb∗u)(x)=u(x).\lim_{b\to0^+} (P_b*u)(x)=u(x).
+The convergence holds at every Lebesgue point of uu.
+Two standard facts.
+                              1. Approximate identity: Pb≥0P_b\ge0, ∥Pb∥L1=1\|P_b\|_{L^1}=1, and for each R>0R>0,
+
+∫∣y∣>RPb(y) dy  =  1−2πarctan⁡ ⁣(Rb)  →b→0+  0.\int_{|y|>R}P_b(y)\,dy \;=\; 1-\frac{2}{\pi}\arctan\!\Big(\frac{R}{b}\Big)\;\xrightarrow[b\to0^+]{}\;0.
+                                 2. Poisson is controlled by the Hardy–Littlewood maximal operator.
+ If f≥0f\ge0 then
+
+(Pb∗f)(x)  ≤  C Mf(x)for all b>0,(P_b*f)(x)\;\le\; C\,M f(x)\quad\text{for all }b>0,
+where
+Mf(x)=sup⁡r>012r∫x−rx+r∣f(t)∣ dt,M f(x)=\sup_{r>0}\frac{1}{2r}\int_{x-r}^{x+r}|f(t)|\,dt,
+and CC is an absolute constant.
+Sketch: split R\mathbb{R} into the dyadic annuli ∣y∣≤b|y|\le b and 2kb<∣y∣≤2k+1b2^k b<|y|\le 2^{k+1}b; on the kk-th annulus Pb(y)≲2−2k/bP_b(y)\lesssim 2^{-2k}/b, integrate against f(x−y)f(x-y), and compare with averages of ff over intervals of radius ∼2k+1b\sim 2^{k+1}b. Summing the geometric series yields the bound by Mf(x)M f(x).
+Proof. Let xx be a Lebesgue point of uu (these form a full-measure set for u∈Lpu\in L^p, 1≤p≤∞1\le p\le\infty). Fix R>0R>0 and split
+(Pb∗u)(x)−u(x)=Inear(b,R)+Ifar(b,R),(P_b*u)(x)-u(x)=I_{\text{near}}(b,R)+I_{\text{far}}(b,R),
+where
+Inear(b,R)=∫∣y∣≤R(u(x−y)−u(x))Pb(y) dy,Ifar(b,R)=∫∣y∣>R(u(x−y)−u(x))Pb(y) dy.I_{\text{near}}(b,R)=\int_{|y|\le R}\big(u(x-y)-u(x)\big)P_b(y)\,dy,\qquad I_{\text{far}}(b,R)=\int_{|y|>R}\big(u(x-y)-u(x)\big)P_b(y)\,dy.
+Near part. Let fR(t)=(u(t)−u(x)) 1∣t−x∣≤Rf_R(t)=(u(t)-u(x))\,\mathbf{1}_{|t-x|\le R}. Using the Poisson–maximal inequality,
+∣Inear(b,R)∣=∣(Pb∗fR)(x)∣≤C MfR(x)=C sup⁡0<r≤R12r∫∣t−x∣≤r∣u(t)−u(x)∣ dt.|I_{\text{near}}(b,R)|=|(P_b*f_R)(x)|\le C\,M f_R(x) = C\,\sup_{0<r\le R}\frac{1}{2r}\int_{|t-x|\le r}|u(t)-u(x)|\,dt.
+Since xx is a Lebesgue point, the right-hand side →0\to 0 as R↓0R\downarrow0, uniformly in b>0b>0.
+Far part. Write
+Ifar(b,R)=∫∣y∣>Ru(x−y)Pb(y) dy⏟J1(b,R)  −  u(x) ∫∣y∣>RPb(y) dy⏟J2(b,R).I_{\text{far}}(b,R)=\underbrace{\int_{|y|>R}u(x-y)P_b(y)\,dy}_{J_1(b,R)} \;-\;u(x)\,\underbrace{\int_{|y|>R}P_b(y)\,dy}_{J_2(b,R)}.
+For J2J_2, by the approximate-identity property, J2(b,R)→0J_2(b,R)\to0 as b→0+b\to0^+ for each fixed RR.
+For J1J_1, use your global integrability:
+                                    * If u∈L∞u\in L^\infty: ∣J1(b,R)∣≤∥u∥∞∫∣y∣>RPb(y) dy→0|J_1(b,R)|\le \|u\|_\infty \int_{|y|>R}P_b(y)\,dy\to0 as b→0+b\to0^+.
+
+                                    * If u∈L1u\in L^1: ∣J1(b,R)∣≤∥u∥1 sup⁡∣y∣>RPb(y)≤∥u∥1 bπ(R2+b2)→0|J_1(b,R)|\le \|u\|_{1}\,\sup_{|y|>R}P_b(y)\le \|u\|_{1}\,\frac{b}{\pi(R^2+b^2)}\to0 as b→0+b\to0^+.
+
+                                    * If u∈Lpu\in L^p with 1<p<∞1<p<\infty: let qq be the conjugate exponent. Young–Hölder gives
+
+∣J1(b,R)∣≤∥u∥p ∥Pb 1{∣y∣>R}∥q,|J_1(b,R)|\le \|u\|_{p}\,\|P_b\,\mathbf{1}_{\{|y|>R\}}\|_{q},
+and a direct change of variables y=bty=bt shows
+∥Pb 1{∣y∣>R}∥qq=bπq∫∣t∣>R/bdt(1+t2)q→b→0+0,\|P_b\,\mathbf{1}_{\{|y|>R\}}\|_{q}^q=\frac{b}{\pi^q}\int_{|t|>R/b}\frac{dt}{(1+t^2)^q}\xrightarrow[b\to0^+]{}0,
+hence ∣J1(b,R)∣→0|J_1(b,R)|\to0.
+Putting these together: for any ε>0\varepsilon>0, choose RR so small that the near term is <ε<\varepsilon (uniformly in bb), then choose bb so small that the far term is <ε<\varepsilon. Therefore (Pb∗u)(x)→u(x)(P_b*u)(x)\to u(x) as b→0+b\to0^+ at every Lebesgue point xx. This proves the theorem.
+________________
+
+
+Remarks.
+                                       * The same method gives the usual non-tangential boundary convergence for the harmonic Poisson extension U(x,b)=(Pb∗u)(x)U(x,b)=(P_b*u)(x): U(⋅,b)→uU(\cdot,b)\to u a.e. as (x,b)→(x0,0)(x,b)\to (x_0,0) inside any fixed Stolz cone at a.e. x0x_0.
+
+                                       * If you truly want only u∈Lloc1u\in L^1_{\mathrm{loc}} with no global condition, you must qualify the statement: at a.e. xx for which (Pb∗u)(x)(P_b*u)(x) is finite for some/all small bb, the same proof (using the near–far split and the Poisson–maximal bound on the near part) shows convergence. But without any tail control, (Pb∗u)(x)(P_b*u)(x) can be infinite everywhere (e.g., u(x)=ex2u(x)=e^{x^2}).

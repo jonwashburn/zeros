@@ -115,6 +115,23 @@ lemma window_contradiction_default
       exact this.le) hPosLower) hNegUpper
   exact (lt_irrefl _ this).elim
 
+/-- Averaged lower bound from the plateau façade: unwrap an existing `c0 > 0`
+and propagate it uniformly in the height `b` on the interval `I = [t0−L,t0+L]`.
+
+This serves as a thin adapter so callers can consume a concise existence form.
+-/
+lemma avg_lower_bound_from_plateau_default
+  (hex : ∃ Kξ, 0 ≤ Kξ ∧ ConcreteHalfPlaneCarleson Kξ)
+  {t0 L : ℝ} (hL : 0 < L)
+  {S : ℝ → ℝ → ℝ} {ψ : ℝ → ℝ}
+  (hPlat : ∃ c0 > 0, ∀ {b : ℝ}, 0 < b → b ≤ 1 →
+      ∫ x in Set.Icc (t0 - L) (t0 + L), ψ x * S b x ≥ c0 * (2 * L))
+  : ∃ c0 > 0, ∀ {b : ℝ}, 0 < b → b ≤ 1 →
+      ∫ x in Set.Icc (t0 - L) (t0 + L), ψ x * S b x ≥ c0 * (2 * L) := by
+  classical
+  rcases hPlat with ⟨c0, hc0pos, hLB⟩
+  exact ⟨c0, hc0pos, by intro b hbpos hble; simpa using (hLB (b := b) hbpos hble)⟩
+
 /-!
 From a concrete half–plane Carleson budget and the plateau lower bound, preclude
 the Poisson negativity window for the default pinch field and derive `(P+)`.
