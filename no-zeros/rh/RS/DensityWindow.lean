@@ -1,6 +1,5 @@
 import Mathlib.Data.Real.Basic
-import Mathlib.MeasureTheory.Measure.Lebesgue
-import Mathlib.MeasureTheory.Convergence.Density
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 import rh.RS.TentShadow
 
 /-!

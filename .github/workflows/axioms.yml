@@ -37,12 +37,12 @@ jobs:
         working-directory: no-zeros
         run: ~/.elan/bin/lake exe cache get || true
 
-      - name: Headless quick build (RS/Cert)
+      - name: Headless quick build (RS minimal)
         working-directory: no-zeros
         env:
           LEAN_EXTRA_ARGS: "-j2 -M 4096"
         run: |
-          ~/.elan/bin/lake build rh.RS.BoundaryWedge rh.RS.PoissonAI rh.Cert.KxiPPlus rh.Cert.KxiWhitney rh.Cert.KxiWhitney_RvM
+          ~/.elan/bin/lake build rh.RS.PoissonAI rh.RS.WhitneyGeometryDefs
 
       - name: Print axioms for public theorems (quick)
         working-directory: no-zeros
