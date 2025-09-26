@@ -120,8 +120,8 @@ private lemma poissonKernel_bound (z : ℂ) (hz : z ∈ Ω) :
       | inl hA_le_one =>
         -- Use `a² ≤ 1` to show `a/(a²+X) ≤ (1/a)/(1+X)`
         have ha2_le_one : a ^ 2 ≤ (1 : ℝ) := by
-          have := pow_le_pow_left (le_of_lt ha) hA_le_one (2 : ℕ)
-          simpa [one_pow] using this
+          have := sq_le_sq.mpr hA_le_one
+          simpa [pow_two, one_pow] using this
         have hstep : a * (1 + (t - z.im) ^ 2)
             ≤ (1 / a) * (a ^ 2 + (t - z.im) ^ 2) := by
           have hx : a ^ 2 * (t - z.im) ^ 2 ≤ (t - z.im) ^ 2 := by
@@ -166,8 +166,8 @@ private lemma poissonKernel_bound (z : ℂ) (hz : z ∈ Ω) :
           mul_le_mul_of_nonneg_left hx (le_of_lt ha)
         have hA : a / (a ^ 2 + (t - z.im) ^ 2)
             ≤ a / (1 + (t - z.im) ^ 2) := by
-          have := (le_div_iff hposR).mpr h2'
-          have := (div_le_iff hposL).mpr this
+          have := (le_div_iff₀ (by exact hposR.ne')).mpr h2'
+          have := (div_le_iff₀ (by exact hposL.ne')).mpr this
           simpa [div_mul_eq_mul_div, mul_comm, mul_left_comm, mul_assoc] using this
         -- Lift to `max a (1/a)`
         have hnum_le : a ≤ max a (1 / a) := le_max_left _ _
@@ -224,10 +224,10 @@ lemma poissonKernel_integrable {z : ℂ} (hz : z ∈ Ω) :
     have hRHS_nonneg : 0 ≤ C / (1 + (t - z.im) ^ 2) := hquot_nonneg
     have h_right : ‖C / (1 + (t - z.im) ^ 2)‖ = C / (1 + (t - z.im) ^ 2) := by
       simp [Real.norm_eq_abs, _root_.abs_of_nonneg hRHS_nonneg]
-    calc
-      ‖poissonKernel z t‖ = poissonKernel z t := h_left
-      _ ≤ C / (1 + (t - z.im) ^ 2) := h_base
-      _ = ‖C / (1 + (t - z.im) ^ 2)‖ := h_right
+    have : ‖poissonKernel z t‖ ≤ ‖C / (1 + (t - z.im) ^ 2)‖ := by
+      simpa [h_left, h_right] using
+        (le_trans h_base (le_of_eq h_right.symm))
+    exact this
 
 /-! ## Poisson integral and representation/transport -/
 
@@ -261,7 +261,11 @@ theorem poissonTransport {F : ℂ → ℂ} (hRep : HasPoissonRep F) :
   -- Rewrite with the formula
   have : (F z).re = poissonIntegral (fun t => (F (boundary t)).re) z := hformula
   -- Conclude
-  simpa [poissonIntegral, hformula]
+  have : 0 ≤ ∫ t : ℝ, (F (boundary t)).re * poissonKernel z t := by
+    apply integral_nonneg_of_ae
+    filter_upwards [hBoundary] with t ht
+    exact mul_nonneg ht (poissonKernel_nonneg hz t)
+  simpa [poissonIntegral, hformula] using this
 
 /-- Transport of boundary positivity on a subset admitting a Poisson representation. -/
 theorem poissonTransportOn {F : ℂ → ℂ} {S : Set ℂ} (hRep : HasPoissonRepOn F S) :

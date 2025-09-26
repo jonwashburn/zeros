@@ -157,8 +157,10 @@ lemma xi_ext_analytic_on_Ω_away_one :
     simpa [RH.RS.Ω, Set.mem_setOf_eq] using
       isOpen_lt continuous_const Complex.continuous_re
   have hOpen : IsOpen (RH.RS.Ω \ ({1} : Set ℂ)) := by
-    -- Ω is open and {1} is closed, so Ω \ {1} is open
-    simpa using (isOpen_diff_iff.mpr ⟨hΩopen, isClosed_singleton⟩)
+    -- Ω is open and {1} is closed, so Ω \ {1} = Ω ∩ {1}ᶜ is open
+    have hCompl : IsOpen (({1} : Set ℂ)ᶜ) := isClosed_singleton.isOpen_compl
+    simpa [Set.diff_eq, Set.inter_comm, Set.inter_left_comm]
+      using hΩopen.inter hCompl
   -- Use AnalyticOn ↔ DifferentiableOn on open sets
   refine (analyticOn_iff_differentiableOn (f := riemannXi_ext)
     (s := RH.RS.Ω \ ({1} : Set ℂ)) hOpen).2 ?_

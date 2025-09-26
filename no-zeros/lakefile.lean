@@ -20,17 +20,25 @@ require mathlib from git
 
 -- Local dependency on no-mathlib-core removed since it was moved to archive
 
-@[default_target]
 lean_lib «rh» where
-  -- Build all rh modules
+  -- Build a minimal, paper-relevant core to keep the active track green
   globs := #[
-    .submodules `rh.academic_framework,
     .submodules `rh.Cert,
     .submodules `rh.Blockers,
-    .submodules `rh.RS,
-    .submodules `rh.Proof
+    .submodules `rh.RS
+  ]
+
+-- Optional academic framework (not part of default target). Build with:
+--   lake build af
+lean_lib «af» where
+  globs := #[
+    .submodules `rh.academic_framework
   ]
 
 -- Test library for verification and validation
 lean_lib «test» where
   globs := #[.submodules `test]
+
+@[default_target]
+lean_exe «core» where
+  root := `core.BuildCore

@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: rh.academic_framework.CompletedXi
-// Imports: Init Mathlib.Analysis.SpecialFunctions.Gamma.Deligne Mathlib.Analysis.SpecialFunctions.Complex.Log Mathlib.Tactic Mathlib.Analysis.SpecialFunctions.Complex.Log Mathlib.NumberTheory.LSeries.RiemannZeta rh.academic_framework.ZetaFunctionalEquation rh.RS.Domain
+// Imports: Init Mathlib.Analysis.SpecialFunctions.Gamma.Deligne Mathlib.Analysis.SpecialFunctions.Complex.Log Mathlib.Tactic Mathlib.Analysis.SpecialFunctions.Complex.Log Mathlib.NumberTheory.LSeries.RiemannZeta Mathlib.Analysis.Analytic.Basic rh.academic_framework.ZetaFunctionalEquation rh.RS.Domain
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -19,6 +19,7 @@ lean_object* initialize_Mathlib_Analysis_SpecialFunctions_Complex_Log(uint8_t bu
 lean_object* initialize_Mathlib_Tactic(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Analysis_SpecialFunctions_Complex_Log(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_NumberTheory_LSeries_RiemannZeta(uint8_t builtin, lean_object*);
+lean_object* initialize_Mathlib_Analysis_Analytic_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_academic__framework_ZetaFunctionalEquation(uint8_t builtin, lean_object*);
 lean_object* initialize_rh_RS_Domain(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
@@ -42,6 +43,9 @@ res = initialize_Mathlib_Analysis_SpecialFunctions_Complex_Log(builtin, lean_io_
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Mathlib_NumberTheory_LSeries_RiemannZeta(builtin, lean_io_mk_world());
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Mathlib_Analysis_Analytic_Basic(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_rh_academic__framework_ZetaFunctionalEquation(builtin, lean_io_mk_world());

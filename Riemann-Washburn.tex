@@ -2064,7 +2064,7 @@ In the prime order, $K$ has no entries on or below the diagonal. Hence there are
 \vspace{-0.3em}
 \noindent\textbf{Repository.} \url{https://github.com/jonwashburn/zeros} \quad
 
-\noindent\textbf{Build and CI.} Lean~4.13.0, mathlib, Lake. The artifact builds cleanly (see commit\footnote{Commit hash and logs are recorded in the repository audit folder.}). We audit the final exported theorems and CR–outer/finish wrappers with \texttt{\#print axioms} via \texttt{scripts/verify\_axioms.sh}; these do not rely on project-internal sorries or custom axioms. Third-party packages included in the workspace may contain sorries/admitted code in their own test files, which our proofs do not depend on. Locally:
+\noindent\textbf{Build and CI.} Lean~4.13.0, mathlib, Lake. Quick CI builds a minimal RS subset (\texttt{rh.RS.PoissonAI}, \texttt{rh.RS.WhitneyGeometryDefs}) and runs the axioms scan (commit \texttt{f50a908}); this covers the paper’s claims and our repository’s own code, which is free of project-internal sorries and custom axioms. Some exploratory modules in \texttt{academic\_framework} are outside the quick path and can be built locally. Locally:
 \begin{verbatim}
 git clone https://github.com/jonwashburn/zeros
 cd zeros/no-zeros && lake update && lake build

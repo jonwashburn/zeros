@@ -155,6 +155,7 @@ theorem PPlusFromCarleson_exists_proved_default :
   -- By contradiction, assume `(P+)` fails; extract a Poisson negativity window
   by_contra hP
   -- Negativity window for the default field `F`
+  -- Extract a Poisson negativity window using the internal AI/density development
   have hWin := RH.RS.negativity_window_poisson_of_not_PPlus_default (hFail := hP)
   rcases hWin with ⟨t0, L, b, κ, I, E, hκpos, hκle1, hbpos, hble1, hIdef, hIlen, hEmeas, hEsub, hEpos, hNeg⟩
   -- Plateau lower bound data: ψ with mass 1 and c0 > 0

@@ -29,7 +29,8 @@ lemma tent_mono {I J : Set ℝ} {α : ℝ} (hIJ : I ⊆ J) : tent I α ⊆ tent 
   intro p hp; exact ⟨hIJ hp.1, hp.2.1, hp.2.2⟩
 lemma shadow_mono {Q R : Set (ℝ × ℝ)} (hQR : Q ⊆ R) : shadow Q ⊆ shadow R := by
   intro t ht; rcases ht with ⟨σ,hσ,hmem⟩; exact ⟨σ,hσ,hQR hmem⟩
-def length (I : Set ℝ) : ℝ := (volume I).toReal
+-- moved: use length from CRGreenOuter; avoid duplicate declaration
+-- def length (I : Set ℝ) : ℝ := (volume I).toReal
 @[simp] def poissonKernel (b x : ℝ) : ℝ := b / (Real.pi * (b^2 + x^2))
 def boundaryMap (t : ℝ) : ℂ := (1/2 : ℂ) + Complex.I * (t : ℂ)
 @[simp] lemma boundaryMap_re (t : ℝ) : (boundaryMap t).re = (1/2 : ℝ) := by simp [boundaryMap]
