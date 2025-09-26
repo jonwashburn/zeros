@@ -5,8 +5,10 @@ import rh.RS.WhitneyGeometryDefs
 import rh.RS.CRGreenOuter
 import rh.Cert.KxiPPlus
 import Mathlib.MeasureTheory.Integral.SetIntegral
+import Mathlib/MeasureTheory/Convergence/Density
 import rh.RS.PoissonAI
 import rh.RS.PoissonAI
+import rh.RS.DensityWindow
 
 /-!
 # Boundary wedge assembly (concise adapter)
@@ -470,17 +472,10 @@ interval. This is the exact shape needed by the negativity-window builder.
 
 The `select` hypothesis is expected to be discharged using the Lebesgue density
 theorem applied to the negative sublevel set of the boundary real part. -/
-lemma density_window_from_not_PPlus_default_scaffold
+lemma density_window_from_not_PPlus_default
   {ε : ℝ} (hε : 0 < ε)
   (hNot : ¬ RH.Cert.PPlus
     (fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z))
-  (select : ∃ κ : ℝ, 0 < κ ∧ ∃ t0 L : ℝ, 0 < L ∧
-      volume
-        ({t : ℝ |
-            RH.RS.boundaryRe
-              (fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z) t
-              ≤ -((2 : ℝ) * κ)} ∩ Icc (t0 - L) (t0 + L))
-        ≥ (1 - ε / 2) * (2 * L))
   : ∃ κ : ℝ, 0 < κ ∧ ∃ t0 L : ℝ, 0 < L ∧
       volume
         ({t : ℝ |
@@ -489,9 +484,12 @@ lemma density_window_from_not_PPlus_default_scaffold
               ≤ -((2 : ℝ) * κ)} ∩ Icc (t0 - L) (t0 + L))
         ≥ (1 - ε / 2) * (2 * L) :=
 by
-  -- This lemma simply re-exposes the selection in the exact shape needed by
-  -- downstream builders. The density existence is supplied by `select`.
-  simpa using select
+  classical
+  -- Delegate to the non-backup density window for F := 2 · J_pinch det2 O_default
+  let F : ℂ → ℂ := fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z
+  rcases RH.RS.density_window_from_not_PPlus (ε := ε) hε F hNot with
+    ⟨κ, hκ, t0, L, hL, _hUnit, hMass⟩
+  exact ⟨κ, hκ, t0, L, hL, hMass⟩
 
 /-- Final scaffold to build the negativity window from `¬(P+)`, assuming
 existence of a density window (via a density selection) and an Egorov window
@@ -506,24 +504,12 @@ lemma neg_window_of_not_PPlus_default
   {ε : ℝ} (hε : 0 < ε)
   (hNot : ¬ RH.Cert.PPlus
     (fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z))
-  (hS_meas : MeasurableSet
-    {t : ℝ |
-      RH.RS.boundaryRe
-        (fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z) t
-        ≤ -((2 : ℝ) * (1 : ℝ))})
-  (density_select : ∃ κ : ℝ, 0 < κ ∧ ∃ t0 L : ℝ, 0 < L ∧
-      volume
-        ({t : ℝ |
-            RH.RS.boundaryRe
-              (fun z => (2 : ℂ) * RH.RS.J_pinch RH.RS.det2 RH.RS.O_default z) t
-              ≤ -((2 : ℝ) * κ)} ∩ Icc (t0 - L) (t0 + L))
-        ≥ (1 - ε / 2) * (2 * L))
   (egorov_on_I : ∀ t0 L δ, 0 < L → 0 < δ → EgorovWindow_default t0 L δ)
   : NegativityWindow_default ε :=
 by
   classical
-  -- Extract density window
-  rcases density_select with ⟨κ, hκ, t0, L, hL, hA⟩
+  -- Build density window via Lebesgue density theorem
+  rcases density_window_from_not_PPlus_default (ε := ε) hε hNot with ⟨κ, hκ, t0, L, hL, hA⟩
   -- Build Egorov window at tolerance δ := min(ε/2, κ)
   have hδpos : 0 < min (ε / 2) κ := by
     have hε2 : 0 < ε / 2 := by nlinarith
